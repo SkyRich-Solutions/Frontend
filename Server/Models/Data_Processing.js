@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const materialSchema = new mongoose.Schema({
-    rowId: {
+    Row_ID: {
         type: Number,
         required: true
     },
@@ -17,28 +17,28 @@ const materialSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    plantSpecificMaterialStatus: {
+    Plant_Specific_Material_Status: {
         type: String,
         required: true
     },
-    batchManagementPlant: {
+    Batch_ManagementPlant: {
         type: String,
         default: ''
     },
-    serialNoProfile: {
+    Serial_No_Profile: {
         type: String,
         required: true
     },
-    replacementPart: {
+    Replacement_Part: {
         type: String,
         default: ''
     },
-    usedInSBom: {
+    Used_in_a_S_bom: {
         type: String,
         default: ''
     }
 });
 
-const PostMaterial = mongoose.model('PostMaterial', materialSchema);
+const UnProcessed = mongoose.model('UnProcessed', materialSchema);
 
-export default PostMaterial;
+export default UnProcessed;
