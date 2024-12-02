@@ -2,17 +2,18 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import testRoute from './Routes/testRoute.js'
 
 dotenv.config();
 
-// mongoose
-//     .connect(process.env.MONGODB)
-//     .then(() => {
-//         console.log('Connected to MongoDB');
-//     })
-//     .catch((err) => {
-//         console.log('Error : ', err);
-//     });
+mongoose
+    .connect(process.env.MONGO_DB_API)
+    .then(() => {
+        console.log('Connected to MongoDB');
+    })
+    .catch((err) => {
+        console.log('Error : ', err);
+    });
 
 const app = express();
 
@@ -53,6 +54,8 @@ app.get('/test', (req, res) => {
         message: 'Hello World !'
     });
 });
+
+app.use('/test', testRoute)
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
