@@ -1,8 +1,9 @@
 import express from "express";
-import { getJSON } from "../Controller/Controller.js";
+import { getJSON, postJSON } from "../Controller/Controller.js";
 
 const router = express.Router();
 
-router.get('/testJSON', getJSON)
+router.get('/getJSON', getJSON)
+router.post('/postJSON', postJSON);
 
 export default router;
