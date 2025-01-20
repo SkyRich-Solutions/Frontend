@@ -4,16 +4,19 @@ import axios from 'axios';
 import Counter from '../Components/Counter';
 
 const JSONTable = () => {
-    const [data, setData] = useState([]);
+    const [UnProcessedData, setUnProcessedData] = useState([]);
+    const [ProcessedData, setProcessedData] = useState([]);
 
-    console.log('Data : ', data);
+    console.log('UnProcessedData', UnProcessedData);
+    console.log('ProcessedData', ProcessedData);
+
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
 
     // Fetch data from backend API
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchUnprocessedData = async () => {
             try {
                 const response = await fetch(
                     'http://localhost:4000/test/getJSON'
@@ -22,7 +25,27 @@ const JSONTable = () => {
                     throw new Error('Failed to fetch data');
                 }
                 const jsonData = await response.json();
-                setData(jsonData);
+                setUnProcessedData(jsonData);
+
+                console.log('Unprocessed Data:', jsonData);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        const fetchProcessedData = async () => {
+            try {
+                const response = await fetch(
+                    'http://localhost:4000/test/getProcessedJSON'
+                ); // Replace with your actual backend URL
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const jsonData = await response.json();
+                setProcessedData(jsonData);
+
+                console.log('Processed Data:', jsonData);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -30,7 +53,8 @@ const JSONTable = () => {
             }
         };
 
-        fetchData();
+        fetchUnprocessedData();
+        fetchProcessedData();
     }, []);
 
     // Handle file input change
@@ -90,7 +114,10 @@ const JSONTable = () => {
                     console.log('Backend response:', response.data);
 
                     // Optionally refresh the table data
-                    setData((prevData) => [...prevData, ...normalizedData]);
+                    setUnProcessedData((prevData) => [
+                        ...prevData,
+                        ...normalizedData
+                    ]);
                 } catch (err) {
                     console.error(
                         'Error uploading data:',
@@ -140,7 +167,10 @@ const JSONTable = () => {
                 <span className='text-2xl'>Violation : </span>
                 <Counter
                     from={0}
-                    to={1000}
+                    to={ProcessedData.reduce(
+                        (sum, item) => sum + item.Violation,
+                        0
+                    )}
                     separator=','
                     direction='up'
                     duration={1}
@@ -149,16 +179,45 @@ const JSONTable = () => {
             </div>
             <br />
             <div className=''>
+                <div className='text-4xl flex items-center justify-center'>
+                    Unprocessed Data
+                </div>
                 <table className='border-spacing-2 border-2 border-black'>
                     <thead>
                         <tr>
-                            {Object.keys(data[0]).map((key) => (
+                            {Object.keys(UnProcessedData[0]).map((key) => (
                                 <th key={key}>{key}</th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
-                        {data.slice(0, 10).map((row, rowIndex) => (
+                        {UnProcessedData.slice(0, 10).map((row, rowIndex) => (
+                            <tr key={rowIndex}>
+                                {Object.values(row).map((value, colIndex) => (
+                                    <td key={colIndex}>{value}</td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                <br />
+                <br />
+
+                <div className='text-4xl flex items-center justify-center'>
+                    Processed Data
+                </div>
+                <div></div>
+                <table className='border-spacing-2 border-2 border-black'>
+                    <thead>
+                        <tr>
+                            {Object.keys(ProcessedData[0]).map((key) => (
+                                <th key={key}>{key}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {ProcessedData.slice(0, 10).map((row, rowIndex) => (
                             <tr key={rowIndex}>
                                 {Object.values(row).map((value, colIndex) => (
                                     <td key={colIndex}>{value}</td>

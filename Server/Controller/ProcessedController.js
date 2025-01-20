@@ -1,6 +1,6 @@
 import Processed from '../Models/Processed.js';
 
-export const getJSON = async (req, res) => {
+export const getProcessedJSON = async (req, res) => {
     try {
         const data = await Processed.find();
         res.status(200).json(data);
