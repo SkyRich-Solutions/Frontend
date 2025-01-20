@@ -2,10 +2,11 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-import testRoute from './Routes/testRoute.js'
+import testRoute from './Routes/testRoute.js';
 
 dotenv.config();
 
+// Database Connection
 mongoose
     .connect(process.env.MONGO_DB_API)
     .then(() => {
@@ -15,10 +16,10 @@ mongoose
         console.log('Error : ', err);
     });
 
+// Creating an Express Server
 const app = express();
 
-app.use(express.json());
-
+// CORS Access Headers
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // Replace this with the actual origin of your client application
     res.header(
@@ -43,20 +44,26 @@ app.use((req, res, next) => {
     }
 });
 
+app.use(express.json());
+
+// Starting the server
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT} :)`);
 });
 
+// Authentication Middleware
 app.use(cookieParser());
 
+// Routes
 app.get('/test', (req, res) => {
     res.json({
         message: 'Hello World !'
     });
 });
 
-app.use('/test', testRoute)
+app.use('/test', testRoute);
 
+// Error Handling Middleware
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Internal Server Error';
