@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import Papa from 'papaparse';
 import axios from 'axios';
+import { Pie } from 'react-chartjs-2';
 import Counter from '../Components/Counter';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const JSONTable = () => {
     const [UnProcessedData, setUnProcessedData] = useState([]);
     const [ProcessedData, setProcessedData] = useState([]);
-
-    console.log('UnProcessedData', UnProcessedData);
-    console.log('ProcessedData', ProcessedData);
-
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
+
+    console.log('UnProcessedData', UnProcessedData);
+    console.log('ProcessedData', ProcessedData);
 
     // Fetch data from backend API
     useEffect(() => {
@@ -20,14 +23,12 @@ const JSONTable = () => {
             try {
                 const response = await fetch(
                     'http://localhost:4000/test/getJSON'
-                ); // Replace with your actual backend URL
+                );
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 }
                 const jsonData = await response.json();
                 setUnProcessedData(jsonData);
-
-                console.log('Unprocessed Data:', jsonData);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -38,14 +39,12 @@ const JSONTable = () => {
             try {
                 const response = await fetch(
                     'http://localhost:4000/test/getProcessedJSON'
-                ); // Replace with your actual backend URL
+                );
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 }
                 const jsonData = await response.json();
                 setProcessedData(jsonData);
-
-                console.log('Processed Data:', jsonData);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -62,8 +61,6 @@ const JSONTable = () => {
         setFile(e.target.files[0]);
     };
 
-    // Upload CSV fil
-
     // Parse CSV file with PapaParse
     const handleFileUpload = () => {
         if (!file) {
@@ -74,80 +71,72 @@ const JSONTable = () => {
         Papa.parse(file, {
             header: true,
             skipEmptyLines: true,
-            strict: false,
             complete: async (results) => {
-                console.log('Parsed CSV data:', results.data);
-
-                // Normalize headers and map to Mongoose schema structure
                 const normalizedData = results.data.map((row) => {
                     const normalizedRow = {};
-
-                    // Rename keys to match Mongoose schema format
                     Object.keys(row).forEach((key) => {
                         const normalizedKey = key
                             .trim()
-                            .replace(/\s+/g, '_') // Replace spaces with underscores
+                            .replace(/\s+/g, '_')
                             .replace(/\-/g, '_')
-                            .replace(/\(.*\)/, '') // Remove parentheses and content (e.g., Batch_Management(Plant))
+                            .replace(/\(.*\)/, '')
                             .replace(
                                 /^Batch_Management$/,
                                 'Batch_ManagementPlant'
-                            ) // Handle specific renaming like Batch_Management -> Batch_ManagementPlant
-                            .replace('Serial_No._Profile', 'Serial_No_Profile'); // Handle serial no renaming
-
-                        // Assign value to normalized key
-                        normalizedRow[normalizedKey] = row[key] || ''; // Set default empty string if value is missing
+                            )
+                            .replace('Serial_No._Profile', 'Serial_No_Profile');
+                        normalizedRow[normalizedKey] = row[key] || '';
                     });
-
                     return normalizedRow;
                 });
 
-                console.log('Normalized Data:', normalizedData);
-
                 try {
-                    // Send validated data to the backend
-                    const response = await axios.post(
+                    await axios.post(
                         'http://localhost:4000/test/postJSON',
                         normalizedData
                     );
                     alert('File uploaded successfully!');
-                    console.log('Backend response:', response.data);
-
-                    // Optionally refresh the table data
                     setUnProcessedData((prevData) => [
                         ...prevData,
                         ...normalizedData
                     ]);
                 } catch (err) {
-                    console.error(
-                        'Error uploading data:',
-                        err.response?.data || err.message
-                    );
                     alert(
                         'Failed to upload file. Check the console for details.'
                     );
                 }
             },
             error: (err) => {
-                console.error('Error parsing CSV:', err);
-                alert(
-                    'Error parsing CSV file. Ensure it is formatted correctly.'
-                );
+                alert('Error parsing CSV file.');
             }
         });
     };
 
     if (loading) {
-        return <p> Loading data...</p>;
+        return <p>Loading data...</p>;
     }
 
     if (error) {
         return <p>Error: {error}</p>;
     }
 
-    // if (!data || data.length === 0) {
-    //     return <p>No data available</p>;
-    // }
+    const totalRows = ProcessedData.length;
+    const totalViolations = ProcessedData.reduce(
+        (sum, item) => sum + item.Violation,
+        0
+    );
+
+    // Data for Pie Chart
+    const pieData = {
+        labels: ['Violations', 'Compliant'],
+        datasets: [
+            {
+                data: [totalViolations, totalRows - totalViolations],
+                backgroundColor: ['#FF6384', '#36A2EB'],
+                hoverBackgroundColor: ['#FF6384', '#36A2EB']
+            }
+        ]
+    };
 
     return (
         <div>
@@ -158,30 +147,30 @@ const JSONTable = () => {
                 <h2>Upload CSV File</h2>
                 <input type='file' accept='.csv' onChange={handleFileChange} />
                 <button onClick={handleFileUpload}>Upload</button>
-                {/* <Upload /> */}
             </div>
 
             <br />
 
-            <div className='text-2xl'>
-                <span className='text-2xl'>Violation : </span>
-                <Counter
-                    from={0}
-                    to={ProcessedData.reduce(
-                        (sum, item) => sum + item.Violation,
-                        0
-                    )}
-                    separator=','
-                    direction='up'
-                    duration={1}
-                    className='count-up-text'
-                />
-            </div>
-            <br />
-            <div className=''>
-                <div className='text-4xl flex items-center justify-center'>
-                    Unprocessed Data
+            {/* Pie Chart Section */}
+            <div>
+                <h2>Violation Summary</h2>
+                <Pie data={pieData} className='h-14 w-14' />
+                <div className='text-2xl'>
+                    <span>Violations Count: </span>
+                    <Counter
+                        from={0}
+                        to={totalViolations}
+                        separator=','
+                        duration={1}
+                    />
                 </div>
+            </div>
+
+            <br />
+
+            {/* Data Tables */}
+            <div>
+                <div className='text-4xl'>Unprocessed Data</div>
                 <table className='border-spacing-2 border-2 border-black'>
                     <thead>
                         <tr>
@@ -202,12 +191,8 @@ const JSONTable = () => {
                 </table>
 
                 <br />
-                <br />
 
-                <div className='text-4xl flex items-center justify-center'>
-                    Processed Data
-                </div>
-                <div></div>
+                <div className='text-4xl'>Processed Data</div>
                 <table className='border-spacing-2 border-2 border-black'>
                     <thead>
                         <tr>
