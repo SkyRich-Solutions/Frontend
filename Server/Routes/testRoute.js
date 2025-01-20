@@ -4,13 +4,10 @@ import {
     postJSON,
     updateJSON,
     deleteJSON
-} from '../Controller/Controller.js';
+} from '../Controller/ProcessedController.js';
 
 const router = express.Router();
 
 router.get('/getJSON', getJSON);
-router.post('/postJSON', postJSON);
-router.post('/updateJSON', updateJSON); //IN WORK
-router.post('/deleteJSON', deleteJSON); //IN WORK
 
 export default router;
