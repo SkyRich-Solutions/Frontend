@@ -11,7 +11,7 @@ export const getJSON = async (req, res) => {
 };
 
 export const postJSON = async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     try {
         // const data = req.body;
         const newData = await UnProcessed.create(req.body);
@@ -21,27 +21,3 @@ export const postJSON = async (req, res) => {
         console.log(error);
     }
 };
-
-export const updateJSON = async (req, res) => {
-    console.log(req.body);
-    try {
-        if (!(await UnProcessed.findById(req.params._id))) {
-            return res.status(404).json('Invalid ID');
-        }
-        try {
-            const update = await UnProcessed.findByIdAndUpdate(
-                req.params.rowId,
-                {
-                    $set: req.body
-                },
-                { new: true }
-            );
-            res.status(200).json(update);
-        } catch (error) {
-            next(error);
-        }
-    } catch (error) {
-        console.log(error);
-    }
-};
-export const deleteJSON = async (req, res) => {};

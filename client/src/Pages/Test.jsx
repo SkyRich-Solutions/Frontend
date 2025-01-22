@@ -1,50 +1,70 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Papa from 'papaparse';
 import axios from 'axios';
 import { Pie } from 'react-chartjs-2';
 import Counter from '../Components/Counter';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { io } from 'socket.io-client';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const JSONTable = () => {
+    const socket = useRef(null); // Use ref to manage socket connection
     const [UnProcessedData, setUnProcessedData] = useState([]);
     const [ProcessedData, setProcessedData] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
+    const [socketMessages, setSocketMessages] = useState([]);
+    const [notification, setNotification] = useState('');
+    const [processingUpdates, setProcessingUpdates] = useState([]);
 
     console.log('UnProcessedData', UnProcessedData);
     console.log('ProcessedData', ProcessedData);
 
+    // Initialize WebSocket connection
+    useEffect(() => {
+        socket.current = io('http://localhost:5000', {
+            transports: ['websocket'] // Force WebSocket transport
+        });
+
+        // Listen for server messages
+        socket.current.on('message', (data) => {
+            setSocketMessages((prev) => [...prev, data.message]);
+        });
+
+        // Listen for notifications
+        socket.current.on('notification', (data) => {
+            setNotification(data.data);
+        });
+
+        // Listen for processing updates
+        socket.current.on('processing_update', (data) => {
+            setProcessingUpdates((prev) => [
+                ...prev,
+                `Step ${data.step}: ${data.status}`
+            ]);
+        });
+
+        // Cleanup on component unmount
+        return () => {
+            socket.current.disconnect();
+        };
+    }, []);
+
     // Fetch data from backend API
     useEffect(() => {
-        const fetchUnprocessedData = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetch(
+                const responseUnProcessed = await axios.get(
                     'http://localhost:4000/test/getJSON'
                 );
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data');
-                }
-                const jsonData = await response.json();
-                setUnProcessedData(jsonData);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        const fetchProcessedData = async () => {
-            try {
-                const response = await fetch(
+                setUnProcessedData(responseUnProcessed.data);
+
+                const responseProcessed = await axios.get(
                     'http://localhost:4000/test/getProcessedJSON'
                 );
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data');
-                }
-                const jsonData = await response.json();
-                setProcessedData(jsonData);
+                setProcessedData(responseProcessed.data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -52,8 +72,7 @@ const JSONTable = () => {
             }
         };
 
-        fetchUnprocessedData();
-        fetchProcessedData();
+        fetchData();
     }, []);
 
     // Handle file input change
@@ -138,9 +157,57 @@ const JSONTable = () => {
         ]
     };
 
+    // WebSocket actions
+    const sendNotification = () => {
+        socket.current.emit(
+            'send_notification',
+            'This is a test notification!'
+        );
+    };
+
+    const startProcessing = () => {
+        socket.current.emit('start_processing');
+    };
+
     return (
         <div>
             <h1>Data Table</h1>
+
+            {/* WebSocket Controls */}
+            <div>
+                <h2>WebSocket Test</h2>
+                <div className='flex space-x-4 flex-row items-center justify-center'>
+                    <button
+                        className='border-2 border-black'
+                        onClick={sendNotification}
+                    >
+                        Send Notification
+                    </button>
+                    <button
+                        className='border-2 border-black'
+                        onClick={startProcessing}
+                    >
+                        Start Processing
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <h3>Socket Messages:</h3>
+                <ul>
+                    {socketMessages.map((msg, idx) => (
+                        <li key={idx}>{msg}</li>
+                    ))}
+                </ul>
+                <h3>Latest Notification:</h3>
+                <p>{notification || 'No notifications yet'}</p>
+                <h3>Processing Updates:</h3>
+                <ul>
+                    {processingUpdates.map((update, idx) => (
+                        <li key={idx}>{update}</li>
+                    ))}
+                </ul>
+            </div>
 
             {/* File Upload Section */}
             <div>
@@ -149,24 +216,11 @@ const JSONTable = () => {
                 <button onClick={handleFileUpload}>Upload</button>
             </div>
 
-            <br />
-
-            {/* Pie Chart Section */}
-            <div>
+            <div className='flex h-96'>
                 <h2>Violation Summary</h2>
-                <Pie data={pieData} className='h-14 w-14' />
-                <div className='text-2xl'>
-                    <span>Violations Count: </span>
-                    <Counter
-                        from={0}
-                        to={totalViolations}
-                        separator=','
-                        duration={1}
-                    />
-                </div>
+                <Pie data={pieData} />
+                <Counter from={0} to={totalViolations} duration={1} />
             </div>
-
-            <br />
 
             {/* Data Tables */}
             <div>
@@ -192,7 +246,7 @@ const JSONTable = () => {
 
                 <br />
 
-                <div className='text-4xl'>Processed Data</div>
+                {/* <div className='text-4xl'>Processed Data</div>
                 <table className='border-spacing-2 border-2 border-black'>
                     <thead>
                         <tr>
@@ -210,7 +264,7 @@ const JSONTable = () => {
                             </tr>
                         ))}
                     </tbody>
-                </table>
+                </table> */}
             </div>
         </div>
     );

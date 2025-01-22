@@ -2,9 +2,15 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import multer from 'multer';
+import Papa from 'papaparse';
+import fs from 'fs';
+import corsMiddleware from './Config/cors.js';
 import testRoute from './Routes/testRoute.js';
 
 dotenv.config();
+
+const upload = multer({ dest: 'uploads/' }); // Save files in 'uploads/' temporarily
 
 // Database Connection
 mongoose
@@ -19,45 +25,93 @@ mongoose
 // Creating an Express Server
 const app = express();
 
-// CORS Access Headers
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // Replace this with the actual origin of your client application
-    res.header(
-        'Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content-Type, Accept'
-    );
-    res.header(
-        'Access-Control-Allow-Methods',
-        'GET, POST, PUT, PATCH, DELETE, OPTIONS'
-    );
-    res.header('Access-Control-Allow-Credentials', 'true'); // Allow credentials
+const extractDataFromFile = (filePath) => {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) return reject(err);
 
-    // Respond to preflight requests
-    if (req.method === 'OPTIONS') {
-        res.header(
-            'Access-Control-Allow-Methods',
-            'GET, POST, PUT, PATCH, DELETE, OPTIONS'
-        );
-        res.sendStatus(200);
-    } else {
-        next();
+            Papa.parse(data, {
+                header: true,
+                skipEmptyLines: true,
+                complete: (result) => resolve(result.data),
+                error: (error) => reject(error)
+            });
+        });
+    });
+};
+
+const generateSchemaAndInsertData = async (collectionName, data) => {
+    const headers = Object.keys(data[0]);
+    const schemaDefinition = {};
+
+    headers.forEach((header) => {
+        schemaDefinition[header] = { type: String, default: '' };
+    });
+
+    const dynamicSchema = new mongoose.Schema(schemaDefinition, {
+        timestamps: true
+    });
+    const DynamicModel = mongoose.model(collectionName, dynamicSchema);
+
+    await DynamicModel.insertMany(data);
+    console.log(
+        `Data successfully inserted into collection: ${collectionName}`
+    );
+};
+
+app.post('/upload', upload.single('file'), async (req, res) => {
+    try {
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const collectionName = `DynamicTable_${Date.now()}`;
+        const data = await extractDataFromFile(file.path);
+
+        if (data.length === 0) {
+            return res
+                .status(400)
+                .json({ message: 'CSV file is empty or invalid.' });
+        }
+
+        await generateSchemaAndInsertData(collectionName, data);
+
+        fs.unlinkSync(file.path); // Delete the file after processing
+        res.status(200).json({
+            message: 'File processed and data stored successfully',
+            collectionName
+        });
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).json({
+            message: 'An error occurred',
+            error: err.message
+        });
     }
 });
 
-app.use(express.json());
+// Use CORS Middleware
+app.use(corsMiddleware);
 
-// Starting the server
-app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${process.env.PORT} :)`);
-});
+// JSON Parsing Middleware
+app.use(express.json());
 
 // Authentication Middleware
 app.use(cookieParser());
 
+const PORT = process.env.PORT || 4000;
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT} :)`);
+});
+
 // Routes
-app.get('/test', (req, res) => {
+app.get('/', (req, res) => {
     res.json({
-        message: 'Hello World !'
+        message: 'Server is Running ...'
     });
 });
 
@@ -73,3 +127,5 @@ app.use((err, req, res, next) => {
         message
     });
 });
+
+export default app; // Export the app
