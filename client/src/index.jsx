@@ -3,11 +3,14 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 import JSONTable from './Pages/Test';
+import Test2 from './Pages/Test2';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-        <JSONTable/>
+        {/* <Test2 /> */}
+
+        <JSONTable />
     </React.StrictMode>
 );
 

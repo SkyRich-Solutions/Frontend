@@ -1,92 +1,70 @@
-// import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from 'react';
+import Papa from 'papaparse';
+import axios from 'axios';
+import { Pie } from 'react-chartjs-2';
+import Counter from '../Components/Counter';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { io } from 'socket.io-client';
 
-// const JSONTable = () => {
-//     const [data, setData] = useState([]);
-//     const [error, setError] = useState(null);
-//     const [loading, setLoading] = useState(true);
-
-//     useEffect(() => {
-//         // Fetch data from the backend API
-//         const fetchData = async () => {
-//             try {
-//                 const response = await fetch("http://localhost:4000/test/getJSON"); // Replace with your actual backend URL
-//                 if (!response.ok) {
-//                     throw new Error("Failed to fetch data");
-//                 }
-//                 const jsonData = await response.json();
-//                 setData(jsonData);
-//             } catch (err) {
-//                 setError(err.message);
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
-
-//         fetchData();
-//     }, []);
-
-//     if (loading) {
-//         return <p>Loading data...</p>;
-//     }
-
-//     if (error) {
-//         return <p>Error: {error}</p>;
-//     }
-
-//     if (!data || data.length === 0) {
-//         return <p>No data available</p>;
-//     }
-
-//     return (
-//         <div>
-//             <h1>Data Table</h1>
-//             <table border="1">
-//                 <thead>
-//                     <tr>
-//                         {/* Dynamically create table headers based on the keys of the first object */}
-//                         {Object.keys(data[0]).map((key) => (
-//                             <th key={key}>{key}</th>
-//                         ))}
-//                     </tr>
-//                 </thead>
-//                 <tbody>
-//                     {/* Render table rows */}
-//                     {data.map((row, rowIndex) => (
-//                         <tr key={rowIndex}>
-//                             {Object.values(row).map((value, colIndex) => (
-//                                 <td key={colIndex}>{value}</td>
-//                             ))}
-//                         </tr>
-//                     ))}
-//                 </tbody>
-//             </table>
-//         </div>
-//     );
-// };
-
-// export default JSONTable;
-
-
-import React, { useEffect, useState } from "react";
-import Papa from "papaparse";
-import axios from "axios";
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const JSONTable = () => {
-    const [data, setData] = useState([]);
+    const socket = useRef(null); // Use ref to manage socket connection
+    const [UnProcessedData, setUnProcessedData] = useState([]);
+    const [ProcessedData, setProcessedData] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
+    const [socketMessages, setSocketMessages] = useState([]);
+    const [notification, setNotification] = useState('');
+    const [processingUpdates, setProcessingUpdates] = useState([]);
+
+    console.log('UnProcessedData', UnProcessedData);
+    console.log('ProcessedData', ProcessedData);
+
+    // Initialize WebSocket connection
+    useEffect(() => {
+        socket.current = io('http://localhost:5000', {
+            transports: ['websocket'] // Force WebSocket transport
+        });
+
+        // Listen for server messages
+        socket.current.on('message', (data) => {
+            setSocketMessages((prev) => [...prev, data.message]);
+        });
+
+        // Listen for notifications
+        socket.current.on('notification', (data) => {
+            setNotification(data.data);
+        });
+
+        // Listen for processing updates
+        socket.current.on('processing_update', (data) => {
+            setProcessingUpdates((prev) => [
+                ...prev,
+                `Step ${data.step}: ${data.status}`
+            ]);
+        });
+
+        // Cleanup on component unmount
+        return () => {
+            socket.current.disconnect();
+        };
+    }, []);
 
     // Fetch data from backend API
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:4000/test/getJSON"); // Replace with your actual backend URL
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
-                }
-                const jsonData = await response.json();
-                setData(jsonData);
+                const responseUnProcessed = await axios.get(
+                    'http://localhost:4000/test/getJSON'
+                );
+                setUnProcessedData(responseUnProcessed.data);
+
+                const responseProcessed = await axios.get(
+                    'http://localhost:4000/test/getProcessedJSON'
+                );
+                setProcessedData(responseProcessed.data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -102,113 +80,194 @@ const JSONTable = () => {
         setFile(e.target.files[0]);
     };
 
-    // Upload CSV fil
-    
-        // Parse CSV file with PapaParse
-        const handleFileUpload = () => {
-            if (!file) {
-                alert("Please select a CSV file first");
-                return;
-            }
-        
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                strict: false,
-                complete: async (results) => {
-                    console.log("Parsed CSV data:", results.data);
-        
-                    // Normalize headers and map to Mongoose schema structure
-                    const normalizedData = results.data.map((row) => {
-                        const normalizedRow = {};
-        
-                        // Rename keys to match Mongoose schema format
-                        Object.keys(row).forEach((key) => {
-                            const normalizedKey = key
-                                .trim()
-                                .replace(/\s+/g, "_") // Replace spaces with underscores
-                                .replace(/\-/g, "_")
-                                .replace(/\(.*\)/, "") // Remove parentheses and content (e.g., Batch_Management(Plant))
-                                .replace(/^Batch_Management$/, "Batch_ManagementPlant") // Handle specific renaming like Batch_Management -> Batch_ManagementPlant
-                                .replace("Serial_No._Profile", "Serial_No_Profile") // Handle serial no renaming
-        
-                            // Assign value to normalized key
-                            normalizedRow[normalizedKey] = row[key] || ""; // Set default empty string if value is missing
-                        });
-        
-                        return normalizedRow;
-                    });
-        
-                    console.log("Normalized Data:", normalizedData);
-        
-                  
-        
-                    try {
-                        // Send validated data to the backend
-                        const response = await axios.post("http://localhost:4000/test/postJSON", normalizedData);
-                        alert("File uploaded successfully!");
-                        console.log("Backend response:", response.data);
-        
-                        // Optionally refresh the table data
-                        setData((prevData) => [...prevData, ...normalizedData]);
-                    } catch (err) {
-                        console.error("Error uploading data:", err.response?.data || err.message);
-                        alert("Failed to upload file. Check the console for details.");
-                    }
-                },
-                error: (err) => {
-                    console.error("Error parsing CSV:", err);
-                    alert("Error parsing CSV file. Ensure it is formatted correctly.");
-                },
-            });
-        };
-        
+    // Parse CSV file with PapaParse
+    const handleFileUpload = () => {
+        if (!file) {
+            alert('Please select a CSV file first');
+            return;
+        }
 
-if (loading) {
-    return <p> Loading data...</p>;
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: async (results) => {
+                const normalizedData = results.data.map((row) => {
+                    const normalizedRow = {};
+                    Object.keys(row).forEach((key) => {
+                        const normalizedKey = key
+                            .trim()
+                            .replace(/\s+/g, '_')
+                            .replace(/\-/g, '_')
+                            .replace(/\(.*\)/, '')
+                            .replace(
+                                /^Batch_Management$/,
+                                'Batch_ManagementPlant'
+                            )
+                            .replace('Serial_No._Profile', 'Serial_No_Profile');
+                        normalizedRow[normalizedKey] = row[key] || '';
+                    });
+                    return normalizedRow;
+                });
+
+                try {
+                    await axios.post(
+                        'http://localhost:4000/test/postJSON',
+                        normalizedData
+                    );
+                    alert('File uploaded successfully!');
+                    setUnProcessedData((prevData) => [
+                        ...prevData,
+                        ...normalizedData
+                    ]);
+                } catch (err) {
+                    alert(
+                        'Failed to upload file. Check the console for details.'
+                    );
+                }
+            },
+            error: (err) => {
+                alert('Error parsing CSV file.');
+            }
+        });
+    };
+
+    if (loading) {
+        return <p>Loading data...</p>;
     }
 
     if (error) {
         return <p>Error: {error}</p>;
     }
 
-    if (!data || data.length === 0) {
-        return <p>No data available</p>;
-    }
+    const totalRows = ProcessedData.length;
+    const totalViolations = ProcessedData.reduce(
+        (sum, item) => sum + item.Violation,
+        0
+    );
+
+    // Data for Pie Chart
+    const pieData = {
+        labels: ['Violations', 'Compliant'],
+        datasets: [
+            {
+                data: [totalViolations, totalRows - totalViolations],
+                backgroundColor: ['#FF6384', '#36A2EB'],
+                hoverBackgroundColor: ['#FF6384', '#36A2EB']
+            }
+        ]
+    };
+
+    // WebSocket actions
+    const sendNotification = () => {
+        socket.current.emit(
+            'send_notification',
+            'This is a test notification!'
+        );
+    };
+
+    const startProcessing = () => {
+        socket.current.emit('start_processing');
+    };
 
     return (
         <div>
             <h1>Data Table</h1>
 
+            {/* WebSocket Controls */}
+            <div>
+                <h2>WebSocket Test</h2>
+                <div className='flex space-x-4 flex-row items-center justify-center'>
+                    <button
+                        className='border-2 border-black'
+                        onClick={sendNotification}
+                    >
+                        Send Notification
+                    </button>
+                    <button
+                        className='border-2 border-black'
+                        onClick={startProcessing}
+                    >
+                        Start Processing
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <h3>Socket Messages:</h3>
+                <ul>
+                    {socketMessages.map((msg, idx) => (
+                        <li key={idx}>{msg}</li>
+                    ))}
+                </ul>
+                <h3>Latest Notification:</h3>
+                <p>{notification || 'No notifications yet'}</p>
+                <h3>Processing Updates:</h3>
+                <ul>
+                    {processingUpdates.map((update, idx) => (
+                        <li key={idx}>{update}</li>
+                    ))}
+                </ul>
+            </div>
+
             {/* File Upload Section */}
             <div>
                 <h2>Upload CSV File</h2>
-                <input type="file" accept=".csv" onChange={handleFileChange} />
+                <input type='file' accept='.csv' onChange={handleFileChange} />
                 <button onClick={handleFileUpload}>Upload</button>
             </div>
 
-            {/* Data Table */}
-            <table border="1">
-                <thead>
-                    <tr>
-                        {Object.keys(data[0]).map((key) => (
-                            <th key={key}>{key}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((row, rowIndex) => (
-                        <tr key={rowIndex}>
-                            {Object.values(row).map((value, colIndex) => (
-                                <td key={colIndex}>{value}</td>
+            <div className='flex h-96'>
+                <h2>Violation Summary</h2>
+                <Pie data={pieData} />
+                <Counter from={0} to={totalViolations} duration={1} />
+            </div>
+
+            {/* Data Tables */}
+            <div>
+                <div className='text-4xl'>Unprocessed Data</div>
+                <table className='border-spacing-2 border-2 border-black'>
+                    <thead>
+                        <tr>
+                            {Object.keys(UnProcessedData[0]).map((key) => (
+                                <th key={key}>{key}</th>
                             ))}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {UnProcessedData.slice(0, 10).map((row, rowIndex) => (
+                            <tr key={rowIndex}>
+                                {Object.values(row).map((value, colIndex) => (
+                                    <td key={colIndex}>{value}</td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                <br />
+
+                {/* <div className='text-4xl'>Processed Data</div>
+                <table className='border-spacing-2 border-2 border-black'>
+                    <thead>
+                        <tr>
+                            {Object.keys(ProcessedData[0]).map((key) => (
+                                <th key={key}>{key}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {ProcessedData.slice(0, 10).map((row, rowIndex) => (
+                            <tr key={rowIndex}>
+                                {Object.values(row).map((value, colIndex) => (
+                                    <td key={colIndex}>{value}</td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table> */}
+            </div>
         </div>
     );
 };
 
 export default JSONTable;
-
