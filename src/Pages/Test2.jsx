@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import SocketConnection from '../Socket/SocketConnection.js';
+import { handleMessageEvent } from '../Socket/SocketHandler.js';
 
 const Test2 = () => {
     const [file, setFile] = useState(null);
     const [response, setResponse] = useState(null);
     const [error, setError] = useState(null);
+
+    const socket = SocketConnection();
+    const [message, setMessage] = useState('');
+
+    const sendMessage = () => {
+        if (socket) {
+            // Handle sending message and receiving response
+            handleMessageEvent(socket, message, setResponse);
+        }
+    };
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -22,9 +34,11 @@ const Test2 = () => {
         const formData = new FormData();
         formData.append('file', file);
 
+        console.log('File:', file);
+
         try {
             const res = await axios.post(
-                'http://localhost:4000/test/postJSON',
+                'http://localhost:4000/DynamicFileUpload',
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' }
@@ -32,7 +46,7 @@ const Test2 = () => {
             );
             setResponse(res.data);
         } catch (err) {
-            setError(err.response?.data?.message || 'An error occurred.');
+            setError(err.response?.data?.message);
         }
     };
 
@@ -59,6 +73,22 @@ const Test2 = () => {
                     <p>{error}</p>
                 </div>
             )}
+
+            <h1>Socket.IO with React (Clean Architecture)</h1>
+            <div>
+                <input
+                    type='text'
+                    placeholder='Enter message'
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)} // Update message on input change
+                />
+                <button onClick={sendMessage}>Send Message</button>
+            </div>
+
+            <div>
+                <h4>Server Response:</h4>
+                <p>{response}</p>
+            </div>
         </div>
     );
 };
