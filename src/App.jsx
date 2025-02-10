@@ -1,19 +1,14 @@
+import { Outlet } from 'react-router';
+import NavBar from './Components/NavBar';
+import Sidebar from './Components/SideBar';
+import Test2 from './Pages/Test2';
 function App() {
+
     return (
-        <div className='App'>
-            <header className='App-header'>
-                <p>
-                    Edit <code>src/App.js</code> and save to reload.
-                </p>
-                <a
-                    className='App-link'
-                    href='https://reactjs.org'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    Learn React
-                </a>
-            </header>
+        <div className="flex flex-col">
+            <Sidebar/>
+            <Test2/>
+        
         </div>
     );
 }

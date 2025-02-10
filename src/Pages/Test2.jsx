@@ -37,7 +37,7 @@ const Test2 = () => {
     };
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+        <div className="flex ">
             <h1>Upload CSV File</h1>
             <form onSubmit={handleUpload}>
                 <input type='file' accept='.csv' onChange={handleFileChange} />
