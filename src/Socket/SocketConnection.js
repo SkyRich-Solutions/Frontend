@@ -1,26 +1,21 @@
-import { useEffect, useState } from 'react';
-import io from 'socket.io-client';
-import { handleConnectionEvent } from './SocketHandler';
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
+import { handleConnectionEvent } from "./SocketHandler";
 
-const SocketConnection = () => {
-    const [socket, setSocket] = useState(null);
+const socket = io("http://localhost:4000", {
+    transports: ["websocket"], // Ensures WebSocket connection
+    reconnection: true, // Enables automatic reconnection
+});
 
-    // Establish socket connection on mount
+const useSocket = () => {
     useEffect(() => {
-        const socketInstance = io('http://localhost:4000'); // Replace with your server URL
-        setSocket(socketInstance);
-
-        // Handle connection and disconnection
-        handleConnectionEvent(socketInstance);
-
-        // Cleanup socket connection on unmount
+        handleConnectionEvent(socket);
         return () => {
-            socketInstance.disconnect();
+            socket.disconnect();
         };
     }, []);
 
-    // Return socket instance to other parts of the app that need it
     return socket;
 };
 
-export default SocketConnection;
+export default socket; // ✅ Correctly exporting the socket instance

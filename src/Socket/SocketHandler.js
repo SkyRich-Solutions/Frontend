@@ -1,22 +1,44 @@
-export const handleConnectionEvent = (socket) => {
-    socket.on('connect', () => {
-        console.log('Connected to the server');
-    });
+// Sends a message to the server
+export const handleMessageEvent = (socket, message) => {
+    if (!socket) {
+        console.error("Socket is not connected.");
+        return;
+    }
+    socket.emit("send_message", message);
+    console.log("Message sent:", message);
+};
 
-    socket.on('disconnect', () => {
-        console.log('Disconnected from the server');
+// Sets up a listener for messages from the server
+export const setupMessageListener = (socket, setResponse) => {
+    if (!socket) {
+        console.error("Socket is not connected.");
+        return;
+    }
+
+    socket.off("receive_message"); // ✅ Prevent duplicate listeners
+
+    socket.on("receive_message", (msg) => {
+        console.log("Received from server:", msg);
+        setResponse(msg);
     });
 };
 
-// Function to handle incoming messages and emit responses
-export const handleMessageEvent = (socket, message, setResponse) => {
-    // Send message to server
-    socket.emit('message', message);
-    console.log('Message sent:', message);
+// Handles connection and disconnection events
+export const handleConnectionEvent = (socket) => {
+    if (!socket) {
+        console.error("Socket is not connected.");
+        return;
+    }
 
-    // Listen for response from server
-    socket.on('message', (msg) => {
-        console.log('Received from server:', msg);
-        setResponse(msg); // Update state with response from server
+    socket.on("connect", () => {
+        console.log("Connected to the server");
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Disconnected from the server");
+    });
+
+    socket.on("connect_error", (err) => {
+        console.error("Connection error:", err);
     });
 };
