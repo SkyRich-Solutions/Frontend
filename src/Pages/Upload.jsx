@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import axios from 'axios';
 
 import Header from '../Components/Header';
@@ -7,6 +7,9 @@ const UploadPage= () =>{
     const [file, setFile] = useState(null);
     const [response, setResponse] = useState(null);
     const [error, setError] = useState(null);
+    const [socket, setSocket] = useState(null);
+
+
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -26,7 +29,7 @@ const UploadPage= () =>{
 
         try {
             const res = await axios.post(
-                'http://localhost:4000/test/postJSON',
+                'http://localhost:4000/api/uploadFile',
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' }
