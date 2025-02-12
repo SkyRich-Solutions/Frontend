@@ -4,8 +4,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import { RouterProvider, createHashRouter } from "react-router";
 import App from './App';
+import UploadPage from './Pages/Upload';
 
-import Test2 from './Pages/Test2';
 
 
 const router = createHashRouter([
@@ -14,8 +14,8 @@ const router = createHashRouter([
     element: <App />,
     children: [
       {
-        path: "/",
-        element: <Test2/>,
+        path: "/upload",
+        element: <UploadPage/>,
       },
     ],
   },
