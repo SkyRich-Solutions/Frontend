@@ -1,6 +1,9 @@
 {
-    "name": "client",
+    "name": "skyrich-client",
     "version": "0.1.0",
+    "description": "Skyrich Solutions Desktop Application",
+    "author": "Skyrich Solutions Team",
+    "main": "public/electron.js",
     "private": true,
     "dependencies": {
         "@testing-library/jest-dom": "^5.17.0",
@@ -19,11 +22,42 @@
         "socket.io-client": "^4.8.1",
         "web-vitals": "^2.1.4"
     },
+    "devDependencies": {
+        "electron": "^34.2.0",
+        "electron-builder": "^25.1.8",
+        "tailwindcss": "^3.4.15"
+    },
     "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
+        "react-start": "react-scripts start",
+        "react-build": "react-scripts build",
+        "electron-start": "electron .",
+        "electron-build": "electron-builder",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
+    },
+    "build": {
+        "appId": "com.skyrich.app",
+        "productName": "SkyrichSolutions",
+        "files": [
+            "build/**/*",
+            "public/electron.js",
+            "node_modules/**/*",
+            "../Backend/**/*",
+            "../Server/**/*"
+        ],
+        "extraResources": [
+            {
+                "from": "../Backend/",
+                "to": "backend"
+            },
+            {
+                "from": "../Server/",
+                "to": "server"
+            }
+        ],
+        "win": {
+            "target": "nsis"
+        }
     },
     "eslintConfig": {
         "extends": [
@@ -42,8 +76,5 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
-    },
-    "devDependencies": {
-        "tailwindcss": "^3.4.15"
     }
 }
