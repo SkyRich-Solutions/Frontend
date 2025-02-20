@@ -45,7 +45,7 @@ const UploadPage= () =>{
 
   const handleRunScript = async () => {
     try {
-      const result = await window.electron.runPythonScript('app'); // Replace with your script name (without `.py`)
+      const result = await window.electron.runPythonScript('processTurbineData'); // Replace with your script name (without `.py`)
       setOutput(result); // You can use the result however you like (e.g., display it on the UI)
     } catch (error) {
       console.error('Error running Python script:', error);
