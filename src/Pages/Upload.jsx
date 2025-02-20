@@ -40,6 +40,17 @@ const UploadPage= () =>{
             setError(err.response?.data?.message || 'An error occurred.');
         }
     };
+
+    const [output, setOutput] = useState('');
+
+  const handleRunScript = async () => {
+    try {
+      const result = await window.electron.runPythonScript('app'); // Replace with your script name (without `.py`)
+      setOutput(result); // You can use the result however you like (e.g., display it on the UI)
+    } catch (error) {
+      console.error('Error running Python script:', error);
+    }
+  };
     return (
         <div className="flex-1 overflow-auto z-1 h-auto space-y-4">
             <Header title="File Uploader"/>
@@ -76,6 +87,11 @@ const UploadPage= () =>{
           </div>
         )}
       </div>
+
+      <div className="bg-gray-900 p-8 rounded-xl shadow-xl text-center ml-8">
+      <button onClick={handleRunScript}>Run Python Script</button>
+      <pre>{output}</pre> {/* Display the output of the script here */}
+        </div>
     </div>
             
  </div>
