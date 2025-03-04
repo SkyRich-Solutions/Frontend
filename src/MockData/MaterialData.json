@@ -1,0 +1,152 @@
+[
+    {
+        "Material": 5130,
+        "Plant": "DKS1",
+        "Description": "Other merchandise",
+        "PlantSpecificMaterialStatus": "Z3",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "15S1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z5",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "24S1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z5",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "25S1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z5",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "26S1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z5",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "43S1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z4",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "51S1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z4",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "53S1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z4",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "54S1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z4",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "DOS1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z4",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "HNS1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z4",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "HRS1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z7",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "HRS3",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z7",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "HUS1",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z8",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    },
+    {
+        "Material": 50001,
+        "Plant": "INS5",
+        "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+        "PlantSpecificMaterialStatus": "Z4",
+        "BatchManagementPlant": "",
+        "SerialNoProfile": "",
+        "ReplacementPart": "",
+        "UsedInSBom": ""
+    }
+]
