@@ -1,4 +1,4 @@
-name: Frontend CI
+name: Frontend CI Pipeline
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
 
       # - name: Run tests
       #   run: npm test
-      
+
       - name: Disable Treating Warnings as Errors
         run: |
           echo "CI=false" >> $GITHUB_ENV  # Explicitly set CI to false
