@@ -35,8 +35,8 @@ const Maps = ({ animate = false }) => {
     return (
         <div className='h-screen w-screen max-w-full max-h-full p-4'>
             <MapContainer
-                center={[51.505, -0.09]}
-                zoom={13}
+                center={[0, 0]}
+                zoom={10}
                 minZoom={2}
                 maxZoom={18}
                 maxBounds={[
