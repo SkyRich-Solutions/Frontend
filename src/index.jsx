@@ -4,8 +4,8 @@ import './index.css';
 import { RouterProvider, createHashRouter } from 'react-router';
 import App from './App';
 import UploadPage from './Pages/Upload';
-import Dashboard from './Pages/Dashboard';
-import Map from './Pages/Map';
+
+
 
 const router = createHashRouter([
     {
