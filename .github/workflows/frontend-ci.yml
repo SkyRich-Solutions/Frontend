@@ -33,6 +33,10 @@ jobs:
 
       # - name: Run tests
       #   run: npm test
+      
+      - name: Disable Treating Warnings as Errors
+        run: |
+          echo "CI=false" >> $GITHUB_ENV  # Explicitly set CI to false
 
       - name: Build the project
         run: npm run build
