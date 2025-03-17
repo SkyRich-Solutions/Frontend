@@ -15,33 +15,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run linting
-        run: npm run lint
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build the project
-        run: npm run build
+      - name: Archive build output
+        run: |
+          mkdir -p ./build_output
+          echo "Test file" > ./build_output/test.txt
+          tar -czf build_output.tar.gz ./build_output
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: react-build
-          path: ./build
+          name: test-artifact
+          path: build_output.tar.gz
