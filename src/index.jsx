@@ -5,6 +5,8 @@ import { RouterProvider, createHashRouter } from 'react-router';
 import App from './App';
 import UploadPage from './Pages/Upload';
 
+
+
 const router = createHashRouter([
     {
         path: '/',
@@ -13,6 +15,14 @@ const router = createHashRouter([
             {
                 path: '/upload',
                 element: <UploadPage />
+            },
+            {
+                path: '/dashboard',
+                element: <Dashboard />
+            },
+            {
+                path: '/map',
+                element: <Map />
             }
         ]
     }
