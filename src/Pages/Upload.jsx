@@ -1,8 +1,13 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { useState } from 'react';
 import axios from 'axios';
 import Header from '../Components/Header';
-import { WandSparklesIcon } from 'lucide-react';
+import {
+    CircleAlertIcon,
+    CircleCheckBigIcon,
+    WandSparklesIcon
+} from 'lucide-react';
 
 const UploadPage = () => {
     const [file, setFile] = useState(null);
@@ -75,7 +80,10 @@ const UploadPage = () => {
                         Upload CSV File
                     </h1>
                     <div className=''>
-                        <form onSubmit={handleUpload} className='flex gap-2'>
+                        <form
+                            onSubmit={handleUpload}
+                            className='flex gap-2 justify-center'
+                        >
                             <input
                                 type='file'
                                 accept='.csv'
@@ -91,16 +99,18 @@ const UploadPage = () => {
                         </form>
 
                         {response && (
-                            <div className='mt-4 text-green-400'>
-                                <h3 className='font-bold'>Success:</h3>
-                                <p>{response}</p>
+                            <div className='mt-3 text-green-400 flex gap-1 justify-center'>
+                                <b>Success</b>
+                                <CircleCheckBigIcon />
+                                {/* {response} */}
                             </div>
                         )}
 
                         {error && (
-                            <div className='mt-4 text-red-400'>
-                                <h3 className='font-bold'>Error:</h3>
-                                <p>{error}</p>
+                            <div className='mt-3 text-red-400 flex gap-1 justify-center'>
+                                <b>Error</b>
+                                <CircleAlertIcon />
+                                {/* {response} */}
                             </div>
                         )}
                     </div>
