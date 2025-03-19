@@ -47,8 +47,8 @@ const Maps = ({ animate = false }) => {
                 className='h-full w-full'
             >
                 <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                    attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> contributors'
+                    url='https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png'
                 />
                 <SetMinZoom />
                 <SetViewOnClick animateRef={animateRef} />
