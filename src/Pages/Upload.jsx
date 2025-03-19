@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 import Header from '../Components/Header';
@@ -7,7 +7,6 @@ const UploadPage = () => {
     const [file, setFile] = useState(null);
     const [response, setResponse] = useState(null);
     const [error, setError] = useState(null);
-    const [socket, setSocket] = useState(null);
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -43,18 +42,31 @@ const UploadPage = () => {
 
     const handleRunScript = async () => {
         try {
-            const result = await window.electron.runPythonScript(
-                'processTurbineData'
-            ); // Replace with your script name (without `.py`)
-            setOutput(result); // You can use the result however you like (e.g., display it on the UI)
+            // Send request to the backend to run a predefined script
+            const response = await axios.post(
+                'http://localhost:4000/api/run-python',
+                {
+                    withCredentials: true
+                }
+            );
+
+            // Extracting output from the response
+            const data = response.data;
+
+            if (data.output) {
+                setOutput(data.output); // Display the script output
+            } else if (data.error) {
+                console.error('Error running Python script:', data.error);
+            }
         } catch (error) {
-            console.error('Error running Python script:', error);
+            console.error('Error making request:', error);
         }
     };
+
     return (
         <div className='flex-1 overflow-auto z-1 h-auto space-y-4'>
             <Header title='File Uploader' />
-        
+
             <div className='flex items-center justify-center bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 py-60'>
                 <div className='bg-gray-900 p-8 rounded-xl shadow-xl text-center'>
                     <h1 className='text-white text-2xl font-semibold mb-4'>
