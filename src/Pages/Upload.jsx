@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import Header from '../Components/Header';
 import {
@@ -8,12 +6,18 @@ import {
     CircleCheckBigIcon,
     WandSparklesIcon
 } from 'lucide-react';
+import DataHandler from '../Utils/DataHandler';
+import DiscrepancyCounter from '../Components/DiscrepancyCounter';
 
 const UploadPage = () => {
     const [file, setFile] = useState(null);
     const [response, setResponse] = useState(null);
     const [error, setError] = useState(null);
     const [output, setOutput] = useState('');
+    const [UnprocessedData, setUnprocessedData] = useState([]);
+    const [ProcessedData, setProcessedData] = useState([]);
+    const [loadingProgress, setLoadingProgress] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -35,21 +39,29 @@ const UploadPage = () => {
             const res = await axios.post(
                 'http://localhost:4000/api/uploadFile',
                 formData,
-                {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                }
+                { headers: { 'Content-Type': 'multipart/form-data' } }
             );
-            setResponse(res.data.message); // Display success message
-            setError(null); // Clear any previous errors
+            setResponse(res.data.message);
+            setError(null);
         } catch (err) {
-            setError(err.response?.data?.message || 'An error occurred.'); // Display error message
-            setResponse(null); // Clear any previous success messages
+            setError(err.response?.data?.message || 'An error occurred.');
+            setResponse(null);
         }
     };
 
     const handleRunScript = async () => {
+        setIsLoading(true);
+        setLoadingProgress(0);
+
+        // Simulate progress bar
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 10;
+            setLoadingProgress(progress);
+            if (progress >= 100) clearInterval(interval);
+        }, 200);
+
         try {
-            // Send request to the backend to run a predefined script
             const response = await axios.post(
                 'http://localhost:4000/api/run-python',
                 {
@@ -57,16 +69,27 @@ const UploadPage = () => {
                 }
             );
 
-            // Extracting output from the response
             const data = response.data;
+            console.log('Data from python : ', data);
 
-            if (data.output) {
-                setOutput(data.output); // Display the script output
+            if (data) {
+                const unprocessed = await DataHandler().getUnprocessedData();
+                setUnprocessedData(unprocessed);
+
+                const processed = await DataHandler().getProcessedData();
+                setProcessedData(processed);
+
+                setOutput(data);
             } else if (data.error) {
                 console.error('Error running Python script:', data.error);
             }
         } catch (error) {
             console.error('Error making request:', error);
+        } finally {
+            setTimeout(() => {
+                setIsLoading(false);
+                setLoadingProgress(100);
+            }, 2000);
         }
     };
 
@@ -79,7 +102,7 @@ const UploadPage = () => {
                     <h1 className='text-white text-2xl font-semibold'>
                         Upload CSV File
                     </h1>
-                    <div className=''>
+                    <div>
                         <form
                             onSubmit={handleUpload}
                             className='flex gap-2 justify-center'
@@ -102,7 +125,6 @@ const UploadPage = () => {
                             <div className='mt-3 text-green-400 flex gap-1 justify-center'>
                                 <b>Success</b>
                                 <CircleCheckBigIcon />
-                                {/* {response} */}
                             </div>
                         )}
 
@@ -110,7 +132,6 @@ const UploadPage = () => {
                             <div className='mt-3 text-red-400 flex gap-1 justify-center'>
                                 <b>Error</b>
                                 <CircleAlertIcon />
-                                {/* {response} */}
                             </div>
                         )}
                     </div>
@@ -125,6 +146,117 @@ const UploadPage = () => {
                         </button>
                     </div>
                 </div>
+
+                {isLoading && (
+                    <div className='w-full bg-gray-700 h-4 rounded-md mt-4'>
+                        <div
+                            className='bg-blue-600 h-4 rounded-md'
+                            style={{
+                                width: `${loadingProgress}%`,
+                                transition: 'width 0.3s'
+                            }}
+                        ></div>
+                    </div>
+                )}
+
+                {!isLoading && (
+                    <>
+                        <h1 className='text-white text-2xl font-semibold text-center p-2'>
+                            {output}
+                        </h1>
+                        <span>
+                            <DiscrepancyCounter />
+                        </span>
+                        <div className='flex item-center justify-center '>
+                            <h2 className='text-xl w-1/2 font-bold text-center mb-2'>
+                                Unprocessed Data
+                            </h2>
+
+                            <h2 className='text-xl w-1/2 font-bold text-center mb-2'>
+                                Processed Data
+                            </h2>
+                        </div>
+                        <div className='flex w-full gap-4 overflow-auto'>
+                            <div className='w-1/2 overflow-auto'>
+                                <table className='table-auto border-collapse border border-gray-400 w-full'>
+                                    <thead>
+                                        <tr className='bg-gray-700'>
+                                            {UnprocessedData.length > 0 &&
+                                                Object.keys(
+                                                    UnprocessedData[0]
+                                                ).map((key) => (
+                                                    <th
+                                                        key={key}
+                                                        className='border text-white font-bold px-4 py-2 whitespace-nowrap'
+                                                    >
+                                                        {key.toUpperCase()}
+                                                    </th>
+                                                ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {UnprocessedData.map((item, index) => (
+                                            <tr
+                                                key={index}
+                                                className='text-center'
+                                            >
+                                                {Object.values(item).map(
+                                                    (value, i) => (
+                                                        <td
+                                                            key={i}
+                                                            className='border border-gray-400 px-4 py-2 whitespace-nowrap'
+                                                        >
+                                                            {value}
+                                                        </td>
+                                                    )
+                                                )}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div className='w-1/2 overflow-auto'>
+                                <table className='table-auto border-collapse border border-gray-400 w-full'>
+                                    <thead>
+                                        <tr className='bg-gray-700'>
+                                            {ProcessedData.length > 0 &&
+                                                Object.keys(
+                                                    ProcessedData[0]
+                                                ).map((key) => (
+                                                    <th
+                                                        key={key}
+                                                        className='border text-white font-bold px-4 py-2 whitespace-nowrap'
+                                                    >
+                                                        {key.toUpperCase()}
+                                                    </th>
+                                                ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {ProcessedData.map((item, index) => (
+                                            <tr
+                                                key={index}
+                                                className='text-center'
+                                            >
+                                                {Object.values(item).map(
+                                                    (value, i) => (
+                                                        <td
+                                                            key={i}
+                                                            className='border border-gray-400 px-4 py-2 whitespace-nowrap'
+                                                        >
+                                                            {value}
+                                                        </td>
+                                                    )
+                                                )}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
