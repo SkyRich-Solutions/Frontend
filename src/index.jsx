@@ -6,6 +6,7 @@ import App from './App';
 import UploadPage from './Pages/Upload';
 import Dashboard from './Pages/Dashboard';
 import Map from './Pages/Map';
+import FaultReport from './Pages/FaultReport';
 
 
 
@@ -25,6 +26,10 @@ const router = createHashRouter([
             {
                 path: '/map',
                 element: <Map />
+            },
+            {
+                path: '/fault-report',
+                element: <FaultReport/>
             }
         ]
     }
