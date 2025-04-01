@@ -1,59 +1,48 @@
-import React, { useRef } from 'react';
-import { MapContainer, TileLayer, useMapEvent, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import React from 'react';
+import {
+    AdvancedMarker,
+    APIProvider,
+    Map,
+    Pin
+} from '@vis.gl/react-google-maps';
+import TurbineData from '../MockData/TurbineData.json';
+// import DataHandler from '../Utils/DataHandler';
 
-function SetViewOnClick({ animateRef }) {
-    const map = useMapEvent('click', (e) => {
-        map.setView(e.latlng, map.getZoom(), {
-            animate: animateRef.current || false
-        });
+const Maps = () => {
+    const position = { lat: 0, lng: 0 };
+
+    const Locations = TurbineData.map((turbine) => {
+        return {
+            lat: parseFloat(turbine.TurbineLatitude),
+            lng: parseFloat(turbine.TurbineLongitude)
+        };
     });
 
-    return null;
-}
-
-function SetMinZoom() {
-    const map = useMap();
-
-    // Set minZoom based on the map's bounds
-    map.setMinZoom(
-        map.getBoundsZoom(
-            [
-                [-90, -180],
-                [90, 180]
-            ],
-            true
-        )
-    );
-
-    return null;
-}
-
-const Maps = ({ animate = false }) => {
-    const animateRef = useRef(animate);
+    console.log(Locations)
 
     return (
-        <div className='h-screen w-screen max-w-full max-h-full p-4'>
-            <MapContainer
-                center={[0, 0]}
-                zoom={10}
-                minZoom={2}
-                maxZoom={18}
-                maxBounds={[
-                    [-90, -180],
-                    [90, 180]
-                ]}
-                scrollWheelZoom={false}
-                className='h-full w-full'
+        <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
+            <Map
+                defaultCenter={position}
+                defaultZoom={3}
+                mapId={process.env.REACT_APP_GOOGLE_MAPS_ID}
             >
-                <TileLayer
-                    attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> contributors'
-                    url='https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png'
-                />
-                <SetMinZoom />
-                <SetViewOnClick animateRef={animateRef} />
-            </MapContainer>
-        </div>
+                {TurbineData.map((turbine, index) => {
+                    return (
+                        <AdvancedMarker
+                            key={index}
+                            position={Locations[index]}
+                            title={turbine.FunctionalLoc}
+                            onClick={() => console.log('Pin clicked!')}
+                        >
+                            <Pin
+                                background="red"
+                            ></Pin>
+                        </AdvancedMarker>
+                    );
+                })}
+            </Map>
+        </APIProvider>
     );
 };
 
