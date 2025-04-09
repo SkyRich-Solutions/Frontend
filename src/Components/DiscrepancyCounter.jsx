@@ -9,7 +9,7 @@ export default function DiscrepancyCounter() {
         async function fetchMistakes() {
             try {
                 const response = await fetch(
-                    'https://api.example.com/mistakes'
+                    'https://localhost:4000/api/violations'
                 ); // Replace with your API endpoint
                 const data = await response.json();
                 setMistakes(data.mistakes); // Assuming API returns { mistakes: number }
