@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '../Components/Header';
+import Header from '../Components/Layout/Header';
 import ChartComponent from '../Components/ChartComponent';
 
 const Dashboard = () => {

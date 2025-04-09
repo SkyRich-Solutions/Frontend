@@ -7,7 +7,7 @@ import {
 } from '@vis.gl/react-google-maps';
 import TurbineData from '../MockData/TurbineData.json';
 import MapsDataHandler from '../Utils/MapsDataHandler.js';
-import Checkbox from './ChechBox.jsx';
+import Checkbox from './ReUseable/ChechBox.jsx';
 
 const Maps = () => {
     const [MaintPlantData, setMaintPlantData] = useState([]);
