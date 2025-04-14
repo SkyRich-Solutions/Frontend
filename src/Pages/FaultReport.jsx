@@ -7,7 +7,7 @@ const FaultReport = () => {
     const [locations, setLocations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [file, setFile] = useState(null); // State for file upload
+    const [file, setFile] = useState(null);
 
     const [formData, setFormData] = useState({
         Technician_ID: "",
@@ -17,7 +17,6 @@ const FaultReport = () => {
         Report_Status: "",
     });
 
-    // Fetch data on component mount
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -50,7 +49,6 @@ const FaultReport = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate file type
         if (file && file.type !== "application/pdf") {
             alert("Only PDF files are allowed.");
             return;
@@ -58,14 +56,10 @@ const FaultReport = () => {
 
         try {
             const formDataToSend = new FormData();
-            formDataToSend.append("Technician_ID", formData.Technician_ID);
-            formDataToSend.append("TurbineLocation", formData.TurbineLocation);
-            formDataToSend.append("Report_Date", formData.Report_Date);
-            formDataToSend.append("Fault_Type", formData.Fault_Type);
-            formDataToSend.append("Report_Status", formData.Report_Status);
-            if (file) {
-                formDataToSend.append("file", file);
-            }
+            Object.entries(formData).forEach(([key, value]) => {
+                formDataToSend.append(key, value);
+            });
+            if (file) formDataToSend.append("file", file);
 
             const response = await axios.post("http://localhost:4000/api/faultReport", formDataToSend, {
                 headers: { "Content-Type": "multipart/form-data" }
@@ -73,7 +67,6 @@ const FaultReport = () => {
 
             alert(response.data.message);
 
-            // Reset form
             setFormData({
                 Technician_ID: "",
                 TurbineLocation: "",
@@ -87,48 +80,97 @@ const FaultReport = () => {
         }
     };
 
-   
-
     return (
         <div className="flex-1 overflow-auto z-1 h-auto space-y-4">
             <Header title="Fault Report" />
-            <div className="items-center justify-center bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-screen">
-                <h2>Submit Fault Report</h2>
-                <form onSubmit={handleSubmit} encType="multipart/form-data">
-                    <label>Technician:</label>
-                    <select name="Technician_ID" value={formData.Technician_ID} onChange={handleChange} required>
-                        <option value="">Select Technician</option>
-                        {technicians.map((tech) => (
-                            <option key={tech.Technician_ID} value={tech.Technician_ID}>
-                                {tech.Name}
-                            </option>
-                        ))}
-                    </select>
+            <div className="flex items-center justify-center bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 min-h-screen">
+                <div className="w-full max-w-md text-white">
+                    {loading ? (
+                        <p className="text-center text-gray-300">Loading technicians and locations...</p>
+                    ) : error ? (
+                        <p className="text-center text-red-400">{error}</p>
+                    ) : (
+                        <>
+                            <form onSubmit={handleSubmit} encType="multipart/form-data" className="flex flex-col gap-4">
+                                <label>Technician:</label>
+                                <select
+                                    name="Technician_ID"
+                                    value={formData.Technician_ID}
+                                    onChange={handleChange}
+                                    required
+                                    className="bg-gray-700 text-white border border-gray-500 p-2 rounded"
+                                >
+                                    <option value="">Select Technician</option>
+                                    {technicians.map((tech) => (
+                                        <option key={tech.Technician_ID} value={tech.Technician_ID}>
+                                            {tech.Name}
+                                        </option>
+                                    ))}
+                                </select>
 
-                    <label>Turbine Location:</label>
-                    <select name="TurbineLocation" value={formData.TurbineLocation} onChange={handleChange} required>
-                        <option value="">Select Location</option>
-                        {locations.map((loc) => (
-                            <option key={loc.Location_ID} value={loc.Location_ID}>
-                                {loc.Location_Name}
-                            </option>
-                        ))}
-                    </select>
+                                <label>Turbine Location:</label>
+                                <select
+                                    name="TurbineLocation"
+                                    value={formData.TurbineLocation}
+                                    onChange={handleChange}
+                                    required
+                                    className="bg-gray-700 text-white border border-gray-500 p-2 rounded"
+                                >
+                                    <option value="">Select Location</option>
+                                    {locations.map((loc) => (
+                                        <option key={loc.Location_ID} value={loc.Location_ID}>
+                                            {loc.Location_Name}
+                                        </option>
+                                    ))}
+                                </select>
 
-                    <label>Report Date:</label>
-                    <input type="date" name="Report_Date" value={formData.Report_Date} onChange={handleChange} required />
+                                <label>Report Date:</label>
+                                <input
+                                    type="date"
+                                    name="Report_Date"
+                                    value={formData.Report_Date}
+                                    onChange={handleChange}
+                                    required
+                                    className="bg-gray-700 text-white border border-gray-500 p-2 rounded"
+                                />
 
-                    <label>Fault Type:</label>
-                    <textarea name="Fault_Type" value={formData.Fault_Type} onChange={handleChange} required />
+                                <label>Fault Type:</label>
+                                <textarea
+                                    name="Fault_Type"
+                                    value={formData.Fault_Type}
+                                    onChange={handleChange}
+                                    required
+                                    className="bg-gray-700 text-white border border-gray-500 p-2 rounded"
+                                />
 
-                    <label>Report Status:</label>
-                    <input type="text" name="Report_Status" value={formData.Report_Status} onChange={handleChange} required />
+                                <label>Report Status:</label>
+                                <input
+                                    type="text"
+                                    name="Report_Status"
+                                    value={formData.Report_Status}
+                                    onChange={handleChange}
+                                    required
+                                    className="bg-gray-700 text-white border border-gray-500 p-2 rounded"
+                                />
 
-                    <label>Upload PDF Report:</label>
-                    <input type="file" accept="application/pdf" onChange={handleFileChange} />
+                                <label>Upload PDF Report:</label>
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={handleFileChange}
+                                    className="text-white"
+                                />
 
-                    <button type="submit">Submit Report</button>
-                </form>
+                                <button
+                                    type="submit"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                >
+                                    Submit Report
+                                </button>
+                            </form>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
