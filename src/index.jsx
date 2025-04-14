@@ -7,14 +7,18 @@ import UploadPage from './Pages/Upload';
 import Dashboard from './Pages/Dashboard';
 import Map from './Pages/Map';
 import FaultReport from './Pages/FaultReport';
-
-
+import MainPage from './Pages/MainPage';
 
 const router = createHashRouter([
     {
         path: '/',
         element: <App />,
         children: [
+            {
+                path: '/',
+                element: <MainPage />
+            },
+
             {
                 path: '/upload',
                 element: <UploadPage />
@@ -29,7 +33,7 @@ const router = createHashRouter([
             },
             {
                 path: '/fault-report',
-                element: <FaultReport/>
+                element: <FaultReport />
             }
         ]
     }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import CountUp from './Counter'; // Assuming CountUp is in the same directory
+import CountUp from './ReUseable/Counter'; // Assuming CountUp is in the same directory
 
 export default function DiscrepancyCounter() {
     const [mistakes, setMistakes] = useState(0);

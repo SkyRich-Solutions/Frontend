@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Header from "../Components/Header";
+import Header from "../Components/Layout/Header";
 
 const FaultReport = () => {
     const [technicians, setTechnicians] = useState([]);
@@ -13,7 +13,7 @@ const FaultReport = () => {
         Technician_ID: "",
         TurbineLocation: "",
         Report_Date: "",
-        Fault_Description: "",
+        Fault_Type: "",
         Report_Status: "",
     });
 
@@ -61,7 +61,7 @@ const FaultReport = () => {
             formDataToSend.append("Technician_ID", formData.Technician_ID);
             formDataToSend.append("TurbineLocation", formData.TurbineLocation);
             formDataToSend.append("Report_Date", formData.Report_Date);
-            formDataToSend.append("Fault_Description", formData.Fault_Description);
+            formDataToSend.append("Fault_Type", formData.Fault_Type);
             formDataToSend.append("Report_Status", formData.Report_Status);
             if (file) {
                 formDataToSend.append("file", file);
@@ -78,7 +78,7 @@ const FaultReport = () => {
                 Technician_ID: "",
                 TurbineLocation: "",
                 Report_Date: "",
-                Fault_Description: "",
+                Fault_Type: "",
                 Report_Status: "",
             });
             setFile(null);
@@ -118,8 +118,8 @@ const FaultReport = () => {
                     <label>Report Date:</label>
                     <input type="date" name="Report_Date" value={formData.Report_Date} onChange={handleChange} required />
 
-                    <label>Fault Description:</label>
-                    <textarea name="Fault_Description" value={formData.Fault_Description} onChange={handleChange} required />
+                    <label>Fault Type:</label>
+                    <textarea name="Fault_Type" value={formData.Fault_Type} onChange={handleChange} required />
 
                     <label>Report Status:</label>
                     <input type="text" name="Report_Status" value={formData.Report_Status} onChange={handleChange} required />

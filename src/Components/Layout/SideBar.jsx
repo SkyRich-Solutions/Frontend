@@ -3,7 +3,8 @@ import {
     Menu,
     TrendingUp,
     MapPinIcon,
-    CloudUploadIcon
+    CloudUploadIcon,
+    ChartNoAxesCombined
 } from 'lucide-react';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -12,6 +13,12 @@ import { Link } from 'react-router';
 const SIDEBAR_ITEMS = [
     {
         name: 'Overview',
+        icon: ChartNoAxesCombined,
+        color: '#6366f1',
+        href: '/'
+    },
+    {
+        name: 'Fault Report',
         icon: BarChart2,
         color: '#6366f1',
         href: '/fault-report'
@@ -22,12 +29,12 @@ const SIDEBAR_ITEMS = [
         color: '#8B5CF6',
         href: '/upload'
     },
-	{
-		name: 'Maps',
-		icon: MapPinIcon,
-		color: '#6EE7B7',
-		href: '/map'
-	},
+    {
+        name: 'Maps',
+        icon: MapPinIcon,
+        color: '#6EE7B7',
+        href: '/map'
+    },
     {
         name: 'Analytics',
         icon: TrendingUp,
