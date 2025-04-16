@@ -248,7 +248,7 @@ const UploadPage = () => {
     const shouldHighlight =
       (fileType === 'material' && item.ViolationReplacementPart === "1") ||
       (fileType === 'turbine' &&
-        (item.UnknownMaintPlant === "1" || item.UnknownPlanningPlant === "1"));
+        (item.UnknownMaintPlant === "1" || item.UnknownPlanningPlant === "1" || item.UnknownLocation === "1"));
 
     return (
       <tr

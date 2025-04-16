@@ -48,11 +48,50 @@ const getPlantData = async () => {
     }
 }
 
+const getWarehousePlanningPlantData = async () => {
+    try {
+        const response = await axios.get(
+            'http://localhost:4000/api/getWarehousePlanningPlant'
+        );
+        // console.log('Warehouse Planning Plant Data:', response.data.data);
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching Warehouse Planning Plant data:', error);
+    }
+}
+
+const getWarehouseManufacturingPlantData = async () => {
+    try {
+        const response = await axios.get(
+            'http://localhost:4000/api/getWarehouseManufacturingPlant'
+        );
+        // console.log('Warehouse Planning Plant Data:', response.data.data);
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching Warehouse Planning Plant data:', error);
+    }
+}
+
+const getWarehousePlantData = async () => {
+    try {
+        const response = await axios.get(
+            'http://localhost:4000/api/getWarehosuePlant'
+        );
+        // console.log('Warehouse Planning Plant Data:', response.data.data);
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching Warehouse Planning Plant data:', error);
+    }
+}
+
 const MapsDataHandler = {
     getPlanningPlantData,
     getMaintPlantData,
     getPlanningAndMaintPlantData,
-    getPlantData
+    getPlantData,
+    getWarehousePlanningPlantData,
+    getWarehouseManufacturingPlantData,
+    getWarehousePlantData
 };
 
 export default MapsDataHandler;
