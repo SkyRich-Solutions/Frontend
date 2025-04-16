@@ -1,5 +1,5 @@
 import React from 'react';
-import { AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
+import { AdvancedMarker } from '@vis.gl/react-google-maps';
 
 const isValidLatLng = (lat, lng) =>
     !isNaN(lat) &&
@@ -27,7 +27,13 @@ const TurbineMarkers = ({
                         title={turbine.FunctionalLoc}
                         onClick={() => setSelectedTurbine(turbine)}
                     >
-                        <Pin background='gray' />
+                        <div className='p-1 rounded-full bg-zinc-500'>
+                            <img
+                                src='/icons/turbine.png'
+                                alt='Turbine'
+                                className='w-6 h-6'
+                            />
+                        </div>
                     </AdvancedMarker>
                 ))}
 
@@ -44,7 +50,13 @@ const TurbineMarkers = ({
                             title={`MaintPlant: ${turbine.FunctionalLoc}`}
                             onClick={() => setSelectedTurbine(turbine)}
                         >
-                            <Pin background='red' />
+                            <div className='p-1 rounded-full bg-red-500'>
+                                <img
+                                    src='/icons/turbine.png'
+                                    alt='Turbine'
+                                    className='w-6 h-6'
+                                />
+                            </div>
                         </AdvancedMarker>
                     );
                 })}
@@ -62,7 +74,13 @@ const TurbineMarkers = ({
                             title={`PlanningPlant: ${turbine.FunctionalLoc}`}
                             onClick={() => setSelectedTurbine(turbine)}
                         >
-                            <Pin background='blue' />
+                            <div className='p-1 rounded-full bg-blue-500'>
+                                <img
+                                    src='/icons/turbine.png'
+                                    alt='Turbine'
+                                    className='w-6 h-6'
+                                />
+                            </div>
                         </AdvancedMarker>
                     );
                 })}
