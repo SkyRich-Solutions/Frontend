@@ -129,40 +129,40 @@ const MainPage = () => {
                 );
                 setClassificationChartData(
                     buildPieChart(
-                        'Compliant',
                         'Non-Compliant',
-                        classified,
+                        'Compliant',
                         unclassified,
+                        classified,
                         'rgba(54, 162, 235, 0.6)',
                         'rgba(255, 206, 86, 0.6)'
                     )
                 );
                 setPlantChartData(
                     buildPieChart(
-                        'Compliant Plant',
-                        'Non-Compliant Plant',
-                        known,
+                        'Non-Compliant',
+                        'Compliant',
                         unknown,
+                        known,
                         'rgba(153, 102, 255, 0.6)',
                         'rgba(255, 159, 64, 0.6)'
                     )
                 );
                 setPlanningPlant(
                     buildPieChart(
-                        'Compliant Plant',
-                        'Non-Compliant Plant',
-                        PlanningPlant,
+                        'Non-Compliant',
+                        'Compliant',
                         PlanningPlantViolation,
+                        PlanningPlant,
                         'rgba(54, 162, 235, 0.6)',
                         'rgba(255, 206, 86, 0.6)'
                     )
                 );
                 setLocation(
                     buildPieChart(
-                        'Compliant Plant',
-                        'Non-Compliant Plant',
-                        KnownLocation,
+                        'Non-Compliant',
+                        'Compliant',
                         UnknownLocation,
+                        KnownLocation,
                         'rgba(153, 102, 255, 0.6)',
                         'rgba(255, 159, 64, 0.6)'
                     )
