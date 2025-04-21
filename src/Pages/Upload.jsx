@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import Header from '../Components/Layout/Header';
@@ -7,7 +6,7 @@ import {
     CircleCheckBigIcon,
     WandSparklesIcon
 } from 'lucide-react';
-import DiscrepancyCounter from '../Components/DiscrepancyCounter';
+// import DiscrepancyCounter from '../Components/DiscrepancyCounter';
 
 const UploadPage = () => {
     const [file, setFile] = useState(null);
@@ -18,7 +17,7 @@ const UploadPage = () => {
     const [UnprocessedData, setUnprocessedData] = useState([]);
     const [ProcessedData, setProcessedData] = useState([]);
     const [loadingProgress, setLoadingProgress] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
+    const [Loading, setLoading] = useState(false);
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -64,7 +63,9 @@ const UploadPage = () => {
 
     const fetchData = async () => {
         if (!fileType) {
-            setError('Unknown file type. Make sure the filename includes "material" or "turbine".');
+            setError(
+                'Unknown file type. Make sure the filename includes "material" or "turbine".'
+            );
             return;
         }
 
@@ -72,14 +73,17 @@ const UploadPage = () => {
 
         try {
             const [unprocessedRes, processedRes] = await Promise.all([
-                axios.get(`http://localhost:4000/api/fetch_Unprocessed${apiPrefix}Data`),
-                axios.get(`http://localhost:4000/api/fetch_Processed${apiPrefix}Data`)
+                axios.get(
+                    `http://localhost:4000/api/fetch_Unprocessed${apiPrefix}Data`
+                ),
+                axios.get(
+                    `http://localhost:4000/api/fetch_Processed${apiPrefix}Data`
+                )
             ]);
 
             setUnprocessedData(unprocessedRes.data.data);
             setProcessedData(processedRes.data.data);
             console.log(processedRes.data.data);
-            
         } catch (err) {
             setError('Error fetching data.');
             console.error(err);
@@ -87,7 +91,7 @@ const UploadPage = () => {
     };
 
     const handleRunScript = async () => {
-        setIsLoading(true);
+        setLoading(true);
         setLoadingProgress(0);
 
         let progress = 0;
@@ -98,22 +102,28 @@ const UploadPage = () => {
         }, 200);
 
         try {
-            const response = await axios.post('http://localhost:4000/api/run-python', {
-                withCredentials: true
-            });
+            const response = await axios.post(
+                'http://localhost:4000/api/run-python',
+                {
+                    withCredentials: true
+                }
+            );
 
             if (response.data) {
                 await fetchData();
                 setOutput(response.data);
             } else if (response.data.error) {
-                console.error('Error running Python script:', response.data.error);
+                console.error(
+                    'Error running Python script:',
+                    response.data.error
+                );
             }
         } catch (error) {
             console.error('Error making request:', error);
             setError('Error running script.');
         } finally {
             setTimeout(() => {
-                setIsLoading(false);
+                setLoading(false);
                 setLoadingProgress(100);
             }, 2000);
         }
@@ -129,7 +139,10 @@ const UploadPage = () => {
                         Upload CSV File
                     </h1>
                     <div>
-                        <form onSubmit={handleUpload} className='flex gap-2 justify-center'>
+                        <form
+                            onSubmit={handleUpload}
+                            className='flex gap-2 justify-center'
+                        >
                             <input
                                 type='file'
                                 accept='.csv'
@@ -159,15 +172,20 @@ const UploadPage = () => {
                         )}
                     </div>
 
-                    <div className='bg-gray-500 text-center px-4 py-3 rounded-lg'>
-                        <button onClick={handleRunScript} className='flex gap-1'>
+                    <div className={`bg-gray-500 text-center px-4 py-3 rounded-lg cursor-${Loading ? 'pointer' : ''}`}>
+                        <button
+                            onClick={handleRunScript}
+                            // className='flex gap-1 cursor-pointer'
+                            className={`flex gap-1 rounded cursor-${Loading ? 'pointer' : 'not-allowed'} ${!Loading && 'opacity-50'}`}
+                            disabled={!Loading}
+                        >
                             <WandSparklesIcon />
                             Clean Data
                         </button>
                     </div>
                 </div>
 
-                {isLoading && (
+                {Loading && (
                     <div className='w-full bg-gray-700 h-4 rounded-md mt-4'>
                         <div
                             className='bg-blue-600 h-4 rounded-md'
@@ -179,7 +197,7 @@ const UploadPage = () => {
                     </div>
                 )}
 
-                {!isLoading && (
+                {!Loading && (
                     <>
                         <h1 className='text-white text-2xl font-semibold text-center p-2'>
                             {output}
@@ -201,7 +219,9 @@ const UploadPage = () => {
                                     <thead>
                                         <tr className='bg-gray-700'>
                                             {UnprocessedData.length > 0 &&
-                                                Object.keys(UnprocessedData[0]).map((key) => (
+                                                Object.keys(
+                                                    UnprocessedData[0]
+                                                ).map((key) => (
                                                     <th
                                                         key={key}
                                                         className='border text-white font-bold px-4 py-2 whitespace-nowrap'
@@ -213,15 +233,20 @@ const UploadPage = () => {
                                     </thead>
                                     <tbody>
                                         {UnprocessedData.map((item, index) => (
-                                            <tr key={index} className='text-center'>
-                                                {Object.values(item).map((value, i) => (
-                                                    <td
-                                                        key={i}
-                                                        className='border border-gray-400 px-4 py-2 whitespace-nowrap'
-                                                    >
-                                                        {value}
-                                                    </td>
-                                                ))}
+                                            <tr
+                                                key={index}
+                                                className='text-center'
+                                            >
+                                                {Object.values(item).map(
+                                                    (value, i) => (
+                                                        <td
+                                                            key={i}
+                                                            className='border border-gray-400 px-4 py-2 whitespace-nowrap'
+                                                        >
+                                                            {value}
+                                                        </td>
+                                                    )
+                                                )}
                                             </tr>
                                         ))}
                                     </tbody>
@@ -233,7 +258,9 @@ const UploadPage = () => {
                                     <thead>
                                         <tr className='bg-gray-700'>
                                             {ProcessedData.length > 0 &&
-                                                Object.keys(ProcessedData[0]).map((key) => (
+                                                Object.keys(
+                                                    ProcessedData[0]
+                                                ).map((key) => (
                                                     <th
                                                         key={key}
                                                         className='border text-white font-bold px-4 py-2 whitespace-nowrap'
@@ -244,29 +271,42 @@ const UploadPage = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-  {ProcessedData.map((item, index) => {
-    const shouldHighlight =
-      (fileType === 'material' && item.ViolationReplacementPart === "1") ||
-      (fileType === 'turbine' &&
-        (item.UnknownMaintPlant === "1" || item.UnknownPlanningPlant === "1" || item.UnknownLocation === "1"));
+                                        {ProcessedData.map((item, index) => {
+                                            const shouldHighlight =
+                                                (fileType === 'material' &&
+                                                    item.ViolationReplacementPart ===
+                                                        '1') ||
+                                                (fileType === 'turbine' &&
+                                                    (item.UnknownMaintPlant ===
+                                                        '1' ||
+                                                        item.UnknownPlanningPlant ===
+                                                            '1' ||
+                                                        item.UnknownLocation ===
+                                                            '1'));
 
-    return (
-      <tr
-        key={index}
-        className={`text-center ${shouldHighlight ? 'bg-red-500 text-white font-bold' : ''}`}
-      >
-        {Object.values(item).map((value, i) => (
-          <td
-            key={i}
-            className='border border-gray-400 px-4 py-2 whitespace-nowrap'
-          >
-            {value}
-          </td>
-        ))}
-      </tr>
-    );
-  })}
-</tbody>
+                                            return (
+                                                <tr
+                                                    key={index}
+                                                    className={`text-center ${
+                                                        shouldHighlight
+                                                            ? 'bg-red-500 text-white font-bold'
+                                                            : ''
+                                                    }`}
+                                                >
+                                                    {Object.values(item).map(
+                                                        (value, i) => (
+                                                            <td
+                                                                key={i}
+                                                                className='border border-gray-400 px-4 py-2 whitespace-nowrap'
+                                                            >
+                                                                {value}
+                                                            </td>
+                                                        )
+                                                    )}
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
