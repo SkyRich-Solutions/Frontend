@@ -84,7 +84,7 @@ const getWarehousePlantData = async () => {
     }
 }
 
-const MapsDataHandler = {
+const  MapsDataHandler = {
     getPlanningPlantData,
     getMaintPlantData,
     getPlanningAndMaintPlantData,
