@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     BarChart2,
     Menu,
@@ -9,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const SIDEBAR_ITEMS = [
     {
@@ -18,7 +19,6 @@ const SIDEBAR_ITEMS = [
         color: '#6366f1',
         href: '/'
     },
-   
     {
         name: 'Upload',
         icon: CloudUploadIcon,
@@ -70,6 +70,7 @@ const Sidebar = () => {
                         <Link key={item.href} to={item.href}>
                             <motion.div className='flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2'>
                                 <item.icon
+                                    data-testid="sidebar-icon"
                                     size={20}
                                     style={{
                                         color: item.color,
@@ -103,4 +104,5 @@ const Sidebar = () => {
         </motion.div>
     );
 };
+
 export default Sidebar;
