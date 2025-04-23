@@ -1,19 +1,8 @@
 import React from 'react';
-import { AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
+import { AdvancedMarker } from '@vis.gl/react-google-maps';
 
-const isValidLatLng = (lat, lng) =>
-    !isNaN(lat) &&
-    !isNaN(lng) &&
-    typeof lat === 'number' &&
-    typeof lng === 'number';
-
-const TurbineMarkers = ({
-    filters,
-    allData,
-    maintData,
-    planningData,
-    setSelectedTurbine
-}) => {
+const TurbineMarkers = ({ filters, allData, setSelectedTurbine }) => {
+    console.log('allData', allData);
     return (
         <>
             {filters.showAll &&
@@ -21,51 +10,21 @@ const TurbineMarkers = ({
                     <AdvancedMarker
                         key={`all-${index}`}
                         position={{
-                            lat: parseFloat(turbine.TurbineLatitude),
-                            lng: parseFloat(turbine.TurbineLongitude)
+                            lat: turbine.TurbineLatitude,
+                            lng: turbine.TurbineLongitude
                         }}
                         title={turbine.FunctionalLoc}
                         onClick={() => setSelectedTurbine(turbine)}
                     >
-                        <Pin background='gray' />
+                        <div className='p-1 rounded-full bg-zinc-500'>
+                            <img
+                                src='/icons/turbine.png'
+                                alt='Turbine'
+                                className='w-6 h-6'
+                            />
+                        </div>
                     </AdvancedMarker>
                 ))}
-
-            {filters.showMaint &&
-                maintData.map((turbine, index) => {
-                    const lat = parseFloat(turbine.TurbineLatitude);
-                    const lng = parseFloat(turbine.TurbineLongitude);
-                    if (!isValidLatLng(lat, lng)) return null;
-
-                    return (
-                        <AdvancedMarker
-                            key={`maint-${index}`}
-                            position={{ lat, lng }}
-                            title={`MaintPlant: ${turbine.FunctionalLoc}`}
-                            onClick={() => setSelectedTurbine(turbine)}
-                        >
-                            <Pin background='red' />
-                        </AdvancedMarker>
-                    );
-                })}
-
-            {filters.showPlanning &&
-                planningData.map((turbine, index) => {
-                    const lat = parseFloat(turbine.TurbineLatitude);
-                    const lng = parseFloat(turbine.TurbineLongitude);
-                    if (!isValidLatLng(lat, lng)) return null;
-
-                    return (
-                        <AdvancedMarker
-                            key={`planning-${index}`}
-                            position={{ lat, lng }}
-                            title={`PlanningPlant: ${turbine.FunctionalLoc}`}
-                            onClick={() => setSelectedTurbine(turbine)}
-                        >
-                            <Pin background='blue' />
-                        </AdvancedMarker>
-                    );
-                })}
         </>
     );
 };

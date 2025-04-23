@@ -3,43 +3,56 @@ import axios from 'axios';
 const getPlanningPlantData = async () => {
     try {
         const response = await axios.get(
-            'http://localhost:4000/api/PlanningPlant'
+            'http://localhost:4000/api/getAllTurbine'
         );
-        console.log('Planning Plant Data:', response.data.data);
+        // console.log('Planning Plant Data:', response.data.data);
         return response.data.data;
     } catch (error) {
         console.error('Error fetching Planning Plant data:', error);
     }
 };
 
-const getMaintPlantData = async () => {
+const getWarehousePlanningPlantData = async () => {
     try {
         const response = await axios.get(
-            'http://localhost:4000/api/MaintPlant'
+            'http://localhost:4000/api/getWarehousePlanningPlant'
         );
-        console.log('Maint Plant Data:', response.data.data);
+        // console.log('Warehouse Planning Plant Data:', response.data.data);
         return response.data.data;
     } catch (error) {
-        console.error('Error fetching Maint Plant data:', error);
+        console.error('Error fetching Warehouse Planning Plant data:', error);
     }
-};
+}
 
-const getPlanningAndMaintPlantData = async () => {
+const getWarehouseManufacturingPlantData = async () => {
     try {
         const response = await axios.get(
-            'http://localhost:4000/api/MainAndPlanningPlant'
+            'http://localhost:4000/api/getWarehouseManufacturingPlant'
         );
-        console.log('Planning + Maint Plant Data:', response.data.data);
+        // console.log('Warehouse Planning Plant Data:', response.data.data);
         return response.data.data;
     } catch (error) {
-        console.error('Error fetching combined data:', error);
+        console.error('Error fetching Warehouse Planning Plant data:', error);
     }
-};
+}
 
-const MapsDataHandler = {
+const getWarehousePlantData = async () => {
+    try {
+        const response = await axios.get(
+            'http://localhost:4000/api/getWarehosuePlant'
+        );
+        // console.log('Warehouse Planning Plant Data:', response.data.data);
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching Warehouse Planning Plant data:', error);
+    }
+}
+
+const  MapsDataHandler = {
     getPlanningPlantData,
-    getMaintPlantData,
-    getPlanningAndMaintPlantData
+    getWarehousePlanningPlantData,
+    getWarehouseManufacturingPlantData,
+    getWarehousePlantData
 };
 
 export default MapsDataHandler;

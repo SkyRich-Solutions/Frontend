@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router';
 import Sidebar from './Components/Layout/SideBar';
+import RouteTitleManager from './RoutesTitle';
 
 function App() {
     return (
@@ -10,7 +11,7 @@ function App() {
                 <div className=' absolute inset-0 backdrop-blur-sm' />
             </div>
             <Sidebar />
-
+            <RouteTitleManager />
             <Outlet />
         </div>
     );
