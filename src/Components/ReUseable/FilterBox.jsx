@@ -1,34 +1,34 @@
+// import React from 'react';
+// import Checkbox from '../ReUseable/ChechBox';
+
+// const FilterBox = ({ filters, onChange, title, filterKey, group }) => {
+//     return (
+//         <label className='flex gap-2 items-center'>
+//             <Checkbox
+//                 name={filterKey}
+//                 checked={filters[filterKey]}
+//                 onChange={(e) => onChange(e, group)}
+//             />
+//             {title}
+//         </label>
+//     );
+// };
+
+// export default FilterBox;
+
 import React from 'react';
 import Checkbox from '../ReUseable/ChechBox';
 
-const FilterBox = ({ filters, onChange }) => {
+const FilterBox = ({ filters, onChange, title, filterKey, group }) => {
     return (
-        <div className='bg-gray-800 bg-opacity-60 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex flex-wrap gap-4 items-center justify-start rounded-lg w-[300px]'>
-            <label className='flex gap-2 items-center'>
-                <Checkbox
-                    name='showAll'
-                    checked={filters.showAll}
-                    onChange={onChange}
-                />
-                Show All (Gray)
-            </label>
-            <label className='flex gap-2 items-center'>
-                <Checkbox
-                    name='showMaint'
-                    checked={filters.showMaint}
-                    onChange={onChange}
-                />
-                Show Maintenance (Red)
-            </label>
-            <label className='flex gap-2 items-center'>
-                <Checkbox
-                    name='showPlanning'
-                    checked={filters.showPlanning}
-                    onChange={onChange}
-                />
-                Show Planning (Blue)
-            </label>
-        </div>
+        <label className='flex gap-2 items-center'>
+            <Checkbox
+                name={filterKey}
+                checked={filters[filterKey]}
+                onChange={(e) => onChange(e, group)}
+            />
+            {title}
+        </label>
     );
 };
 

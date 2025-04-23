@@ -1,46 +1,137 @@
 import React, { useEffect, useState } from 'react';
 import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import Header from '../Components/Layout/Header';
-import TurbineData from '../MockData/TurbineData.json';
 import MapsDataHandler from '../Utils/MapsDataHandler';
 import FilterBox from '../Components/ReUseable/FilterBox';
 import TurbineMarkers from '../Components/Maps/TurbineMarker';
 import TurbineDetailPanel from '../Components/Maps/TurbineDetailPanel';
+import WarehouseMarker from '../Components/Maps/WarehouseMarker';
+import ConnectionLine from '../Components/Maps/ConnectingLine';
 
 const Maps = () => {
-    const [MaintPlantData, setMaintPlantData] = useState([]);
-    const [PlanningPlantData, setPlanningPlantData] = useState([]);
+    const [TurbineData, setTurbineData] = useState([])
+    const [PlantData, setPlantData] = useState([]);
+    const [linePath, setLinePath] = useState([]);
     const [SelectedTurbine, setSelectedTurbine] = useState(null);
     const [Filters, setFilters] = useState({
-        showAll: true,
-        showMaint: true,
-        showPlanning: true
+        turbine: {
+            showAll: true
+        },
+        warehouse: {
+            showAll: true,
+            showMaint: true,
+            showPlanning: true
+        }
     });
 
     const position = { lat: 0, lng: 0 };
 
-    const handleFilterChange = (e) => {
+    const handleFilterChange = (e, group) => {
         const { name, checked } = e.target;
         setFilters((prev) => ({
             ...prev,
-            [name]: checked
+            [group]: {
+                ...prev[group],
+                [name]: checked
+            }
         }));
     };
 
+    const handleTurbineClick = (turbine) => {
+        if (
+            SelectedTurbine &&
+            SelectedTurbine.TurbineName === turbine.TurbineName
+        ) {
+            setSelectedTurbine(null);
+            setLinePath([]);
+        } else {
+            setSelectedTurbine(turbine);
+        }
+    };
+
+    const handleMapClick = () => {
+        setSelectedTurbine(null);
+        setLinePath([]);
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
+        if (!SelectedTurbine || !PlantData.maint) {
+            setLinePath([]);
+            return;
+        }
+
+        try {
+            const turbineCoords = {
+                lat: parseFloat(SelectedTurbine.TurbineLatitude),
+                lng: parseFloat(SelectedTurbine.TurbineLongitude)
+            };
+
+            const path = [turbineCoords];
+
+            if (Filters.warehouse.showMaint) {
+                const maintLocation = PlantData.maint.find(
+                    (item) => item.Plant_Name === SelectedTurbine.MaintPlant
+                );
+
+                if (maintLocation) {
+                    path.push({
+                        lat: parseFloat(maintLocation.Plant_Latitude),
+                        lng: parseFloat(maintLocation.Plant_Longitude)
+                    });
+                }
+            }
+
+            if (Filters.warehouse.showPlanning) {
+                const planningLocation = PlantData.maint.find(
+                    (item) => item.Plant_Name === SelectedTurbine.PlanningPlant
+                );
+
+                if (planningLocation) {
+                    path.push({
+                        lat: parseFloat(planningLocation.Plant_Latitude),
+                        lng: parseFloat(planningLocation.Plant_Longitude)
+                    });
+                }
+            }
+
+            setLinePath(path.length > 1 ? path : []);
+        } catch (error) {
+            console.error('Error during plant lookup:', error);
+            setLinePath([]);
+        }
+    }, [SelectedTurbine, PlantData, Filters.warehouse]);
+
+    useEffect(() => {
+
+        const syncTurbineData = async () => {
             try {
-                const planningData =
-                    await MapsDataHandler.getPlanningPlantData();
-                const maintData = await MapsDataHandler.getMaintPlantData();
-                setPlanningPlantData(planningData);
-                setMaintPlantData(maintData);
+                const response = await MapsDataHandler.getPlanningPlantData();
+                setTurbineData(response || []);
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error syncing turbine data:', error);
+                
+            }
+         }
+        const syncPlantData = async () => {
+            try {
+                const [all, maint, planning] = await Promise.all([
+                    MapsDataHandler.getWarehousePlantData(),
+                    MapsDataHandler.getWarehouseManufacturingPlantData(),
+                    MapsDataHandler.getWarehousePlanningPlantData()
+                ]);
+
+                setPlantData({
+                    all: all || [],
+                    maint: maint || [],
+                    planning: planning || []
+                });
+            } catch (error) {
+                console.error('Error syncing plant data:', error);
             }
         };
 
-        fetchData();
+        syncTurbineData();
+        syncPlantData();
     }, []);
 
     return (
@@ -56,24 +147,71 @@ const Maps = () => {
                             defaultCenter={position}
                             defaultZoom={3}
                             mapId={process.env.REACT_APP_GOOGLE_MAPS_ID}
+                            onClick={handleMapClick}
                         >
                             <TurbineMarkers
-                                filters={Filters}
+                                filters={Filters.turbine}
                                 allData={TurbineData}
-                                maintData={MaintPlantData}
-                                planningData={PlanningPlantData}
-                                setSelectedTurbine={setSelectedTurbine}
+                                setSelectedTurbine={handleTurbineClick}
                             />
+
+                            <WarehouseMarker
+                                plantData={PlantData}
+                                filters={Filters.warehouse}
+                            />
+
+                            {linePath.length > 0 && (
+                                <ConnectionLine path={linePath} />
+                            )}
                         </Map>
                     </APIProvider>
                 </div>
 
-                {/* Filter and Detail Panel Section */}
+                {/* Sidebar */}
                 <div className='flex flex-col space-y-4 p-4 w-[350px] bg-gray-900 text-white border-l border-gray-700 '>
-                    <FilterBox
-                        filters={Filters}
-                        onChange={handleFilterChange}
-                    />
+                    {/* Turbine Filtering */}
+                    <div className='bg-gray-800 bg-opacity-60 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex flex-wrap gap-4 items-center rounded-lg w-[300px]'>
+                        <div className='flex justify-center w-full'>
+                            <strong>Turbine</strong>
+                        </div>
+                        <FilterBox
+                            title='All Turbines'
+                            group='turbine'
+                            filterKey='showAll'
+                            filters={Filters.turbine}
+                            onChange={handleFilterChange}
+                        />
+                    </div>
+
+                    {/* Warehouse Filtering */}
+                    <div className='bg-gray-800 bg-opacity-60 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex flex-wrap gap-4 items-center rounded-lg w-[300px]'>
+                        <div className='flex justify-center w-full'>
+                            <strong>Warehouse</strong>
+                        </div>
+
+                        <FilterBox
+                            title='Part Warehouse (Grey)'
+                            filterKey='showAll'
+                            group='warehouse'
+                            filters={Filters.warehouse}
+                            onChange={handleFilterChange}
+                        />
+                        <FilterBox
+                            title='Maintenance Warehouse (Red)'
+                            filterKey='showMaint'
+                            group='warehouse'
+                            filters={Filters.warehouse}
+                            onChange={handleFilterChange}
+                        />
+                        <FilterBox
+                            title='Planning Warehouse (Blue)'
+                            filterKey='showPlanning'
+                            group='warehouse'
+                            filters={Filters.warehouse}
+                            onChange={handleFilterChange}
+                        />
+                    </div>
+
                     <TurbineDetailPanel selectedTurbine={SelectedTurbine} />
                 </div>
             </div>
