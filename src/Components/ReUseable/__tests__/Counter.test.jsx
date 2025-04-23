@@ -32,13 +32,11 @@ describe('CountUp component', () => {
       <CountUp from={0} to={100} delay={1} duration={2} onStart={onStart} onEnd={onEnd} />
     );
 
-    // Delay timer triggers onStart
     act(() => {
       jest.advanceTimersByTime(1000);
     });
     expect(onStart).toHaveBeenCalled();
 
-    // After full duration, onEnd should be called
     act(() => {
       jest.advanceTimersByTime(2000);
     });
@@ -60,7 +58,7 @@ describe('CountUp component', () => {
     act(() => {
       jest.advanceTimersByTime(3000);
     });
-    expect(container.textContent).toBe('0'); // value should remain unchanged
+    expect(container.textContent).toBe('0');
   });
 
   it('formats number with separator', () => {
@@ -70,7 +68,6 @@ describe('CountUp component', () => {
       jest.advanceTimersByTime(100);
     });
 
-    // Accept either raw or formatted value due to animation async
     const formatted = container.textContent.replace(/\s/g, '');
     expect(['1000', '1.000']).toContain(formatted);
   });

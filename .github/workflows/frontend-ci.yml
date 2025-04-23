@@ -3,9 +3,10 @@ name: Frontend CI Pipeline
 on:
   push:
     branches:
-      - Development
-      - Feature
-      - test-branch
+      # - Development
+      # - Feature
+      # - test-branch
+       -main
 
 jobs:
   build:
@@ -31,18 +32,31 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests
-        run: npm test -- --watchAll=false
-
-      - name: Disable Treating Warnings as Errors
+      - name: Run tests with HTML report
         run: |
-          echo "CI=false" >> $GITHUB_ENV  # Explicitly set CI to false
+          npm install jest-html-reporter
+          mkdir -p artifacts/test-report
+          npx jest --ci --reporters=default --reporters=jest-html-reporter
+        env:
+          JEST_HTML_REPORTER_OUTPUT_PATH: ./artifacts/test-report/test-report.html
 
-      - name: Build the project
-        run: npm run build
+      - name: Generate code coverage
+        run: |
+          npx jest --coverage --coverageReporters=html
+          mv coverage/lcov-report artifacts/htmlcov || echo "No htmlcov folder"
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@master
+      - name: Inject last updated timestamp into dashboard
+        run: |
+          TIMESTAMP=$(TZ="Europe/Copenhagen" date +"%Y-%m-%d %H:%M CET")
+          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" Test/ReportDashboard/index.html
+
+      - name: Copy dashboard to artifact folder
+        run: |
+          mkdir -p artifacts
+          cp Test/ReportDashboard/index.html artifacts/index.html
+
+      - name: Upload frontend test artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: react-build
-          path: ./build
+          name: frontend-artifacts
+          path: artifacts/*

@@ -1,4 +1,3 @@
-// src/Utils/MapsDataHandler.js
 import axios from 'axios';
 
 const getPlanningPlantData = async () => {
