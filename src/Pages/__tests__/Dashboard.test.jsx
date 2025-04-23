@@ -39,4 +39,3 @@ describe('Dashboard', () => {
     expect(chartElements).toHaveLength(6);
   });
 });
-
