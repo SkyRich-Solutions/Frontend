@@ -1,4 +1,3 @@
-import React from 'react';
 import { useEffect, useState } from 'react';
 import CountUp from './ReUseable/Counter'; // Assuming CountUp is in the same directory
 
