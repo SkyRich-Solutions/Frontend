@@ -1,3 +1,4 @@
+import React from 'react';
 import { Outlet } from 'react-router';
 import Sidebar from './Components/Layout/SideBar';
 import RouteTitleManager from './RoutesTitle';
