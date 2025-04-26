@@ -1,0 +1,111 @@
+[
+    {
+      "Material": 5130,
+      "Description": "Other merchandaise",
+      "PrevStatus": "Z3",
+      "Plant": "DKS1",
+      "PlantSpecificMaterialStatus": "Z3",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z5",
+      "Plant": "15S1",
+      "PlantSpecificMaterialStatus": "Z5",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z5",
+      "Plant": "24S1",
+      "PlantSpecificMaterialStatus": "Z5",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z5",
+      "Plant": "25S1",
+      "PlantSpecificMaterialStatus": "Z5",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z5",
+      "Plant": "26S1",
+      "PlantSpecificMaterialStatus": "Z5",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z4",
+      "Plant": "43S1",
+      "PlantSpecificMaterialStatus": "Z4",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z4",
+      "Plant": "51S1",
+      "PlantSpecificMaterialStatus": "Z4",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z4",
+      "Plant": "53S1",
+      "PlantSpecificMaterialStatus": "Z4",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z4",
+      "Plant": "54S1",
+      "PlantSpecificMaterialStatus": "Z4",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z4",
+      "Plant": "DOS1",
+      "PlantSpecificMaterialStatus": "Z4",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z4",
+      "Plant": "HNS1",
+      "PlantSpecificMaterialStatus": "Z4",
+      "TransitionCount": 0,
+      "Direction": "none"
+    },
+    {
+      "Material": 50001,
+      "Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "PrevStatus": "Z7",
+      "Plant": "HRS1",
+      "PlantSpecificMaterialStatus": "Z7",
+      "TransitionCount": 0,
+      "Direction": "none"
+    }
+  ]
+  

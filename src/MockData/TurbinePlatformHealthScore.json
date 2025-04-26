@@ -1,0 +1,52 @@
+[
+    {
+      "PlatformHealthScore_ID": 1,
+      "Platform": "D8",
+      "Plant": "DKS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.838017"
+    },
+    {
+      "PlatformHealthScore_ID": 2,
+      "Platform": "G1",
+      "Plant": "DKS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.838027"
+    },
+    {
+      "PlatformHealthScore_ID": 3,
+      "Platform": "G2",
+      "Plant": "DKS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.838035"
+    },
+    {
+      "PlatformHealthScore_ID": 4,
+      "Platform": "G4",
+      "Plant": "DKS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.838032"
+    },
+    {
+      "PlatformHealthScore_ID": 5,
+      "Platform": "SG5X",
+      "Plant": "DKS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.838030"
+    },
+    {
+      "PlatformHealthScore_ID": 6,
+      "Platform": "SG4X",
+      "Plant": "DKS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.838024"
+    },
+    {
+      "PlatformHealthScore_ID": 7,
+      "Platform": "D3",
+      "Plant": "DKS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.838037"
+    }
+  ]
+  

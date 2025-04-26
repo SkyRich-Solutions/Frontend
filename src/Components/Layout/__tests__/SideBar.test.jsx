@@ -41,6 +41,10 @@ describe('Sidebar component', () => {
       '/upload',
       '/map',
       '/dashboard',
+      '/turbineDashboard',
+      '/materialPredictionsDashboard',
+      '/materialPredictionsDashboard2',
+      '/turbinePredictionsDashboard',
       '/fault-report',
     ];
 

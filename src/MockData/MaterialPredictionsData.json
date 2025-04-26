@@ -1,0 +1,104 @@
+[
+    {
+      "Material_ID": 1,
+      "Material_A9B_Number": 50001,
+      "MaterialCategory": "Electrical",
+      "Material_Description": "2P K6 6A S202 CIRCUIT BREAKER",
+      "Is_Batch_Managed": 0,
+      "Future_Replacement_Probability": 0.0476190476190476,
+      "TotalReplacementCount": 0,
+      "TotalUsageCount": 19
+    },
+    {
+      "Material_ID": 2,
+      "Material_A9B_Number": 50020,
+      "MaterialCategory": "Electrical",
+      "Material_Description": "CONTACTOR 3P 370A",
+      "Is_Batch_Managed": 0,
+      "Future_Replacement_Probability": 0.666666666666667,
+      "TotalReplacementCount": 7,
+      "TotalUsageCount": 10
+    },
+    {
+      "Material_ID": 3,
+      "Material_A9B_Number": 50010,
+      "MaterialCategory": "Electrical",
+      "Material_Description": "S6-S7 OPEN RELAY",
+      "Is_Batch_Managed": 0,
+      "Future_Replacement_Probability": 0.0526315789473684,
+      "TotalReplacementCount": 0,
+      "TotalUsageCount": 17
+    },
+    {
+      "Material_ID": 4,
+      "Material_A9B_Number": 50039,
+      "MaterialCategory": "Electrical",
+      "Material_Description": "ROTARY CAM SWITCH PROL.S3.S4.S5",
+      "Is_Batch_Managed": 0,
+      "Future_Replacement_Probability": 0.0526315789473684,
+      "TotalReplacementCount": 0,
+      "TotalUsageCount": 17
+    },
+    {
+      "Material_ID": 5,
+      "Material_A9B_Number": 50019,
+      "MaterialCategory": "Unclassified",
+      "Material_Description": "ABB CONTAC 24VDC A16-30-10 (KRM0010)",
+      "Is_Batch_Managed": 0,
+      "Future_Replacement_Probability": 0.166666666666667,
+      "TotalReplacementCount": 0,
+      "TotalUsageCount": 4
+    },
+    {
+      "Material_ID": 6,
+      "Material_A9B_Number": 50025,
+      "MaterialCategory": "Electrical",
+      "Material_Description": "TEMPERATURE RELAY 0,4-0,63A",
+      "Is_Batch_Managed": 0,
+      "Future_Replacement_Probability": 0.333333333333333,
+      "TotalReplacementCount": 0,
+      "TotalUsageCount": 1
+    },
+    {
+      "Material_ID": 7,
+      "Material_A9B_Number": 50031,
+      "MaterialCategory": "Electrical",
+      "Material_Description": "ROTARY CAM SWITCH PROL.S6",
+      "Is_Batch_Managed": 0,
+      "Future_Replacement_Probability": 0.0526315789473684,
+      "TotalReplacementCount": 0,
+      "TotalUsageCount": 17
+    },
+    {
+      "Material_ID": 8,
+      "Material_A9B_Number": 50047,
+      "MaterialCategory": "Electrical",
+      "Material_Description": "AUX.NC+NC CONTACT BLOCK",
+      "Is_Batch_Managed": 0,
+      "Future_Replacement_Probability": 0.0555555555555556,
+      "TotalReplacementCount": 0,
+      "TotalUsageCount": 16
+    },
+    {
+      "Material_ID": 9,
+      "Material_A9B_Number": 50005,
+      "MaterialCategory": "Electrical",
+      "Material_Description": "STATIC CURRENT LIMITER PROL III PLM20-C3",
+      "Is_Batch_Managed": 0,
+      "Future_Replacement_Probability": 0.8,
+      "TotalReplacementCount": 3,
+      "TotalUsageCount": 3
+    },
+    {
+      "Material_ID": 10,
+      "Material_A9B_Number": 50044,
+      "MaterialCategory": "Electrical",
+      "Material_Description": "OVERVOLTAGE PROTECTION RELAY DR230 FML",
+      "Is_Batch_Managed": 0,
+      "Future_Replacement_Probability": 0.111111111111111,
+      "TotalReplacementCount": 0,
+      "TotalUsageCount": 7
+    }
+  ]
+
+  

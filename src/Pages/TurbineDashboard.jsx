@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Header from '../Components/Layout/Header';
 import ChartComponent from '../Components/ChartComponent';
 
-const Dashboard = () => {
+const TurbineDashboard = () => {
     const [selectedItem, setSelectedItem] = useState(null);
 
     const handleItemClick = (item) => {
@@ -11,7 +11,7 @@ const Dashboard = () => {
 
     return (
         <div className='flex-1 overflow-auto z-1 min-h-screen space-y-4'>
-            <Header title='Material Dashboard' />
+            <Header title='Turbine Dashboard' />
 
             <div className='grid grid-cols-3 gap-6 p-4'>
                 {/* Top row with three different charts */}
@@ -23,10 +23,10 @@ const Dashboard = () => {
                         <ChartComponent
                             type={
                                 index === 0
-                                    ? 'bar_PlantSpecificMaterialStatus'
+                                    ? 'bar_FunctionalLocByRegion'
                                     : index === 1
-                                    ? 'line_MaterialCategoryCount'
-                                    : 'bar_MaterialByPlant'
+                                    ? 'scatter_TurbinePowerVsHubHeight'
+                                    : 'donut_TurbineCountByManufacturer'
                             }
                             selectedItem={selectedItem}
                             handleClick={handleItemClick}
@@ -42,7 +42,7 @@ const Dashboard = () => {
                             className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[18rem] flex items-center justify-center rounded-lg'
                         >
                             <ChartComponent
-                                type={index === 3 ? 'line_ReplacementPartsByPlant' : 'bar_MaterialCount'}
+                                type={index === 3 ? 'radar_MaintPlant_PlanningPlant_ByPlatform' : 'line_CumulativeTurbineCount_ByPlatform'}
                                 selectedItem={selectedItem}
                                 handleClick={handleItemClick}
                             />
@@ -53,7 +53,7 @@ const Dashboard = () => {
                 {/* Large square chart on the right */}
                 <div className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 flex items-center justify-center rounded-lg col-span-2 row-span-2 h-[38rem]'>
                     <ChartComponent
-                        type='line_TopMaterialByReplacementParts'
+                        type='bubble_TurbinePowerByRegion'
                         selectedItem={selectedItem}
                         handleClick={handleItemClick}
                     />
@@ -63,4 +63,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default TurbineDashboard;

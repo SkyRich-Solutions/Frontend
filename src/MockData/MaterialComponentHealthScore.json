@@ -1,0 +1,72 @@
+[
+    {
+      "ComponentHealthScore_ID": 1,
+      "Material_ID": 5130,
+      "Plant": "DKS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.739977"
+    },
+    {
+      "ComponentHealthScore_ID": 2,
+      "Material_ID": 50001,
+      "Plant": "HNS1",
+      "HealthScore": 10.0,
+      "LastUpdated": "2025-04-21T17:27:00.739998"
+    },
+    {
+      "ComponentHealthScore_ID": 3,
+      "Material_ID": 50001,
+      "Plant": "NIS1",
+      "HealthScore": 50.0,
+      "LastUpdated": "2025-04-21T17:27:00.740002"
+    },
+    {
+      "ComponentHealthScore_ID": 4,
+      "Material_ID": 50001,
+      "Plant": "25S1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.740007"
+    },
+    {
+      "ComponentHealthScore_ID": 5,
+      "Material_ID": 50001,
+      "Plant": "51S1",
+      "HealthScore": 50.0,
+      "LastUpdated": "2025-04-21T17:27:00.740010"
+    },
+    {
+      "ComponentHealthScore_ID": 6,
+      "Material_ID": 50001,
+      "Plant": "HRS1",
+      "HealthScore": 70.0,
+      "LastUpdated": "2025-04-21T17:27:00.740014"
+    },
+    {
+      "ComponentHealthScore_ID": 7,
+      "Material_ID": 50001,
+      "Plant": "INS5",
+      "HealthScore": 80.0,
+      "LastUpdated": "2025-04-21T17:27:00.740018"
+    },
+    {
+      "ComponentHealthScore_ID": 8,
+      "Material_ID": 50001,
+      "Plant": "HUS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.740022"
+    },
+    {
+      "ComponentHealthScore_ID": 9,
+      "Material_ID": 50001,
+      "Plant": "24S1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.740026"
+    },
+    {
+      "ComponentHealthScore_ID": 10,
+      "Material_ID": 50001,
+      "Plant": "MXS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.740030"
+    }
+  ]

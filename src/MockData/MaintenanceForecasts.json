@@ -1,0 +1,83 @@
+[
+    {
+      "Forecast_ID": 1,
+      "Material_ID": 37,
+      "Plant_ID": 1,
+      "LastMaintenance": "2025-04-21T17:27:00.771583",
+      "AverageIntervalDays": 365,
+      "NextEstimatedMaintenanceDate": "2026-04-21T17:27:00.771583"
+    },
+    {
+      "Forecast_ID": 2,
+      "Material_ID": 1,
+      "Plant_ID": 3,
+      "LastMaintenance": "2025-04-21T17:27:00.771583",
+      "AverageIntervalDays": 365,
+      "NextEstimatedMaintenanceDate": "2026-04-21T17:27:00.771583"
+    },
+    {
+      "Forecast_ID": 3,
+      "Material_ID": 1,
+      "Plant_ID": 4,
+      "LastMaintenance": "2025-04-21T17:27:00.771583",
+      "AverageIntervalDays": 365,
+      "NextEstimatedMaintenanceDate": "2026-04-21T17:27:00.771583"
+    },
+    {
+      "Forecast_ID": 4,
+      "Material_ID": 1,
+      "Plant_ID": 5,
+      "LastMaintenance": "2025-04-21T17:27:00.771583",
+      "AverageIntervalDays": 365,
+      "NextEstimatedMaintenanceDate": "2026-04-21T17:27:00.771583"
+    },
+    {
+      "Forecast_ID": 5,
+      "Material_ID": 1,
+      "Plant_ID": 6,
+      "LastMaintenance": "2025-04-21T17:27:00.771583",
+      "AverageIntervalDays": 365,
+      "NextEstimatedMaintenanceDate": "2026-04-21T17:27:00.771583"
+    },
+    {
+      "Forecast_ID": 6,
+      "Material_ID": 1,
+      "Plant_ID": 7,
+      "LastMaintenance": "2025-04-21T17:27:00.771583",
+      "AverageIntervalDays": 365,
+      "NextEstimatedMaintenanceDate": "2026-04-21T17:27:00.771583"
+    },
+    {
+      "Forecast_ID": 7,
+      "Material_ID": 1,
+      "Plant_ID": 8,
+      "LastMaintenance": "2025-04-21T17:27:00.771583",
+      "AverageIntervalDays": 365,
+      "NextEstimatedMaintenanceDate": "2026-04-21T17:27:00.771583"
+    },
+    {
+      "Forecast_ID": 8,
+      "Material_ID": 1,
+      "Plant_ID": 9,
+      "LastMaintenance": "2025-04-21T17:27:00.771583",
+      "AverageIntervalDays": 365,
+      "NextEstimatedMaintenanceDate": "2026-04-21T17:27:00.771583"
+    },
+    {
+      "Forecast_ID": 9,
+      "Material_ID": 1,
+      "Plant_ID": 10,
+      "LastMaintenance": "2025-04-21T17:27:00.771583",
+      "AverageIntervalDays": 365,
+      "NextEstimatedMaintenanceDate": "2026-04-21T17:27:00.771583"
+    },
+    {
+      "Forecast_ID": 10,
+      "Material_ID": 1,
+      "Plant_ID": 11,
+      "LastMaintenance": "2025-04-21T17:27:00.771583",
+      "AverageIntervalDays": 365,
+      "NextEstimatedMaintenanceDate": "2026-04-21T17:27:00.771583"
+    }
+  ]
+  
