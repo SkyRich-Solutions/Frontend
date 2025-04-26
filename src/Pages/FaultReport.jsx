@@ -16,6 +16,7 @@ const FaultReport = () => {
         Fault_Type: "",
         Report_Status: "",
     });
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -103,7 +104,7 @@ const FaultReport = () => {
                                     <option value="">Select Technician</option>
                                     {technicians.map((tech) => (
                                         <option key={tech.Technician_ID} value={tech.Technician_ID}>
-                                            {tech.Name}
+                                            {tech.Technician_ID}{".    "}{tech.Name} {tech.Surname}
                                         </option>
                                     ))}
                                 </select>
@@ -119,7 +120,7 @@ const FaultReport = () => {
                                     <option value="">Select Location</option>
                                     {locations.map((loc) => (
                                         <option key={loc.Location_ID} value={loc.Location_ID}>
-                                            {loc.Location_Name}
+                                        {loc.Location_ID}{".    "}{loc.Location_Name || "Unnamed Location"}
                                         </option>
                                     ))}
                                 </select>
@@ -135,23 +136,40 @@ const FaultReport = () => {
                                 />
 
                                 <label>Fault Type:</label>
-                                <textarea
+                                <select
                                     name="Fault_Type"
                                     value={formData.Fault_Type}
                                     onChange={handleChange}
                                     required
                                     className="bg-gray-700 text-white border border-gray-500 p-2 rounded"
-                                />
+                                >
+                                    <option value="Replacement Part">Replacement Part</option>
+                                    <option value="Maintenance Check">Maintenance Check</option>
+                                    <option value="Electrical Fault">Electrical Fault</option>
+                                    <option value="Mechanical Fault">Mechanical Fault</option>
+                                    <option value="Sensor Issue">Sensor Issue</option>
+                                    <option value="Firmware Update">Firmware Update</option>
+                                    <option value="Environmental Damage">Environmental Damage</option>
+                                    <option value="Unknown">Unknown</option>
+                                </select>
 
                                 <label>Report Status:</label>
-                                <input
-                                    type="text"
+                                <select
                                     name="Report_Status"
                                     value={formData.Report_Status}
                                     onChange={handleChange}
                                     required
                                     className="bg-gray-700 text-white border border-gray-500 p-2 rounded"
-                                />
+                                >
+                                    <option value="">Select Status</option>
+                                    <option value="Open">Open</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Waiting for Parts">Waiting for Parts</option>
+                                    <option value="Under Review">Under Review</option>
+                                    <option value="Resolved">Resolved</option>
+                                    <option value="Closed">Closed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
 
                                 <label>Upload PDF Report:</label>
                                 <input

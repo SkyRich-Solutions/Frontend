@@ -1,0 +1,73 @@
+[
+    {
+      "Dominance_ID": 1,
+      "Description": "3P 50kA S6S 800 F AP PR211 LI CIRCUIT BR",
+      "DominanceCount": 172,
+      "Percentage": 17.2,
+      "Timestamp": "2025-04-21 17:26:57"
+    },
+    {
+      "Dominance_ID": 2,
+      "Description": "STATIC CURRENT LIMITER PROL III PLM20-C3",
+      "DominanceCount": 166,
+      "Percentage": 16.6,
+      "Timestamp": "2025-04-21 17:26:57"
+    },
+    {
+      "Dominance_ID": 3,
+      "Description": "3P 160A S4L-160 FAP-211LI CIRCUIT BREAKER",
+      "DominanceCount": 154,
+      "Percentage": 15.4,
+      "Timestamp": "2025-04-21 17:26:57"
+    },
+    {
+      "Dominance_ID": 4,
+      "Description": "CONTACTOR 3P 300A",
+      "DominanceCount": 122,
+      "Percentage": 12.2,
+      "Timestamp": "2025-04-21 17:26:57"
+    },
+    {
+      "Dominance_ID": 5,
+      "Description": "CONTACTOR 3P 370A",
+      "DominanceCount": 105,
+      "Percentage": 10.5,
+      "Timestamp": "2025-04-21 17:26:57"
+    },
+    {
+      "Dominance_ID": 6,
+      "Description": "G52 IND.G.0021 COLLECTOR RINGS GROUP",
+      "DominanceCount": 88,
+      "Percentage": 8.8,
+      "Timestamp": "2025-04-21 17:26:57"
+    },
+    {
+      "Dominance_ID": 7,
+      "Description": "3P 100A S4L-160 CIRCUIT BREAKER",
+      "DominanceCount": 88,
+      "Percentage": 8.8,
+      "Timestamp": "2025-04-21 17:26:57"
+    },
+    {
+      "Dominance_ID": 8,
+      "Description": "W2D250-CD0201EBM FAN",
+      "DominanceCount": 59,
+      "Percentage": 5.9,
+      "Timestamp": "2025-04-21 17:26:57"
+    },
+    {
+      "Dominance_ID": 9,
+      "Description": "CONTACTOR 3P 175A",
+      "DominanceCount": 46,
+      "Percentage": 4.6,
+      "Timestamp": "2025-04-21 17:26:57"
+    },
+    {
+      "Dominance_ID": 10,
+      "Description": "A9-A40 RC FILTER",
+      "DominanceCount": 0,
+      "Percentage": 0.0,
+      "Timestamp": "2025-04-21 17:26:57"
+    }
+  ]
+  

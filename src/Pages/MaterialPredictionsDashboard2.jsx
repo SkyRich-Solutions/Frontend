@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Header from '../Components/Layout/Header';
-import ChartComponent from '../Components/ChartComponent';
+import PredictionsChartComponent from '../Components/PredictionsChartComponent';
 
-const Dashboard = () => {
+const MaterialPredictionsDashboard2 = () => {
     const [selectedItem, setSelectedItem] = useState(null);
 
     const handleItemClick = (item) => {
@@ -11,7 +11,7 @@ const Dashboard = () => {
 
     return (
         <div className='flex-1 overflow-auto z-1 min-h-screen space-y-4'>
-            <Header title='Material Dashboard' />
+            <Header title='Material Predictions Dashboard 2' />
 
             <div className='grid grid-cols-3 gap-6 p-4'>
                 {/* Top row with three different charts */}
@@ -20,13 +20,13 @@ const Dashboard = () => {
                         key={index}
                         className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[20rem] flex items-center justify-center rounded-lg'
                     >
-                        <ChartComponent
+                        <PredictionsChartComponent
                             type={
                                 index === 0
-                                    ? 'bar_PlantSpecificMaterialStatus'
+                                    ? 'bar_MaterialComponentScoreSummary'
                                     : index === 1
-                                    ? 'line_MaterialCategoryCount'
-                                    : 'bar_MaterialByPlant'
+                                    ? 'bar_MaterialComponentHealthScores'
+                                    : 'bar_MaterialCategoryScoreSummary'
                             }
                             selectedItem={selectedItem}
                             handleClick={handleItemClick}
@@ -41,8 +41,8 @@ const Dashboard = () => {
                             key={index}
                             className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[18rem] flex items-center justify-center rounded-lg'
                         >
-                            <ChartComponent
-                                type={index === 3 ? 'line_ReplacementPartsByPlant' : 'bar_MaterialCount'}
+                            <PredictionsChartComponent
+                                type={index === 3 ? 'bar_MaterialCategoryHealthScores' : 'line_MaterialCategoryPredictions'}
                                 selectedItem={selectedItem}
                                 handleClick={handleItemClick}
                             />
@@ -52,8 +52,8 @@ const Dashboard = () => {
 
                 {/* Large square chart on the right */}
                 <div className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 flex items-center justify-center rounded-lg col-span-2 row-span-2 h-[38rem]'>
-                    <ChartComponent
-                        type='line_TopMaterialByReplacementParts'
+                    <PredictionsChartComponent
+                        type='table_MaintenanceForecasts'
                         selectedItem={selectedItem}
                         handleClick={handleItemClick}
                     />
@@ -63,4 +63,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default MaterialPredictionsDashboard2;

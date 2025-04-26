@@ -1,0 +1,58 @@
+[
+    {
+      "TurbineModel": "SG 5.8-170",
+      "TotalModelScore": 50.0,
+      "LastUpdated": "2025-04-21T17:27:00.834874"
+    },
+    {
+      "TurbineModel": "SWT-2.3-82",
+      "TotalModelScore": 80.0,
+      "LastUpdated": "2025-04-21T17:27:00.834869"
+    },
+    {
+      "TurbineModel": "SWT-1.3-62 FA2000 filter",
+      "TotalModelScore": 50.0,
+      "LastUpdated": "2025-04-21T17:27:00.834892"
+    },
+    {
+      "TurbineModel": "SWT-0.6-44",
+      "TotalModelScore": 50.0,
+      "LastUpdated": "2025-04-21T17:27:00.834883"
+    },
+    {
+      "TurbineModel": "SWT-3.6-120",
+      "TotalModelScore": 30.0,
+      "LastUpdated": "2025-04-21T17:27:00.834862"
+    },
+    {
+      "TurbineModel": "SWT-2.3-93 B45 blades",
+      "TotalModelScore": 10.0,
+      "LastUpdated": "2025-04-21T17:27:00.834872"
+    },
+    {
+      "TurbineModel": "SWT-1.0-54 Hyd-pitch",
+      "TotalModelScore": 30.0,
+      "LastUpdated": "2025-04-21T17:27:00.834881"
+    },
+    {
+      "TurbineModel": "SG 4.3-130 DD",
+      "TotalModelScore": 30.0,
+      "LastUpdated": "2025-04-21T17:27:00.834846"
+    },
+    {
+      "TurbineModel": "SWT-2.0-76 WTC3",
+      "TotalModelScore": 50.0,
+      "LastUpdated": "2025-04-21T17:27:00.834858"
+    },
+    {
+      "TurbineModel": "150 kW",
+      "TotalModelScore": 50.0,
+      "LastUpdated": "2025-04-21T17:27:00.834888"
+    },
+    {
+      "TurbineModel": "SWT-3.6-107",
+      "TotalModelScore": 70.0,
+      "LastUpdated": "2025-04-21T17:27:00.834890"
+    }
+  ]
+  

@@ -1,0 +1,35 @@
+[
+    {
+      "Category": "Unclassified",
+      "BayesianProbability": 0.333333333333333,
+      "MonteCarloEstimate": 0.325,
+      "MonteCarlo_5th_Percentile": 0.0,
+      "MonteCarlo_50th_Percentile": 0.0,
+      "MonteCarlo_95th_Percentile": 0.0
+    },
+    {
+      "Category": "Electrical",
+      "BayesianProbability": 0.333333333333333,
+      "MonteCarloEstimate": 0.322,
+      "MonteCarlo_5th_Percentile": 0.0,
+      "MonteCarlo_50th_Percentile": 0.0,
+      "MonteCarlo_95th_Percentile": 0.0
+    },
+    {
+      "Category": "Consumables",
+      "BayesianProbability": 0.333333333333333,
+      "MonteCarloEstimate": 0.301,
+      "MonteCarlo_5th_Percentile": 0.0,
+      "MonteCarlo_50th_Percentile": 0.0,
+      "MonteCarlo_95th_Percentile": 0.0
+    },
+    {
+      "Category": "Mechanical",
+      "BayesianProbability": 0.333333333333333,
+      "MonteCarloEstimate": 0.302,
+      "MonteCarlo_5th_Percentile": 0.0,
+      "MonteCarlo_50th_Percentile": 0.0,
+      "MonteCarlo_95th_Percentile": 0.0
+    }
+  ]
+  

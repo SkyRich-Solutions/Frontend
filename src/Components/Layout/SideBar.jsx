@@ -5,8 +5,11 @@ import {
     TrendingUp,
     MapPinIcon,
     CloudUploadIcon,
-    ChartNoAxesCombined,
-    NotepadTextIcon
+    NotepadTextIcon,
+    PackageIcon,
+    PackageCheckIcon,
+    WindIcon,
+    ChartNoAxesCombined
 } from 'lucide-react';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -16,34 +19,59 @@ const SIDEBAR_ITEMS = [
     {
         name: 'Overview',
         icon: ChartNoAxesCombined,
-        color: '#6366f1',
+        color: '#9966FF',
         href: '/'
     },
     {
         name: 'Upload',
         icon: CloudUploadIcon,
-        color: '#8B5CF6',
+        color: '#FF9F40',
         href: '/upload'
     },
     {
         name: 'Maps',
         icon: MapPinIcon,
-        color: '#6EE7B7',
+        color: '#36A2EB',
         href: '/map'
     },
     {
         name: 'Analytics',
         icon: TrendingUp,
-        color: '#3B82F6',
+        color: '#FFCE56',
         href: '/dashboard'
+    },
+    {
+        name: 'TurbineAnalytics',
+        icon: PackageIcon,
+        color: '#FF6384',
+        href: '/turbineDashboard'
+    },
+    {
+        name: 'MaterialPredictionsAnalytics',
+        icon: BarChart2,
+        color: '#4BC04B',
+        href: '/materialPredictionsDashboard'
+    },
+    {
+        name: 'MaterialPredictionsAnalytics2',
+        icon: PackageCheckIcon,
+        color: '#008080',
+        href: '/materialPredictionsDashboard2'
+    },
+    {
+        name: 'TurbinePredictionsAnalytics',
+        icon: WindIcon,
+        color: '#FF8C00',
+        href: '/turbinePredictionsDashboard'
     },
     {
         name: 'Fault Report',
         icon: NotepadTextIcon,
-        color: '#6366f1',
+        color: '#6A5ACD',
         href: '/fault-report'
-    },
+    }
 ];
+
 
 const Sidebar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
