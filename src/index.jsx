@@ -19,7 +19,7 @@ const router = createHashRouter([
         element: <App />,
         children: [
             {
-                path: '/',
+                path: '/uploadedDataOverview',
                 element: <MainPage />
             },
 
@@ -28,7 +28,7 @@ const router = createHashRouter([
                 element: <UploadPage />
             },
             {
-                path: '/dashboard',
+                path: '/materialDashboard',
                 element: <Dashboard />
             },
             {

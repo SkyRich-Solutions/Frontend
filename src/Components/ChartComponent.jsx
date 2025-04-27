@@ -1,82 +1,12 @@
-// import React from 'react';
-// import {
-//     BarChart,
-//     Bar,
-//     XAxis,
-//     YAxis,
-//     Tooltip,
-//     ResponsiveContainer,
-//     Legend,
-//     LineChart,
-//     Line
-// } from 'recharts';
-// import TurbineData from '../MockData/TurbineData.json';
 
-// const ChartComponent = ({ type }) => {
-//     // Ensure that the JSON data has the correct format
-//     const formattedData = TurbineData.map((turbine) => ({
-//         model: turbine.TurbineModel,
-//         nominal_power: parseFloat(
-//             turbine.NominalPower.replace(' KW', '').replace(',', '.')
-//         )
-//     }));
 
-//     if (type === 'bar') {
-//         return (
-//             <div className='w-full h-full p-4  shadow-md rounded-lg overflow-hidden'>
-//                 <div className='flex justify-center items-center w-full h-full'>
-//                     <ResponsiveContainer width='100%' height='100%'>
-//                         <BarChart
-//                             data={formattedData}
-//                             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-//                         >
-//                             <XAxis dataKey='model' />
-//                             <YAxis />
-//                             <Tooltip />
-//                             <Bar dataKey='nominal_power' fill='#00b0ad' />
-//                             <Legend />
-//                         </BarChart>
-//                     </ResponsiveContainer>
-//                 </div>
-//             </div>
-//         );
-//     }
-
-//     if (type === 'line') {
-//         return (
-//             <div className='w-full h-full p-4 shadow-md rounded-lg overflow-hidden'>
-//                 <div className='flex justify-center items-center w-full h-full'>
-//                     <ResponsiveContainer width='100%' height='100%'>
-//                         <LineChart
-//                             data={formattedData}
-//                             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-//                         >
-//                             <XAxis dataKey='model' />
-//                             <YAxis />
-//                             <Tooltip />
-//                             <Line
-//                                 type='monotone'
-//                                 dataKey='nominal_power'
-//                                 stroke='#00b0ad'
-//                                 // stroke='#5a4673'
-//                             />
-//                             <Legend />
-//                         </LineChart>
-//                     </ResponsiveContainer>
-//                 </div>
-//             </div>
-//         );
-//     }
-
-//     return null;
-// };
-
-// export default ChartComponent;
-
-import React from 'react';
+import React, { use } from 'react';
 import {Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, BarChart, PieChart, Pie, Bar, ScatterChart, Scatter, CartesianGrid, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, Cell, Label } from 'recharts';
-import MaterialData from '../MockData/MaterialData.json';
-import TurbineData from '../MockData/TurbineData.json';
+
+
+import { getPredictionMaterialData } from '../Utils/MaterialDashboardDataHandler';
+import { getPredictionTurbineData } from '../Utils/TurbineDashboardDataHandler';
+import { useEffect , useState} from 'react';
 
 const COLORS = [
     'rgba(153, 102, 255, 0.6)',
@@ -97,6 +27,23 @@ const COLORS = [
 ];
 
 const ChartComponent = ({ type }) => {
+    const [MaterialData, setMaterialData] = useState([]);
+    const [TurbineData, setTurbineData] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const materialData = await getPredictionMaterialData(); // <<<<< now you actually CALL it
+            const turbineData = await getPredictionTurbineData();
+            console.log('Fetched data in component:', materialData);
+            setMaterialData(materialData);
+            setTurbineData(turbineData);
+          } catch (error) {
+            console.error('Error fetching material data:', error);
+          }
+        };
+    
+        fetchData();
+      }, []);
     // Count occurrences of each PlantSpecificMaterialStatus
     const statusCounts = MaterialData.reduce((acc, item) => {
         const status = item.PlantSpecificMaterialStatus || 'Unknown';

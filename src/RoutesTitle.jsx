@@ -3,9 +3,9 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 const routeTitles = {
-    '/': 'Main Page',
+    '/uploadedDataOverview': 'Main Page',
     '/upload': 'Upload Page',
-    '/dashboard': 'Dashboard',
+    '/materialDashboard': 'Dashboard',
     '/turbineDashboard': 'Turbine Dashboard',
     '/materialPredictionsDashboard': 'Material Predictions Dashboard',
     '/materialPredictionsDashboard2': 'Material Predictions Dashboard 2',
