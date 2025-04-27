@@ -20,7 +20,7 @@ const SIDEBAR_ITEMS = [
         name: 'Overview',
         icon: ChartNoAxesCombined,
         color: '#9966FF',
-        href: '/'
+        href: '/uploadedDataOverview'
     },
     {
         name: 'Upload',
@@ -35,31 +35,31 @@ const SIDEBAR_ITEMS = [
         href: '/map'
     },
     {
-        name: 'Analytics',
+        name: 'MaterialDashboard',
         icon: TrendingUp,
         color: '#FFCE56',
-        href: '/dashboard'
+        href: '/materialDashboard'
     },
     {
-        name: 'TurbineAnalytics',
+        name: 'TurbineDashboard',
         icon: PackageIcon,
         color: '#FF6384',
         href: '/turbineDashboard'
     },
     {
-        name: 'MaterialPredictionsAnalytics',
+        name: 'MaterialPredictions',
         icon: BarChart2,
         color: '#4BC04B',
         href: '/materialPredictionsDashboard'
     },
     {
-        name: 'MaterialPredictionsAnalytics2',
+        name: 'MaterialPredictions2',
         icon: PackageCheckIcon,
         color: '#008080',
         href: '/materialPredictionsDashboard2'
     },
     {
-        name: 'TurbinePredictionsAnalytics',
+        name: 'TurbinePredictions',
         icon: WindIcon,
         color: '#FF8C00',
         href: '/turbinePredictionsDashboard'

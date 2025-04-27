@@ -34,6 +34,15 @@ const Dashboard = () => {
                     </div>
                 ))}
 
+                {/* Large square chart on the right */}
+                <div className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 flex items-center justify-center rounded-lg col-span-2 row-span-2 h-[38rem]'>
+                    <ChartComponent
+                        type='line_TopMaterialByReplacementParts'
+                        selectedItem={selectedItem}
+                        handleClick={handleItemClick}
+                    />
+                </div>
+
                 {/* Middle-left two different charts */}
                 <div className='flex flex-col gap-6 col-span-1'>
                     {[3, 4].map((index) => (
@@ -50,14 +59,7 @@ const Dashboard = () => {
                     ))}
                 </div>
 
-                {/* Large square chart on the right */}
-                <div className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 flex items-center justify-center rounded-lg col-span-2 row-span-2 h-[38rem]'>
-                    <ChartComponent
-                        type='line_TopMaterialByReplacementParts'
-                        selectedItem={selectedItem}
-                        handleClick={handleItemClick}
-                    />
-                </div>
+                
             </div>
         </div>
     );

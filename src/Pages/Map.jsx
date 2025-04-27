@@ -81,8 +81,21 @@ const Maps = () => {
                 }
             }
 
+            if (Filters.warehouse.showAll) {
+                const allLocation = PlantData.all.find(
+                    (item) => item.Plant_Name === SelectedTurbine.PlanningPlant && item.Plant_Name === SelectedTurbine.MaintPlant
+                );
+
+                if (allLocation) {
+                    path.push({
+                        lat: parseFloat(allLocation.Plant_Latitude),
+                        lng: parseFloat(allLocation.Plant_Longitude)
+                    });
+                }
+            }
+
             if (Filters.warehouse.showPlanning) {
-                const planningLocation = PlantData.maint.find(
+                const planningLocation = PlantData.planning.find(
                     (item) => item.Plant_Name === SelectedTurbine.PlanningPlant
                 );
 
