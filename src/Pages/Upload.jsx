@@ -1,28 +1,40 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import Header from '../Components/Header';
+import Header from '../Components/Layout/Header';
 import {
     CircleAlertIcon,
     CircleCheckBigIcon,
     WandSparklesIcon
 } from 'lucide-react';
-import DataHandler from '../Utils/DataHandler';
-import DiscrepancyCounter from '../Components/DiscrepancyCounter';
+// import DiscrepancyCounter from '../Components/DiscrepancyCounter';
 
 const UploadPage = () => {
     const [file, setFile] = useState(null);
+    const [fileType, setFileType] = useState(null); // 'material' or 'turbine'
     const [response, setResponse] = useState(null);
     const [error, setError] = useState(null);
     const [output, setOutput] = useState('');
     const [UnprocessedData, setUnprocessedData] = useState([]);
     const [ProcessedData, setProcessedData] = useState([]);
     const [loadingProgress, setLoadingProgress] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
+    const [Loading, setLoading] = useState(false);
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        const selectedFile = e.target.files[0];
+        setFile(selectedFile);
         setResponse(null);
         setError(null);
+
+        if (selectedFile) {
+            const lowerName = selectedFile.name.toLowerCase();
+            if (lowerName.includes('material')) {
+                setFileType('material');
+            } else if (lowerName.includes('turbine')) {
+                setFileType('turbine');
+            } else {
+                setFileType(null);
+            }
+        }
     };
 
     const handleUpload = async (e) => {
@@ -49,11 +61,39 @@ const UploadPage = () => {
         }
     };
 
+    const fetchData = async () => {
+        if (!fileType) {
+            setError(
+                'Unknown file type. Make sure the filename includes "material" or "turbine".'
+            );
+            return;
+        }
+
+        const apiPrefix = fileType === 'material' ? 'Material' : 'Turbine';
+
+        try {
+            const [unprocessedRes, processedRes] = await Promise.all([
+                axios.get(
+                    `http://localhost:4000/api/fetch_Unprocessed${apiPrefix}Data`
+                ),
+                axios.get(
+                    `http://localhost:4000/api/fetch_Processed${apiPrefix}Data`
+                )
+            ]);
+
+            setUnprocessedData(unprocessedRes.data.data);
+            setProcessedData(processedRes.data.data);
+            console.log(processedRes.data.data);
+        } catch (err) {
+            setError('Error fetching data.');
+            console.error(err);
+        }
+    };
+
     const handleRunScript = async () => {
-        setIsLoading(true);
+        setLoading(true);
         setLoadingProgress(0);
 
-        // Simulate progress bar
         let progress = 0;
         const interval = setInterval(() => {
             progress += 10;
@@ -69,25 +109,21 @@ const UploadPage = () => {
                 }
             );
 
-            const data = response.data;
-            console.log('Data from python : ', data);
-
-            if (data) {
-                const unprocessed = await DataHandler().getUnprocessedData();
-                setUnprocessedData(unprocessed);
-
-                const processed = await DataHandler().getProcessedData();
-                setProcessedData(processed);
-
-                setOutput(data);
-            } else if (data.error) {
-                console.error('Error running Python script:', data.error);
+            if (response.data) {
+                await fetchData();
+                setOutput(response.data);
+            } else if (response.data.error) {
+                console.error(
+                    'Error running Python script:',
+                    response.data.error
+                );
             }
         } catch (error) {
             console.error('Error making request:', error);
+            setError('Error running script.');
         } finally {
             setTimeout(() => {
-                setIsLoading(false);
+                setLoading(false);
                 setLoadingProgress(100);
             }, 2000);
         }
@@ -97,7 +133,7 @@ const UploadPage = () => {
         <div className='flex-1 overflow-auto z-1 h-auto space-y-4'>
             <Header title='File Uploader' />
 
-            <div className='items-center justify-center bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-screen '>
+            <div className='items-center justify-center bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-screen'>
                 <div className='bg-gray-900 p-8 rounded-xl shadow-xl text-center flex items-center justify-between'>
                     <h1 className='text-white text-2xl font-semibold'>
                         Upload CSV File
@@ -130,16 +166,18 @@ const UploadPage = () => {
 
                         {error && (
                             <div className='mt-3 text-red-400 flex gap-1 justify-center'>
-                                <b>Error</b>
+                                <b>{error}</b>
                                 <CircleAlertIcon />
                             </div>
                         )}
                     </div>
 
-                    <div className='bg-gray-500 text-center px-4 py-3 rounded-lg'>
+                    <div className={`bg-gray-500 text-center px-4 py-3 rounded-lg cursor-${Loading ? 'pointer' : ''}`}>
                         <button
                             onClick={handleRunScript}
-                            className='flex gap-1'
+                            // className='flex gap-1 cursor-pointer'
+                            className={`flex gap-1 rounded cursor-${Loading ? 'pointer' : 'not-allowed'} ${!Loading && 'opacity-50'}`}
+                            disabled={!Loading}
                         >
                             <WandSparklesIcon />
                             Clean Data
@@ -147,7 +185,7 @@ const UploadPage = () => {
                     </div>
                 </div>
 
-                {isLoading && (
+                {Loading && (
                     <div className='w-full bg-gray-700 h-4 rounded-md mt-4'>
                         <div
                             className='bg-blue-600 h-4 rounded-md'
@@ -159,19 +197,18 @@ const UploadPage = () => {
                     </div>
                 )}
 
-                {!isLoading && (
+                {!Loading && (
                     <>
                         <h1 className='text-white text-2xl font-semibold text-center p-2'>
                             {output}
                         </h1>
-                        <span>
+                        {/* <span>
                             <DiscrepancyCounter />
-                        </span>
-                        <div className='flex item-center justify-center '>
+                        </span> */}
+                        <div className='flex item-center justify-center'>
                             <h2 className='text-xl w-1/2 font-bold text-center mb-2'>
                                 Unprocessed Data
                             </h2>
-
                             <h2 className='text-xl w-1/2 font-bold text-center mb-2'>
                                 Processed Data
                             </h2>
@@ -234,23 +271,41 @@ const UploadPage = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {ProcessedData.map((item, index) => (
-                                            <tr
-                                                key={index}
-                                                className='text-center'
-                                            >
-                                                {Object.values(item).map(
-                                                    (value, i) => (
-                                                        <td
-                                                            key={i}
-                                                            className='border border-gray-400 px-4 py-2 whitespace-nowrap'
-                                                        >
-                                                            {value}
-                                                        </td>
-                                                    )
-                                                )}
-                                            </tr>
-                                        ))}
+                                        {ProcessedData.map((item, index) => {
+                                            const shouldHighlight =
+                                                (fileType === 'material' &&
+                                                    item.ViolationReplacementPart ===
+                                                        '1') ||
+                                                (fileType === 'turbine' &&
+                                                    (item.UnknownMaintPlant ===
+                                                        '1' ||
+                                                        item.UnknownPlanningPlant ===
+                                                            '1' ||
+                                                        item.UnknownLocation ===
+                                                            '1'));
+
+                                            return (
+                                                <tr
+                                                    key={index}
+                                                    className={`text-center ${
+                                                        shouldHighlight
+                                                            ? 'bg-red-500 text-white font-bold'
+                                                            : ''
+                                                    }`}
+                                                >
+                                                    {Object.values(item).map(
+                                                        (value, i) => (
+                                                            <td
+                                                                key={i}
+                                                                className='border border-gray-400 px-4 py-2 whitespace-nowrap'
+                                                            >
+                                                                {value}
+                                                            </td>
+                                                        )
+                                                    )}
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>

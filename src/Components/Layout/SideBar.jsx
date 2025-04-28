@@ -1,9 +1,15 @@
+import React from 'react';
 import {
     BarChart2,
     Menu,
     TrendingUp,
     MapPinIcon,
-    CloudUploadIcon
+    CloudUploadIcon,
+    NotepadTextIcon,
+    PackageIcon,
+    PackageCheckIcon,
+    WindIcon,
+    ChartNoAxesCombined
 } from 'lucide-react';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -12,29 +18,60 @@ import { Link } from 'react-router';
 const SIDEBAR_ITEMS = [
     {
         name: 'Overview',
-        icon: BarChart2,
-        color: '#6366f1',
-        href: '/'
+        icon: ChartNoAxesCombined,
+        color: '#9966FF',
+        href: '/uploadedDataOverview'
     },
     {
         name: 'Upload',
         icon: CloudUploadIcon,
-        color: '#8B5CF6',
+        color: '#FF9F40',
         href: '/upload'
     },
-	{
-		name: 'Maps',
-		icon: MapPinIcon,
-		color: '#6EE7B7',
-		href: '/map'
-	},
     {
-        name: 'Analytics',
+        name: 'Maps',
+        icon: MapPinIcon,
+        color: '#36A2EB',
+        href: '/map'
+    },
+    {
+        name: 'MaterialDashboard',
         icon: TrendingUp,
-        color: '#3B82F6',
-        href: '/dashboard'
+        color: '#FFCE56',
+        href: '/materialDashboard'
+    },
+    {
+        name: 'TurbineDashboard',
+        icon: PackageIcon,
+        color: '#FF6384',
+        href: '/turbineDashboard'
+    },
+    {
+        name: 'MaterialPredictions',
+        icon: BarChart2,
+        color: '#4BC04B',
+        href: '/materialPredictionsDashboard'
+    },
+    {
+        name: 'MaterialPredictions2',
+        icon: PackageCheckIcon,
+        color: '#008080',
+        href: '/materialPredictionsDashboard2'
+    },
+    {
+        name: 'TurbinePredictions',
+        icon: WindIcon,
+        color: '#FF8C00',
+        href: '/turbinePredictionsDashboard'
+    },
+    {
+        name: 'Fault Report',
+        icon: NotepadTextIcon,
+        color: '#6A5ACD',
+        href: '/fault-report'
     }
 ];
+
 
 const Sidebar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -61,6 +98,7 @@ const Sidebar = () => {
                         <Link key={item.href} to={item.href}>
                             <motion.div className='flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2'>
                                 <item.icon
+                                    data-testid="sidebar-icon"
                                     size={20}
                                     style={{
                                         color: item.color,
@@ -94,4 +132,5 @@ const Sidebar = () => {
         </motion.div>
     );
 };
+
 export default Sidebar;

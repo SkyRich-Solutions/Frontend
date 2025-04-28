@@ -1,0 +1,23 @@
+[
+    {
+      "Category": "Unclassified",
+      "TotalCategoryScore": 10.0,
+      "LastUpdated": "2025-04-21T17:27:00.724121"
+    },
+    {
+      "Category": "Electrical",
+      "TotalCategoryScore": 80.0,
+      "LastUpdated": "2025-04-21T17:27:00.724269"
+    },
+    {
+      "Category": "Consumables",
+      "TotalCategoryScore": 50.0,
+      "LastUpdated": "2025-04-21T17:27:00.724375"
+    },
+    {
+      "Category": "Mechanical",
+      "TotalCategoryScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.724471"
+    }
+  ]
+  

@@ -4,7 +4,7 @@
         "Description": "WT Arauco I & II ,AG-70 (61028441)",
         "MaintPlant": "50S1",
         "PlanningPlant": "50S1",
-        "Platform": "SG2X",
+        "Platform": "SG4X",
         "WTShortName": "AG-70",
         "TurbineModel": "SG 2.1-114",
         "MkVersion": "",
@@ -22,15 +22,15 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,056",
-        "TurbineLongitude": "-6,67,15,888"
+        "TurbineLatitude": "2.8914044",
+        "TurbineLongitude": "6.6877467"
     },
     {
         "FunctionalLoc": "AR0003=G002",
         "Description": "WT Arauco I & II ,AG-71 (61028442)",
         "MaintPlant": "50S1",
         "PlanningPlant": "50S1",
-        "Platform": "SG2X",
+        "Platform": "SG4X",
         "WTShortName": "AG-71",
         "TurbineModel": "SG 2.1-114",
         "MkVersion": "",
@@ -43,13 +43,13 @@
         "SCADACode": "61028442",
         "SCADAFunctionalLoc": "AR0003=K001",
         "TechID": "61028442",
-        "Region": "Latin America",
+        "Region": "Middle East & Africa",
         "Technology": "DAC",
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,101",
-        "TurbineLongitude": "-6,67,18,590"
+        "TurbineLatitude": "2.8914170",
+        "TurbineLongitude": "6.6884972"
     },
     {
         "FunctionalLoc": "AR0003=G003",
@@ -74,8 +74,8 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,147",
-        "TurbineLongitude": "-6,67,21,291"
+        "TurbineLatitude": "2.8914308",
+        "TurbineLongitude": "6.6892364"
     },
     {
         "FunctionalLoc": "AR0003=G004",
@@ -100,8 +100,8 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,193",
-        "TurbineLongitude": "-6,67,23,992"
+        "TurbineLatitude": "2.8914447",
+        "TurbineLongitude": "6.6899756"
     },
     {
         "FunctionalLoc": "AR0003=G005",
@@ -126,8 +126,8 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,238",
-        "TurbineLongitude": "-6,67,26,694"
+        "TurbineLatitude": "-2.8914578",
+        "TurbineLongitude": "-6.6907244"
     },
     {
         "FunctionalLoc": "AR0003=G006",
@@ -147,13 +147,13 @@
         "SCADACode": "61028446",
         "SCADAFunctionalLoc": "AR0003=K001",
         "TechID": "61028446",
-        "Region": "Latin America",
+        "Region": "Middle East & Africa",
         "Technology": "DAC",
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,277",
-        "TurbineLongitude": "-6,67,29,027"
+        "TurbineLatitude": "2.8914681",
+        "TurbineLongitude": "6.6913964"
     },
     {
         "FunctionalLoc": "AR0003=G007",
@@ -178,8 +178,8 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,316",
-        "TurbineLongitude": "-6,67,31,360"
+        "TurbineLatitude": "2.8729316",
+        "TurbineLongitude": "6.6731360"
     },
     {
         "FunctionalLoc": "AR0003=G008",
@@ -199,20 +199,20 @@
         "SCADACode": "61028448",
         "SCADAFunctionalLoc": "AR0003=K001",
         "TechID": "61028448",
-        "Region": "Latin America",
+        "Region": "Middle East & Africa",
         "Technology": "DAC",
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,356",
-        "TurbineLongitude": "-6,67,33,693"
+        "TurbineLatitude": "2.8914783",
+        "TurbineLongitude": "6.6920683"
     },
     {
         "FunctionalLoc": "AR0003=G009",
         "Description": "WT Arauco I & II ,AG-89 (61028449)",
         "MaintPlant": "50S1",
         "PlanningPlant": "50S1",
-        "Platform": "SG2X",
+        "Platform": "SG4X",
         "WTShortName": "AG-89",
         "TurbineModel": "SG 2.1-114",
         "MkVersion": "",
@@ -230,8 +230,8 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,395",
-        "TurbineLongitude": "-6,67,36,026"
+        "TurbineLatitude": "2.8729395",
+        "TurbineLongitude": "6.6736026"
     },
     {
         "FunctionalLoc": "AR0003=G010",
@@ -256,15 +256,15 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,434",
-        "TurbineLongitude": "-6,67,38,359"
+        "TurbineLatitude": "2.8729434",
+        "TurbineLongitude": "6.6738359"
     },
     {
         "FunctionalLoc": "AR0003=G001",
         "Description": "WT Arauco I & II ,AG-70 (61028441)",
         "MaintPlant": "50S1",
         "PlanningPlant": "50S1",
-        "Platform": "SG2X",
+        "Platform": "SG5X",
         "WTShortName": "AG-70",
         "TurbineModel": "SG 2.1-114",
         "MkVersion": "",
@@ -282,8 +282,8 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,056",
-        "TurbineLongitude": "-6,67,15,888"
+        "TurbineLatitude": "2.8729056",
+        "TurbineLongitude": "6.6715888"
     },
     {
         "FunctionalLoc": "AR0003=G002",
@@ -303,20 +303,20 @@
         "SCADACode": "61028442",
         "SCADAFunctionalLoc": "AR0003=K001",
         "TechID": "61028442",
-        "Region": "Latin America",
+        "Region": "Middle East & Africa",
         "Technology": "DAC",
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,101",
-        "TurbineLongitude": "-6,67,18,590"
+        "TurbineLatitude": "2.8729101",
+        "TurbineLongitude": "6.6718590"
     },
     {
         "FunctionalLoc": "AR0003=G003",
         "Description": "WT Arauco I & II ,AG-72 (61028443)",
         "MaintPlant": "50S1",
         "PlanningPlant": "50S1",
-        "Platform": "SG2X",
+        "Platform": "SG5X",
         "WTShortName": "AG-72",
         "TurbineModel": "SG 2.1-114",
         "MkVersion": "",
@@ -334,15 +334,15 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,147",
-        "TurbineLongitude": "-6,67,21,291"
+        "TurbineLatitude": "2.8729147",
+        "TurbineLongitude": "6.6721291"
     },
     {
         "FunctionalLoc": "AR0003=G004",
         "Description": "WT Arauco I & II ,AG-73 (61028444)",
         "MaintPlant": "50S1",
         "PlanningPlant": "50S1",
-        "Platform": "SG2X",
+        "Platform": "SG5X",
         "WTShortName": "AG-73",
         "TurbineModel": "SG 2.1-114",
         "MkVersion": "",
@@ -360,15 +360,15 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,193",
-        "TurbineLongitude": "-6,67,23,992"
+        "TurbineLatitude": "2.8729193",
+        "TurbineLongitude": "6.6723992"
     },
     {
         "FunctionalLoc": "AR0003=G005",
         "Description": "WT Arauco I & II ,AG-74 (61028445)",
         "MaintPlant": "50S1",
         "PlanningPlant": "50S1",
-        "Platform": "SG2X",
+        "Platform": "SG5X",
         "WTShortName": "AG-74",
         "TurbineModel": "SG 2.1-114",
         "MkVersion": "",
@@ -386,7 +386,7 @@
         "HubHeight": "80,00 m",
         "TowerHeight": "IIA",
         "TurbineClass": "",
-        "TurbineLatitude": "-2,87,29,238",
-        "TurbineLongitude": "-6,67,26,694"
+        "TurbineLatitude": "2.8729238",
+        "TurbineLongitude": "6.6726694"
     }
 ]

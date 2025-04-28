@@ -1,0 +1,73 @@
+[
+    {
+      "CategoryHealthScore_ID": 1,
+      "Category": "Unclassified",
+      "Plant": "HNS1",
+      "HealthScore": 10.0,
+      "LastUpdated": "2025-04-21T17:27:00.723981"
+    },
+    {
+      "CategoryHealthScore_ID": 2,
+      "Category": "Unclassified",
+      "Plant": "NIS1",
+      "HealthScore": 50.0,
+      "LastUpdated": "2025-04-21T17:27:00.724006"
+    },
+    {
+      "CategoryHealthScore_ID": 3,
+      "Category": "Unclassified",
+      "Plant": "25S1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.724011"
+    },
+    {
+      "CategoryHealthScore_ID": 4,
+      "Category": "Unclassified",
+      "Plant": "51S1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.724015"
+    },
+    {
+      "CategoryHealthScore_ID": 5,
+      "Category": "Unclassified",
+      "Plant": "INS5",
+      "HealthScore": 60.0,
+      "LastUpdated": "2025-04-21T17:27:00.724019"
+    },
+    {
+      "CategoryHealthScore_ID": 6,
+      "Category": "Unclassified",
+      "Plant": "AUS7",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.724023"
+    },
+    {
+      "CategoryHealthScore_ID": 7,
+      "Category": "Unclassified",
+      "Plant": "EGS1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.724027"
+    },
+    {
+      "CategoryHealthScore_ID": 8,
+      "Category": "Unclassified",
+      "Plant": "TRS1",
+      "HealthScore": 80.0,
+      "LastUpdated": "2025-04-21T17:27:00.724031"
+    },
+    {
+      "CategoryHealthScore_ID": 9,
+      "Category": "Unclassified",
+      "Plant": "24S1",
+      "HealthScore": 100.0,
+      "LastUpdated": "2025-04-21T17:27:00.724035"
+    },
+    {
+      "CategoryHealthScore_ID": 10,
+      "Category": "Unclassified",
+      "Plant": "MXS1",
+      "HealthScore": 50.0,
+      "LastUpdated": "2025-04-21T17:27:00.724039"
+    }
+  ]
+  
