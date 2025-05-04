@@ -13,6 +13,7 @@ import CategoryClassificationDashboard from './Pages/CategoryClassificationDashb
 import Map from './Pages/Map';
 import FaultReport from './Pages/FaultReport';
 import MainPage from './Pages/MainPage';
+import StartPage from './Pages/StartPage';
 
 const router = createHashRouter([
     {
@@ -59,6 +60,10 @@ const router = createHashRouter([
             {
                 path: '/categoryClassificationDashboard',
                 element: <CategoryClassificationDashboard />
+            },
+            {
+                path:'/',
+                element: <StartPage />
             }
         ]
     }
