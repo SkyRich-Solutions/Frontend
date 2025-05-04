@@ -130,8 +130,8 @@ const UploadPage = () => {
     };
 
     return (
-        <div className='flex-1 overflow-auto z-1 h-auto space-y-4'>
-            <Header title='File Uploader' />
+        <div className="flex-1 overflow-auto z-10 min-h-screen space-y-4">
+            <Header title='CSV Upload Dashboard' />
 
             <div className='items-center justify-center bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-screen'>
                 <div className='bg-gray-900 p-8 rounded-xl shadow-xl text-center flex items-center justify-between'>

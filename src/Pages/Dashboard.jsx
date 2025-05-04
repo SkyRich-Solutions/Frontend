@@ -1,68 +1,167 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Header from '../Components/Layout/Header';
 import ChartComponent from '../Components/ChartComponent';
+import Fuse from 'fuse.js';
+import { getPredictionMaterialData } from '../Utils/MaterialDashboardDataHandler';
+
 
 const Dashboard = () => {
     const [selectedItem, setSelectedItem] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const [materialData, setMaterialData] = useState([]);
 
     const handleItemClick = (item) => {
         setSelectedItem(item);
     };
 
-    return (
-        <div className='flex-1 overflow-auto z-1 min-h-screen space-y-4'>
-            <Header title='Material Dashboard' />
+    const searchWrapperRef = useRef(null);
 
-            <div className='grid grid-cols-3 gap-6 p-4'>
-                {/* Top row with three different charts */}
-                {[0, 1, 2].map((index) => (
-                    <div
-                        key={index}
-                        className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[20rem] flex items-center justify-center rounded-lg'
-                    >
-                        <ChartComponent
-                            type={
-                                index === 0
-                                    ? 'bar_PlantSpecificMaterialStatus'
-                                    : index === 1
-                                    ? 'line_MaterialCategoryCount'
-                                    : 'bar_MaterialByPlant'
-                            }
-                            selectedItem={selectedItem}
-                            handleClick={handleItemClick}
-                        />
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchWrapperRef.current && !searchWrapperRef.current.contains(event.target)) {
+                setShowSuggestions(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    // Fetch data on mount
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const materials = await getPredictionMaterialData();
+                setMaterialData(materials);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    // Combine terms for fuzzy search
+    const allTerms = useMemo(() => {
+        return [
+            ...new Set([
+                ...materialData.flatMap(item => [
+                    item.Material, item.MaterialCategory, item.Plant, item.PlantSpecificMaterialStatus
+                ])
+            ].filter(Boolean))
+        ];
+    }, [materialData]);
+
+    // Set up Fuse instance
+    const fuse = useMemo(() => new Fuse(allTerms, { includeScore: true, threshold: 0.4 }), [allTerms]);
+
+    // Generate suggestions
+    const suggestions = searchQuery
+        ? fuse.search(searchQuery).map(res => res.item).slice(0, 5)
+        : [];
+
+        return (
+            <div className="flex flex-col h-screen w-screen bg-gray-950 pb-4 overflow-hidden">
+                {/* Header Section */}
+                <div className="flex justify-between items-center px-6 py-4 bg-gray-900 bg-opacity-90 z-10 relative">
+                    <Header title="Material Component Overview" />
+                        <div className="relative w-1/2 max-w-md" ref={searchWrapperRef}>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search Material..."
+                                    className="w-full bg-gray-800 text-white px-4 py-2 pr-10 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value={searchQuery}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        setShowSuggestions(true);
+                                    }}
+                                />
+                            {searchQuery && (
+                                <button
+                                onClick={() => {
+                                    setSearchQuery('');
+                                    setShowSuggestions(false);
+                                }}
+                                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/10 px-2 py-0.5 rounded text-gray-300 hover:text-white hover:bg-white/20 transition"
+                                aria-label="Clear search"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
+
+                        {showSuggestions && suggestions.length > 0 && (
+                            <ul className="absolute z-50 bg-gray-900 text-white w-full mt-1 rounded-md shadow-lg border border-gray-700 max-h-40 overflow-auto">
+                                {suggestions.map((item, index) => (
+                                    <li
+                                        key={index}
+                                        className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+                                        onClick={() => {
+                                            setSearchQuery(item);
+                                            setShowSuggestions(false);
+                                        }}
+                                    >
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
-                ))}
-
-                {/* Large square chart on the right */}
-                <div className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 flex items-center justify-center rounded-lg col-span-2 row-span-2 h-[38rem]'>
-                    <ChartComponent
-                        type='line_TopMaterialByReplacementParts'
-                        selectedItem={selectedItem}
-                        handleClick={handleItemClick}
-                    />
                 </div>
-
-                {/* Middle-left two different charts */}
-                <div className='flex flex-col gap-6 col-span-1'>
-                    {[3, 4].map((index) => (
+        
+                {/* Charts Section */}
+                <div className="grid grid-cols-3 gap-6 px-4 pt-2 pb-2">
+                    {[0, 1, 2].map((index) => (
                         <div
                             key={index}
-                            className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[18rem] flex items-center justify-center rounded-lg'
+                            className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[20rem] flex items-center justify-center rounded-lg"
                         >
                             <ChartComponent
-                                type={index === 3 ? 'line_ReplacementPartsByPlant' : 'bar_MaterialCount'}
+                                type={
+                                    index === 0
+                                        ? 'bar_PlantSpecificMaterialStatus'
+                                        : index === 1
+                                        ? 'line_MaterialCategoryCount'
+                                        : 'bar_MaterialByPlant'
+                                }
                                 selectedItem={selectedItem}
                                 handleClick={handleItemClick}
+                                searchQuery={searchQuery}
                             />
                         </div>
                     ))}
+        
+                    <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 flex items-center justify-center rounded-lg col-span-2 row-span-2 h-[38rem]">
+                        <ChartComponent
+                            type="line_TopMaterialByReplacementParts"
+                            selectedItem={selectedItem}
+                            handleClick={handleItemClick}
+                            searchQuery={searchQuery}
+                        />
+                    </div>
+        
+                    <div className="flex flex-col gap-6 col-span-1">
+                        {[3, 4].map((index) => (
+                            <div
+                                key={index}
+                                className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[18rem] flex items-center justify-center rounded-lg"
+                            >
+                                <ChartComponent
+                                    type={index === 3 ? 'line_ReplacementPartsByPlant' : 'bar_MaterialCount'}
+                                    selectedItem={selectedItem}
+                                    handleClick={handleItemClick}
+                                    searchQuery={searchQuery}
+                                />
+                            </div>
+                        ))}
+                    </div>
                 </div>
-
-                
             </div>
-        </div>
-    );
-};
+        );
+    };        
 
 export default Dashboard;

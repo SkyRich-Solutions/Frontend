@@ -82,8 +82,9 @@ const FaultReport = () => {
     };
 
     return (
-        <div className="flex-1 overflow-auto z-1 h-auto space-y-4">
-            <Header title="Fault Report" />
+        <div className="flex-1 overflow-auto z-10 min-h-screen space-y-4">
+             <div className="flex justify-between items-center px-6 pt-6 bg-gray-900 bg-opacity-90 z-10"></div>
+            <Header title="Fault Report Upload" />
             <div className="flex items-center justify-center bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 min-h-screen">
                 <div className="w-full max-w-md text-white">
                     {loading ? (

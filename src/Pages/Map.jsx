@@ -148,14 +148,17 @@ const Maps = () => {
     }, []);
 
     return (
-        <div className='flex-1 overflow-auto z-1 h-auto space-y-4'>
-            <Header title='Map' />
-            <div className='flex w-full h-[90vh] ml-4'>
+        <div className="flex flex-col h-screen w-screen z-10 space-y-4  bg-gray-950">
+            {/* Header Section */}
+            <div className="flex justify-between items-center px-6 pt-6 bg-gray-900 bg-opacity-90 z-10">
+                <Header title="Map Overview" />
+            </div>
+
+            {/* Main Content */}
+            <div className="flex flex-1 overflow-hidden">
                 {/* Map Section */}
-                <div className='flex-1 relative'>
-                    <APIProvider
-                        apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
-                    >
+                <div className="flex-1 relative">
+                    <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
                         <Map
                             defaultCenter={position}
                             defaultZoom={3}
@@ -167,59 +170,54 @@ const Maps = () => {
                                 allData={TurbineData}
                                 setSelectedTurbine={handleTurbineClick}
                             />
-
                             <WarehouseMarker
                                 plantData={PlantData}
                                 filters={Filters.warehouse}
                             />
-
-                            {linePath.length > 0 && (
-                                <ConnectionLine path={linePath} />
-                            )}
+                            {linePath.length > 0 && <ConnectionLine path={linePath} />}
                         </Map>
                     </APIProvider>
                 </div>
 
                 {/* Sidebar */}
-                <div className='flex flex-col space-y-4 p-4 w-[350px] bg-gray-900 text-white border-l border-gray-700 '>
+                <div className="flex flex-col space-y-4 p-4 w-[350px] bg-gray-900 text-white border-l border-gray-700 overflow-y-auto">
                     {/* Turbine Filtering */}
-                    <div className='bg-gray-800 bg-opacity-60 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex flex-wrap gap-4 items-center rounded-lg w-[300px]'>
-                        <div className='flex justify-center w-full'>
+                    <div className="bg-gray-800 bg-opacity-60 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex flex-wrap gap-4 items-center rounded-lg w-[300px]">
+                        <div className="flex justify-center w-full">
                             <strong>Turbine</strong>
                         </div>
                         <FilterBox
-                            title='All Turbines'
-                            group='turbine'
-                            filterKey='showAll'
+                            title="All Turbines"
+                            group="turbine"
+                            filterKey="showAll"
                             filters={Filters.turbine}
                             onChange={handleFilterChange}
                         />
                     </div>
 
                     {/* Warehouse Filtering */}
-                    <div className='bg-gray-800 bg-opacity-60 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex flex-wrap gap-4 items-center rounded-lg w-[300px]'>
-                        <div className='flex justify-center w-full'>
+                    <div className="bg-gray-800 bg-opacity-60 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex flex-wrap gap-4 items-center rounded-lg w-[300px]">
+                        <div className="flex justify-center w-full">
                             <strong>Warehouse</strong>
                         </div>
-
                         <FilterBox
-                            title='Part Warehouse (Grey)'
-                            filterKey='showAll'
-                            group='warehouse'
+                            title="Part Warehouse (Grey)"
+                            filterKey="showAll"
+                            group="warehouse"
                             filters={Filters.warehouse}
                             onChange={handleFilterChange}
                         />
                         <FilterBox
-                            title='Maintenance Warehouse (Red)'
-                            filterKey='showMaint'
-                            group='warehouse'
+                            title="Maintenance Warehouse (Red)"
+                            filterKey="showMaint"
+                            group="warehouse"
                             filters={Filters.warehouse}
                             onChange={handleFilterChange}
                         />
                         <FilterBox
-                            title='Planning Warehouse (Blue)'
-                            filterKey='showPlanning'
-                            group='warehouse'
+                            title="Planning Warehouse (Blue)"
+                            filterKey="showPlanning"
+                            group="warehouse"
                             filters={Filters.warehouse}
                             onChange={handleFilterChange}
                         />
@@ -229,6 +227,7 @@ const Maps = () => {
                 </div>
             </div>
         </div>
+
     );
 };
 
