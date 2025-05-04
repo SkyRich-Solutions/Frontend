@@ -12,6 +12,7 @@ const CategoryClassificationDashboard = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const [MaterialCategoryClassificationsData, setMaterialCategoryClassificationsData] = useState([]);
 
@@ -121,6 +122,8 @@ const CategoryClassificationDashboard = () => {
                 <div className='flex w-full h-[calc(100vh/3)] gap-4'>
                     <div className='w-1/2 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 rounded-lg overflow-auto'>
                         <CategoryClassificationComponent 
+                            refreshKey={refreshKey}
+                            setRefreshKey={setRefreshKey}
                             type='Line_chart_UnclassifiedNewlyDiscovered'
                             editingUnlocked={editingUnlocked}
                             setEditingUnlocked={setEditingUnlocked}
@@ -134,6 +137,8 @@ const CategoryClassificationDashboard = () => {
 
                     <div className='w-[30%] bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 rounded-lg overflow-auto'>
                         <CategoryClassificationComponent 
+                            refreshKey={refreshKey}
+                            setRefreshKey={setRefreshKey}
                             type='donut_UnclassifiedNewlyDiscovered'
                             editingUnlocked={editingUnlocked}
                             setEditingUnlocked={setEditingUnlocked}
@@ -147,7 +152,9 @@ const CategoryClassificationDashboard = () => {
 
                     <div className='w-1/5 flex flex-col gap-4'>
                         <div className='flex-1 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 rounded-lg overflow-auto'>
-                            <CategoryClassificationComponent 
+                            <CategoryClassificationComponent
+                                refreshKey={refreshKey}
+                                setRefreshKey={setRefreshKey}
                                 type='count_Unclassified'
                                 editingUnlocked={editingUnlocked}
                                 setEditingUnlocked={setEditingUnlocked}
@@ -160,7 +167,9 @@ const CategoryClassificationDashboard = () => {
                         </div>
 
                         <div className='flex-1 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 rounded-lg overflow-auto'>
-                            <CategoryClassificationComponent 
+                            <CategoryClassificationComponent
+                                refreshKey={refreshKey}
+                                setRefreshKey={setRefreshKey}
                                 type='count_NewlyDiscovered'
                                 editingUnlocked={editingUnlocked}
                                 setEditingUnlocked={setEditingUnlocked}
@@ -178,6 +187,8 @@ const CategoryClassificationDashboard = () => {
                 <div className='flex w-full h-[calc(100vh-8rem-100vh/3-2rem)] gap-4'>
                     <div className='w-4/5 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 rounded-lg overflow-auto'>
                         <CategoryClassificationComponent 
+                            refreshKey={refreshKey}
+                            setRefreshKey={setRefreshKey}
                             type='table_MaterialCategoryClassificationsData'
                             editingUnlocked={editingUnlocked}
                             setEditingUnlocked={setEditingUnlocked}
@@ -191,6 +202,8 @@ const CategoryClassificationDashboard = () => {
 
                     <div className='w-1/5 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 rounded-lg overflow-auto'>
                         <CategoryClassificationComponent 
+                            refreshKey={refreshKey}
+                            setRefreshKey={setRefreshKey}
                             type='table_UniqueMaterialCategories'
                             editingUnlocked={editingUnlocked}
                             setEditingUnlocked={setEditingUnlocked}

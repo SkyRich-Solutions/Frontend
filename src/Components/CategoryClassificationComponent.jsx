@@ -51,6 +51,8 @@ const materialStatusMap = {
 
 const CategoryClassificationComponent = ({
     type,
+    refreshKey,
+    setRefreshKey,
     editingUnlocked,
     setEditingUnlocked,
     selectedRows,
@@ -65,19 +67,19 @@ const CategoryClassificationComponent = ({
     const [successMessage, setSuccessMessage] = useState('');
     
 
+    const fetchData = async () => {
+        try {
+            const categoryData = await getProcessedCategoryData();
+            console.log('Fetched category data in component:', categoryData);
+            setMaterialCategoryClassificationsData(categoryData);
+        } catch (error) {
+            console.error('Error fetching category data:', error);
+        }
+    };
+    
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const categoryData = await getProcessedCategoryData();
-                console.log('Fetched category data in component:', categoryData);
-                setMaterialCategoryClassificationsData(categoryData);
-            } catch (error) {
-                console.error('Error fetching category data:', error);
-            }
-        };
-
         fetchData();
-    }, []);
+    }, [refreshKey]);;
 
      // Normalize search query
     const query = searchQuery.toLowerCase();
@@ -157,30 +159,23 @@ const CategoryClassificationComponent = ({
         setSuccessMessage('');
     
         try {
-            // 1. Update categories in DB
             await axios.post('http://localhost:4000/api/updateMaterialCategories', {
                 selectedCategory,
                 rows: selectedRows.map(row => ({ Material: row.Material, Plant: row.Plant }))
             });
     
-            // 2. Wait for the human_in_the_loop Python script to finish
-            const scriptRes = await axios.post('http://localhost:4000/api/run-python-human-in-the-loop');
+            await axios.post('http://localhost:4000/api/run-python-human-in-the-loop');
     
-            console.log("🔁 Python script output:", scriptRes.data.output);
-    
-            // 3. Refresh frontend data
-            const updatedData = await getProcessedCategoryData();
-            setMaterialCategoryClassificationsData(updatedData);
-    
-            // 4. Clear state and show success
             setSelectedRows([]);
             setSelectedCategory(null);
             setEditingUnlocked(false);
             setSuccessMessage('✅ Categories saved and synced successfully!');
     
-            // Auto-hide confirmation after 3 seconds
-            setTimeout(() => setSuccessMessage(''), 3000);
-    
+           
+            setTimeout(() => {
+                setSuccessMessage('');
+                setRefreshKey(prev => prev + 1); // <-- here
+            }, 3000);
         } catch (err) {
             console.error("Update error:", err);
             alert(err.response?.data?.message || 'Failed to update material categories.');
@@ -188,7 +183,6 @@ const CategoryClassificationComponent = ({
             setLoading(false);
         }
     };
-    
     
     if (type === 'table_MaterialCategoryClassificationsData') {
         return (
