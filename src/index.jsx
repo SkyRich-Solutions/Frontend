@@ -9,6 +9,7 @@ import TurbineDashboard from './Pages/TurbineDashboard';
 import MaterialPredictionsDashboard from './Pages/MaterialPredictionsDashboard';
 import MaterialPredictionsDashboard2 from './Pages/MaterialPredictionsDashboard2';
 import TurbinePredictionsDashboard from './Pages/TurbinePredictionsDashboard';
+import CategoryClassificationDashboard from './Pages/CategoryClassificationDashboard';
 import Map from './Pages/Map';
 import FaultReport from './Pages/FaultReport';
 import MainPage from './Pages/MainPage';
@@ -54,6 +55,10 @@ const router = createHashRouter([
             {
                 path: '/fault-report',
                 element: <FaultReport />
+            }, 
+            {
+                path: '/categoryClassificationDashboard',
+                element: <CategoryClassificationDashboard />
             }
         ]
     }

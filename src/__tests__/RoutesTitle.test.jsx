@@ -27,6 +27,6 @@ describe('RouteTitleManager', () => {
 
   it('sets the title for root route', () => {
     renderWithRoute('/');
-    expect(document.title).toBe('Main Page');
+    expect(document.title).toBe('Overview of Compliance');
   });
 });

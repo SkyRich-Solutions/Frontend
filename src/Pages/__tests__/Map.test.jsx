@@ -51,7 +51,7 @@ jest.mock('../../Components/Layout/Header', () => ({ title }) => (
 ));
 
 describe('Maps Page', () => {
-    it('renders the map page layout correctly', async () => {
+    it('renders the Map Overview layout correctly', async () => {
         render(<Maps />);
 
         expect(screen.getByTestId('header')).toHaveTextContent('Map');

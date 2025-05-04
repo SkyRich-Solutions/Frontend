@@ -45,6 +45,7 @@ describe('Sidebar component', () => {
       '/materialPredictionsDashboard',
       '/materialPredictionsDashboard2',
       '/turbinePredictionsDashboard',
+      '/categoryClassificationDashboard',
       '/fault-report',
     ];
 

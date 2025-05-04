@@ -17,59 +17,65 @@ import { Link } from 'react-router';
 
 const SIDEBAR_ITEMS = [
     {
-        name: 'Overview',
-        icon: ChartNoAxesCombined,
+        name: 'Overview of Compliance',
+        icon: BarChart2, // Represents analytics overview
         color: '#9966FF',
         href: '/uploadedDataOverview'
     },
     {
-        name: 'Upload',
-        icon: CloudUploadIcon,
-        color: '#FF9F40',
-        href: '/upload'
-    },
-    {
-        name: 'Maps',
+        name: 'Map Overview',
         icon: MapPinIcon,
         color: '#36A2EB',
         href: '/map'
     },
     {
-        name: 'MaterialDashboard',
-        icon: TrendingUp,
+        name: 'Material Component Overview',
+        icon: PackageIcon, // Suits materials/components
         color: '#FFCE56',
         href: '/materialDashboard'
     },
     {
-        name: 'TurbineDashboard',
-        icon: PackageIcon,
+        name: 'Turbine Design Overview',
+        icon: WindIcon, // Matches turbines
         color: '#FF6384',
         href: '/turbineDashboard'
     },
     {
-        name: 'MaterialPredictions',
-        icon: BarChart2,
+        name: 'Material Component Predictions',
+        icon: TrendingUp, // For predictions/trends
         color: '#4BC04B',
         href: '/materialPredictionsDashboard'
     },
     {
-        name: 'MaterialPredictions2',
-        icon: PackageCheckIcon,
+        name: 'Material Component Health Scores',
+        icon: PackageCheckIcon, // Checked package for health
         color: '#008080',
         href: '/materialPredictionsDashboard2'
     },
     {
-        name: 'TurbinePredictions',
-        icon: WindIcon,
+        name: 'Turbine Model Health Scores',
+        icon: BarChart2, // Same analytical symbol as above
         color: '#FF8C00',
         href: '/turbinePredictionsDashboard'
+    }, 
+    {
+        name: 'Category Classification Dashboard',
+        icon: ChartNoAxesCombined, // Implies grouped data or classification
+        color: '#FF4500',
+        href: '/categoryClassificationDashboard'
     },
     {
-        name: 'Fault Report',
+        name: 'CSV Upload Dashboard',
+        icon: CloudUploadIcon,
+        color: '#FF9F40',
+        href: '/upload'
+    },
+    {
+        name: 'Fault Report Upload',
         icon: NotepadTextIcon,
         color: '#6A5ACD',
         href: '/fault-report'
-    }
+    },
 ];
 
 
@@ -78,7 +84,7 @@ const Sidebar = () => {
 
     return (
         <motion.div
-            className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 ${
+            className={`relative z-20 transition-all duration-300 ease-in-out flex-shrink-0 ${
                 isSidebarOpen ? 'w-64' : 'w-20'
             }`}
             animate={{ width: isSidebarOpen ? 160 : 80 }}

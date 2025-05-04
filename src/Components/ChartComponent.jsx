@@ -1,8 +1,7 @@
 
 
-import React, { use } from 'react';
+import React from 'react';
 import {Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, BarChart, PieChart, Pie, Bar, ScatterChart, Scatter, CartesianGrid, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, Cell, Label } from 'recharts';
-
 
 import { getPredictionMaterialData } from '../Utils/MaterialDashboardDataHandler';
 import { getPredictionTurbineData } from '../Utils/TurbineDashboardDataHandler';
@@ -26,26 +25,44 @@ const COLORS = [
     'rgba(244, 164, 96, 0.6)',
 ];
 
-const ChartComponent = ({ type }) => {
+
+const ChartComponent = ({ type, searchQuery = '', selectedItem, handleClick }) => {
     const [MaterialData, setMaterialData] = useState([]);
     const [TurbineData, setTurbineData] = useState([]);
+
     useEffect(() => {
         const fetchData = async () => {
-          try {
-            const materialData = await getPredictionMaterialData(); // <<<<< now you actually CALL it
-            const turbineData = await getPredictionTurbineData();
-            console.log('Fetched data in component:', materialData);
-            setMaterialData(materialData);
-            setTurbineData(turbineData);
-          } catch (error) {
-            console.error('Error fetching material data:', error);
-          }
+            try {
+                const materialData = await getPredictionMaterialData();
+                const turbineData = await getPredictionTurbineData();
+                setMaterialData(materialData);
+                setTurbineData(turbineData);
+            } catch (error) {
+                console.error('Error fetching material data:', error);
+            }
         };
-    
+
         fetchData();
-      }, []);
+    }, []);
+
+    // Normalize search query
+    const query = searchQuery.toLowerCase();
+
+    // Apply search filter to material data (search across multiple fields)
+    const filteredMaterialData = MaterialData.filter((item) =>
+        [item.Material, item.MaterialCategory, item.Plant, item.PlantSpecificMaterialStatus]
+            .some(field => field?.toString().toLowerCase().includes(query))
+    );
+
+   // Apply search filter to turbine data (search across multiple fields)
+    const filteredTurbineData = TurbineData.filter((item) =>
+        [item.FunctionalLoc, item.Region, item.Platform, item.MaintPlant, item.PlanningPlant, item.OriginalEqManufact]
+            .some(field => field?.toString().toLowerCase().includes(query))
+    );
+    
+
     // Count occurrences of each PlantSpecificMaterialStatus
-    const statusCounts = MaterialData.reduce((acc, item) => {
+    const statusCounts = (filteredMaterialData ?? []).reduce((acc, item) => {
         const status = item.PlantSpecificMaterialStatus || 'Unknown';
         acc[status] = (acc[status] || 0) + 1;
         return acc;
@@ -82,7 +99,7 @@ const ChartComponent = ({ type }) => {
     }
 
     if (type === 'bar_MaterialByPlant') {
-        const plantCounts = MaterialData.reduce((acc, item) => {
+        const plantCounts = (filteredMaterialData ?? []).reduce((acc, item) => {
             const plant = item.Plant || 'Unknown';
             acc[plant] = (acc[plant] || 0) + 1;
             return acc;
@@ -118,7 +135,7 @@ const ChartComponent = ({ type }) => {
     }
 
     if (type === 'bar_MaterialCount') {
-        const materialCounts = MaterialData.reduce((acc, item) => {
+        const materialCounts = (filteredMaterialData ?? []).reduce((acc, item) => {
             const material = item.Material?.toString() || 'Unknown';
             acc[material] = (acc[material] || 0) + 1;
             return acc;
@@ -152,46 +169,21 @@ const ChartComponent = ({ type }) => {
             </div>
         );
     }
-
-    if (type === 'line') {
-        return (
-            <div className='w-full h-full flex flex-col justify-between'>
-                <div className='flex justify-center items-center w-full h-full'>
-                    <ResponsiveContainer width='100%' height='100%'>
-                        <LineChart data={formattedData} margin={{ top: 20, right: 30, left: 20, bottom: 25 }}>
-                            <XAxis dataKey='status'>
-                                <Label value="Material Status" offset={-5} position="insideBottom" style={{ textAnchor: 'middle' }} />
-                            </XAxis>
-                            <YAxis>
-                                <Label value="Material Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
-                            </YAxis>
-                            <Tooltip />
-                            <Line
-                                type='monotone'
-                                dataKey='statusCount'
-                                stroke='#00b0ad'
-                                strokeWidth={2}
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
-        );
-    }
-
     if (type === 'line_MaterialCategoryCount') {
         const grouped = {};
 
-        MaterialData.forEach(item => {
-            const category = item.MaterialCategory || 'Unclassified';
-            const material = item.Material?.toString() || 'Unknown';
-
-            if (!grouped[material]) {
-                grouped[material] = { material, total: 0 };
-            }
-            grouped[material][category] = (grouped[material][category] || 0) + 1;
-            grouped[material].total += 1;
-        });
+        if (Array.isArray(filteredMaterialData)) {
+            filteredMaterialData.forEach(item => {
+                const category = item.MaterialCategory || 'Unclassified';
+                const material = item.Material?.toString() || 'Unknown';
+        
+                if (!grouped[material]) {
+                    grouped[material] = { material, total: 0 };
+                }
+                grouped[material][category] = (grouped[material][category] || 0) + 1;
+                grouped[material].total += 1;
+            });
+        }        
 
         const sortedMaterials = Object.values(grouped)
             .sort((a, b) => b.total - a.total)
@@ -200,9 +192,12 @@ const ChartComponent = ({ type }) => {
         const formattedData = sortedMaterials.map(({ total, ...rest }) => rest);
 
         const uniqueCategories = new Set();
-        MaterialData.forEach(item => {
-            uniqueCategories.add(item.MaterialCategory || 'Unclassified');
-        });
+        if (Array.isArray(filteredMaterialData)) {
+            filteredMaterialData.forEach(item => {
+                uniqueCategories.add(item.MaterialCategory || 'Unclassified');
+            });
+        }
+        
         const categoriesArray = Array.from(uniqueCategories);
 
         return (
@@ -236,7 +231,7 @@ const ChartComponent = ({ type }) => {
     }
 
     if (type === 'line_TopMaterialByReplacementParts') {
-        const materialCounts = MaterialData.reduce((acc, item) => {
+        const materialCounts = (filteredMaterialData ?? []).reduce((acc, item) => {
             if (item.ReplacementPart === 'B') {
                 const material = item.Material?.toString() || 'Unknown';
                 acc[material] = (acc[material] || 0) + 1;
@@ -278,28 +273,21 @@ const ChartComponent = ({ type }) => {
     if (type === 'line_ReplacementPartsByPlant') {
         const grouped = {};
     
-        MaterialData.forEach(item => {
-            const plant = item.Plant || 'Unknown';
-            const replacementPart = item.ReplacementPart || 'None';
+        if (Array.isArray(filteredMaterialData)) {
+            filteredMaterialData.forEach(item => {
+                if (item.ReplacementPart === 'B') {  // ✅ Only count when ReplacementPart is B
+                    const plant = item.Plant || 'Unknown';
+                    if (!grouped[plant]) {
+                        grouped[plant] = { plant, count: 0 };
+                    }
+                    grouped[plant].count += 1;
+                }
+            });
+        }
     
-            if (!grouped[plant]) {
-                grouped[plant] = { plant, total: 0 };
-            }
-            grouped[plant][replacementPart] = (grouped[plant][replacementPart] || 0) + 1;
-            grouped[plant].total += 1;
-        });
-    
-        const sortedPlants = Object.values(grouped)
-            .sort((a, b) => b.total - a.total)
-            .slice(0, 15);
-    
-        const formattedData = sortedPlants.map(({ total, ...rest }) => rest);
-    
-        const uniqueReplacementParts = new Set();
-        MaterialData.forEach(item => {
-            uniqueReplacementParts.add(item.ReplacementPart || 'None');
-        });
-        const replacementPartsArray = Array.from(uniqueReplacementParts);
+        const formattedData = Object.values(grouped)
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 15);  // top 15 plants by replacement part count
     
         return (
             <div className='w-full h-full flex flex-col justify-between'>
@@ -310,20 +298,16 @@ const ChartComponent = ({ type }) => {
                                 <Label value="Plant" offset={-5} position="insideBottom" style={{ textAnchor: 'middle' }} />
                             </XAxis>
                             <YAxis>
-                                <Label value="Replacement Parts Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
+                                <Label value="Replacement Parts Count (B)" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
                             <Tooltip />
-                            {replacementPartsArray.map((replacementPart, index) => (
-                                <Line
-                                    key={replacementPart}
-                                    type="monotone"
-                                    dataKey={replacementPart}
-                                    stroke={COLORS[index % COLORS.length]}
-                                    strokeWidth={2}
-                                    dot={{ r: 2 }}
-                                    connectNulls
-                                />
-                            ))}
+                            <Line
+                                type="monotone"
+                                dataKey="count"
+                                stroke={COLORS[1]}
+                                strokeWidth={2}
+                                dot={{ r: 2 }}
+                            />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
@@ -335,7 +319,7 @@ const ChartComponent = ({ type }) => {
  
  if (type === 'bar_FunctionalLocByRegion') {
     // Count FunctionalLocs by Region
-    const regionCounts = TurbineData.reduce((acc, item) => {
+    const regionCounts = (filteredTurbineData ?? []).reduce((acc, item) => {
         const region = item.Region || 'Unknown';
         acc[region] = (acc[region] || 0) + 1;
         return acc;
@@ -383,7 +367,7 @@ const ChartComponent = ({ type }) => {
 
 if (type === 'donut_TurbineCountByManufacturer') {
     // Count turbines by OriginalEqManufact
-    const manufacturerCounts = TurbineData.reduce((acc, item) => {
+    const manufacturerCounts = (filteredTurbineData ?? []).reduce((acc, item) => {
         const manufacturer = item.OriginalEqManufact || 'Unknown';
         acc[manufacturer] = (acc[manufacturer] || 0) + 1;
         return acc;
@@ -424,7 +408,7 @@ if (type === 'donut_TurbineCountByManufacturer') {
 
 if (type === 'scatter_TurbinePowerVsHubHeight') {
     // Preprocess: extract and clean Power and HubHeight
-    const scatterData = TurbineData.map(item => {
+    const scatterData = filteredTurbineData.map(item => {
         const nominalPowerStr = item.NominalPower || '';
         const hubHeightStr = item.HubHeight || '';
 
@@ -483,7 +467,7 @@ if (type === 'scatter_TurbinePowerVsHubHeight') {
 
 if (type === 'bubble_TurbinePowerByRegion') {
     // Step 1: Group by Region
-    const regionAggregation = TurbineData.reduce((acc, item) => {
+    const regionAggregation = (filteredTurbineData ?? []).reduce((acc, item) => {
         const region = item.Region || 'Unknown';
         const nominalPowerStr = item.NominalPower || '';
         const nominalPower = parseFloat(nominalPowerStr.replace(' KW', '').replace(',', '.'));
@@ -558,18 +542,19 @@ if (type === 'bubble_TurbinePowerByRegion') {
 if (type === 'radar_MaintPlant_PlanningPlant_ByPlatform') {
     const platformGroups = {};
 
-    TurbineData.forEach(item => {
+    (filteredTurbineData ?? []).forEach(item => {
         const platform = item.Platform || 'Unknown';
         const maintPlant = item.MaintPlant || 'Unknown';
         const planningPlant = item.PlanningPlant || 'Unknown';
-
+    
         if (!platformGroups[platform]) {
             platformGroups[platform] = { platform, MaintPlantCount: 0, PlanningPlantCount: 0 };
         }
-
+    
         if (maintPlant) platformGroups[platform].MaintPlantCount += 1;
         if (planningPlant) platformGroups[platform].PlanningPlantCount += 1;
     });
+    
 
     const formattedData = Object.values(platformGroups)
         .sort((a, b) => b.MaintPlantCount - a.MaintPlantCount)
@@ -596,7 +581,7 @@ if (type === 'radar_MaintPlant_PlanningPlant_ByPlatform') {
 
 if (type === 'line_CumulativeTurbineCount_ByPlatform') {
     // Step 1: Group turbine counts by Platform
-    const platformCounts = TurbineData.reduce((acc, item) => {
+    const platformCounts = (filteredTurbineData ?? []).reduce((acc, item) => {
         const platform = item.Platform || 'Unknown';
         acc[platform] = (acc[platform] || 0) + 1;
         return acc;
@@ -641,6 +626,7 @@ if (type === 'line_CumulativeTurbineCount_ByPlatform') {
         </div>
     );
 }
+
     
     return null;
 };

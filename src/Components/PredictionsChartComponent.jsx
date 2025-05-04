@@ -1,22 +1,13 @@
 import React from 'react';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, BarChart, PieChart, Pie, Bar, ScatterChart, Scatter, CartesianGrid, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, Cell, Label } from 'recharts';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, BarChart, PieChart, Pie, Bar, ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, Cell, Label } from 'recharts';
 import { ArrowLeft, ArrowRight, Minus } from 'lucide-react';
 import { useState, useEffect } from 'react';
-
-
-
-
 
 import { getMaterialCategoryHealthScores, getMaterialCategoryPredictions, getMaterialCategoryScoreSummary, getMaterialComponentHealthScores } from '../Utils/MaterialDashboardDataHandler';
 import { getMaterialComponentScoreSummary, getReplacementPredictions, getReplacementPredictionGlobal } from '../Utils/MaterialDashboardDataHandler';
 import { getTurbineModelHealthScores, getTurbineModelScoreSummary, getTurbinePlatformHealthScores, getTurbinePlatformScoreSummary } from '../Utils/TurbineDashboardDataHandler';
 
 import {getMaterialPredictions, getMaintenanceForecasts , getMaterialStatusTransitions , getMonteCarloDominance} from '../Utils/MaterialDashboardDataHandler';
-
-
-
-
-
 
 
 const COLORS = [
@@ -38,7 +29,7 @@ const COLORS = [
 ];
 
 //-------------------------------------------------MaterialPredictions--------------------------------------------------//
-const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
+const PredictionsChartComponent = ({ type, searchQuery, selectedItem, onItemClick }) => {
     const [MaterialCategoryHealthScores, setMaterialCategoryHealthScores] = useState([]);
     const [MaterialCategoryPredictions, setMaterialCategoryPredictions] = useState([]);
     const [MaterialCategoryScoreSummary, setMaterialCategoryScoreSummary] = useState([]);
@@ -79,8 +70,6 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
                 const MaterialStatusTransitionsData = await getMaterialStatusTransitions();
                 const MonteCarloDominanceData = await getMonteCarloDominance();
 
-
-                console.log('Fetched data in component:', MaterialCategoryHealthScoresData);
                 setMaterialCategoryHealthScores(MaterialCategoryHealthScoresData);
                 setMaterialCategoryPredictions(MaterialCategoryPredictionsData);
                 setMaterialCategoryScoreSummary(MaterialCategoryScoreSummaryData);
@@ -104,9 +93,105 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
                 console.error('Error fetching material data:', error);
             }
         };
-
         fetchData();
     }, []);
+
+            // Normalize search query
+    const query = searchQuery.toLowerCase();
+
+    // Example fields to search for each dataset — adjust based on actual data
+
+    const filteredMaterialCategoryHealthScores = MaterialCategoryHealthScores.filter(item =>
+        [item.Material_ID, item.HealthScore].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredMaterialCategoryPredictions = MaterialCategoryPredictions.filter(item =>
+        [item.BayesianProbability, item.MonteCarloEstimate, item.Category].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredMaterialCategoryScoreSummary = MaterialCategoryScoreSummary.filter(item =>
+        [item.Material_ID, item.TotalCategoryScore].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredMaterialComponentHealthScores = MaterialComponentHealthScores.filter(item =>
+        [item.Material_ID, item.HealthScore].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredMaterialComponentScoreSummary = MaterialComponentScoreSummary.filter(item =>
+        [item.Material_ID, item.TotalComponentScore].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredReplacementPredictions = ReplacementPredictions.filter(item =>
+        [item.Material_Description, item.BayesianProbability].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredReplacementPredictionGlobal = ReplacementPredictionGlobal.filter(item =>
+        [item.MaterialCategory, item.MonteCarloProbability, item.BayesianProbability  ].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredTurbineModelHealthScores = TurbineModelHealthScores.filter(item =>
+        [item.TurbineModel, item.HealthScore].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredTurbineModelScoreSummary = TurbineModelScoreSummary.filter(item =>
+        [item.TurbineModel, item.TotalModelScore].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredTurbinePlatformHealthScores = TurbinePlatformHealthScores.filter(item =>
+        [item.Platform, item.Plant, item.HealthScore].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredTurbinePlatformScoreSummary = TurbinePlatformScoreSummary.filter(item =>
+        [item.Platform, item.TotalPlatformScore].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredMaterialPredictions = MaterialPredictions.filter(item =>
+        [item.Material_ID, item.Material_A9B_Number, item.MaterialCategory, item.Material_Description, item.Is_Batch_Managed, item.Future_Replacement_Probability, item.TotalReplacementCount, item.TotalUsageCount].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredMaintenanceForecasts = MaintenanceForecasts.filter(item =>
+        [item.Material_ID, item.Plant_ID, item.Forecast_ID, item.LastMaintenance, item.AverageIntervalDays, item.NextEstimatedMaintenanceDate].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredMaterialStatusTransitions = MaterialStatusTransitions.filter(item =>
+        [item.PlantSpecificMaterialStatus, item.Description, item.Material, item.PrevStatus, item.Plant, item.TransitionCount, item.Direction].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+    
+    const filteredMonteCarloDominance = MonteCarloDominance.filter(item =>
+        [item.Description, item.DominanceCount, item.Percentage].some(field =>
+        field?.toString().toLowerCase().includes(query)
+        )
+    );
+
+
     //Shared click handler for all charts
     const handleClick = (data) => {
         if (data && onItemClick) {
@@ -116,7 +201,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
     };
 
     if (type === 'bar_ReplacementPrediction') {
-        const formattedData = ReplacementPredictions
+        const formattedData = filteredReplacementPredictions
             .map(item => ({
                 materialDescription: item.Material_Description || 'Unknown',
                 bayesianProbability: item.BayesianProbability || 0
@@ -152,7 +237,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
     }
 
     if (type === 'line_MonteCarloVsBayesian') {
-        const topMaterials = ReplacementPredictions
+        const topMaterials = filteredReplacementPredictions
             .sort((a, b) => b.MonteCarloProbability - a.MonteCarloProbability)
             .slice(0, 10);
 
@@ -205,7 +290,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
     if (type === 'line_GlobalMonteCarloVsBayesian') {
         const categoryData = {};
 
-        ReplacementPredictionGlobal.forEach(item => {
+        filteredReplacementPredictionGlobal.forEach(item => {
             const category = item.MaterialCategory || 'Unclassified';
             if (!categoryData[category]) {
                 categoryData[category] = {
@@ -271,7 +356,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
         const DOMINANCE_COUNT_KEY = 'dominanceCount';
         const PERCENTAGE_KEY = 'percentage';
 
-        const topDominantMaterials = MonteCarloDominance
+        const topDominantMaterials = filteredMonteCarloDominance
             .sort((a, b) => b.DominanceCount - a.DominanceCount)
             .slice(0, 20)
             .map((item) => ({
@@ -341,7 +426,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
 
 
     if (type === 'pie_MaterialStatusTransitions') {
-        const statusCounts = MaterialStatusTransitions.reduce((acc, item) => {
+        const statusCounts = filteredMaterialStatusTransitions.reduce((acc, item) => {
             const status = item.PlantSpecificMaterialStatus || 'Unknown';
             acc[status] = (acc[status] || 0) + 1;
             return acc;
@@ -401,7 +486,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {MaterialStatusTransitions.map((item, index) => (
+                        {filteredMaterialStatusTransitions.map((item, index) => (
                             <tr
                                 key={index}
                                 className={`cursor-pointer ${(item.Description === selectedItem) ? 'bg-yellow-600' : (index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900')
@@ -445,7 +530,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {MaterialPredictions.map((item, index) => (
+                        {filteredMaterialPredictions.map((item, index) => (
                             <tr
                                 key={index}
                                 className={`cursor-pointer ${(item.Material_Description === selectedItem) ? 'bg-yellow-600' : (index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900')
@@ -476,7 +561,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
             return 'rgba(75, 192, 75, 0.8)';
         };
 
-        const formattedData = MaterialComponentScoreSummary
+        const formattedData = filteredMaterialComponentScoreSummary
             .map(item => ({
                 Material_ID: item.Material_ID,
                 TotalComponentScore: item.TotalComponentScore || 0,
@@ -526,7 +611,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
             return 'rgba(75, 192, 75, 0.8)';
         };
 
-        const formattedData = MaterialComponentHealthScores
+        const formattedData = filteredMaterialComponentHealthScores
             .map(item => ({
                 Material_ID: item.Material_ID,
                 HealthScore: item.HealthScore || 0,
@@ -575,7 +660,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
             return 'rgba(75, 192, 75, 0.8)';
         };
 
-        const formattedData = MaterialCategoryScoreSummary
+        const formattedData = filteredMaterialCategoryScoreSummary
             .map(item => ({
                 Material_ID: item.Material_ID,
                 TotalCategoryScore: item.TotalCategoryScore || 0,
@@ -624,7 +709,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
             return 'rgba(75, 192, 75, 0.8)';
         };
 
-        const formattedData = MaterialCategoryHealthScores
+        const formattedData = filteredMaterialCategoryHealthScores
             .map(item => ({
                 Material_ID: item.Material_ID,
                 HealthScore: item.HealthScore || 0,
@@ -667,7 +752,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
     }
 
     if (type === 'table_MaintenanceForecasts') {
-        const forecastData = Array.isArray(MaintenanceForecasts) ? MaintenanceForecasts : [];
+        const forecastData = Array.isArray(filteredMaintenanceForecasts) ? filteredMaintenanceForecasts : [];
 
         const formatDate = (dateStr) =>
             dateStr ? new Date(dateStr).toLocaleDateString('en-GB') : 'N/A'; // 'dd/mm/yyyy'
@@ -717,7 +802,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
 
 
     if (type === 'line_MaterialCategoryPredictions') {
-        const formattedData = Array.isArray(MaterialCategoryPredictions) ? MaterialCategoryPredictions : [];
+        const formattedData = Array.isArray(filteredMaterialCategoryPredictions) ? filteredMaterialCategoryPredictions : [];
 
         return (
             <div className="w-full h-full flex flex-col justify-between">
@@ -783,7 +868,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
             return 'rgba(75, 192, 75, 0.8)';
         };
 
-        const formattedData = Array.isArray(TurbineModelHealthScores) ? TurbineModelHealthScores
+        const formattedData = Array.isArray(filteredTurbineModelHealthScores) ? filteredTurbineModelHealthScores
             .map(item => ({
                 TurbineModel: item.TurbineModel,
                 HealthScore: item.HealthScore || 0,
@@ -842,7 +927,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
             return 'rgba(75, 192, 75, 0.8)';
         };
 
-        const formattedData = Array.isArray(TurbineModelScoreSummary) ? TurbineModelScoreSummary
+        const formattedData = Array.isArray(filteredTurbineModelScoreSummary) ? filteredTurbineModelScoreSummary
             .map(item => ({
                 TurbineModel: item.TurbineModel,
                 TotalModelScore: item.TotalModelScore || 0,
@@ -903,7 +988,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
 
         const modelGroups = {};
 
-        TurbineModelHealthScores.forEach(item => {
+        filteredTurbineModelHealthScores.forEach(item => {
             const model = item.TurbineModel || 'Unknown';
             const healthScore = item.HealthScore || 0;
 
@@ -959,7 +1044,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
         const PLANT_KEY = 'Plant';
         const HEALTH_SCORE_KEY = 'HealthScore';
 
-        const formattedData = Array.isArray(TurbinePlatformHealthScores) ? TurbinePlatformHealthScores
+        const formattedData = Array.isArray(filteredTurbinePlatformHealthScores) ? filteredTurbinePlatformHealthScores
             .map(item => ({
                 [PLATFORM_KEY]: item.Platform || 'Unknown',
                 [PLANT_KEY]: item.Plant || 'Unknown',
@@ -1028,7 +1113,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
             return 'rgba(75, 192, 75, 0.8)';
         };
 
-        const formattedData = Array.isArray(TurbinePlatformScoreSummary) ? TurbinePlatformScoreSummary
+        const formattedData = Array.isArray(filteredTurbinePlatformScoreSummary) ? filteredTurbinePlatformScoreSummary
             .map(item => ({
                 Platform: item.Platform,
                 TotalPlatformScore: item.TotalPlatformScore || 0,
@@ -1080,7 +1165,7 @@ const PredictionsChartComponent = ({ type, selectedItem, onItemClick }) => {
         );
     }
     if (type === 'line_TurbineModelHealthScores') {
-        const formattedData = Array.isArray(TurbineModelHealthScores) ? TurbineModelHealthScores
+        const formattedData = Array.isArray(filteredTurbineModelHealthScores) ? filteredTurbineModelHealthScores
             .map(item => ({
                 TurbineModel: item.TurbineModel || 'Unknown',
                 HealthScore: item.HealthScore || 0,
