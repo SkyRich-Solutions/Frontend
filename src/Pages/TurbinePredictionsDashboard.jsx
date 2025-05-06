@@ -143,7 +143,7 @@ const TurbinePredictionsDashboard = () => {
                                     : 'bar_TurbineModelScoreSummary'
                             }
                             selectedItem={selectedItem}
-                            handleClick={handleItemClick}
+                            onItemClick={handleItemClick}
                             searchQuery={searchQuery}
                         />
                     </div>
@@ -162,7 +162,7 @@ const TurbinePredictionsDashboard = () => {
                                     : 'bar_TurbinePlatformScoreSummary'
                                 }
                                 selectedItem={selectedItem}
-                                handleClick={handleItemClick}
+                                onItemClick={handleItemClick}
                                 searchQuery={searchQuery}
                             />
                         </div>
@@ -174,7 +174,7 @@ const TurbinePredictionsDashboard = () => {
                     <TurbineComponentHealthScoresComponent
                         type='radar_TurbineModelHealthScores_ByPlant'
                         selectedItem={selectedItem}
-                        handleClick={handleItemClick}
+                        onItemClick={handleItemClick}
                         searchQuery={searchQuery}
                     />
                 </div>

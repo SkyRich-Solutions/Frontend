@@ -125,7 +125,7 @@ const TurbineDashboard = () => {
                                             : 'donut_TurbineCountByManufacturer'
                                 }
                                 selectedItem={selectedItem}
-                                handleClick={handleItemClick}
+                                onItemClick={handleItemClick}
                                 searchQuery={searchQuery}
                             />
                         </div>
@@ -145,7 +145,7 @@ const TurbineDashboard = () => {
                                             : 'line_CumulativeTurbineCount_ByPlatform'
                                     }
                                     selectedItem={selectedItem}
-                                    handleClick={handleItemClick}
+                                    onItemClick={handleItemClick}
                                     searchQuery={searchQuery}
                                 />
                             </div>
@@ -157,7 +157,7 @@ const TurbineDashboard = () => {
                         <TurbineOverviewComponent
                             type="bubble_TurbinePowerByRegion"
                             selectedItem={selectedItem}
-                            handleClick={handleItemClick}
+                            onItemClick={handleItemClick}
                             searchQuery={searchQuery}
                         />
                     </div>

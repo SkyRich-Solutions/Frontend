@@ -128,7 +128,7 @@ if (type === 'bar_ReplacementPrediction') {
         .sort((a, b) => b.bayesianProbability - a.bayesianProbability)
         .slice(0, 10);
 
-        const CustomTooltipBar_ReplacementPrediction = ({ active, payload }) => {
+        const CustomTooltipBarReplacementPrediction = ({ active, payload }) => {
             if (active && payload && payload.length) {
                 const data = payload[0].payload;
                 return (
@@ -168,7 +168,7 @@ if (type === 'bar_ReplacementPrediction') {
                         <YAxis domain={[0, 1]}>
                             <Label value="Probability (%)" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />    
                         </YAxis>
-                        <Tooltip content={<CustomTooltipBar_ReplacementPrediction />} />
+                        <Tooltip content={<CustomTooltipBarReplacementPrediction />} />
                         <Bar dataKey='bayesianProbability'>
                             {formattedData.map((entry, index) => (
                                 <Cell
@@ -208,7 +208,7 @@ if (type === 'bar_ReplacementPrediction') {
             bayesian: item.bayesian / item.count,
         }));
 
-        const CustomTooltipLine_GlobalMonteCarloVsBayesian = ({ active, payload }) => {
+        const CustomTooltipLineGlobalMonteCarloVsBayesian = ({ active, payload }) => {
             if (active && payload && payload.length) {
                 const data = payload[0].payload;
                 return (
@@ -280,7 +280,7 @@ if (type === 'bar_ReplacementPrediction') {
                             <YAxis>
                                 <Label value="Probability (%)" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipLine_GlobalMonteCarloVsBayesian />} />
+                            <Tooltip content={<CustomTooltipLineGlobalMonteCarloVsBayesian />} />
                             <Legend verticalAlign="top" align="center" layout="horizontal" />
                             <Line
                                 type="monotone"
@@ -318,7 +318,7 @@ if (type === 'bar_ReplacementPrediction') {
             bayesian: item.BayesianProbability * 100,
         }));
 
-        const CustomTooltipLine_MonteCarloVsBayesian = ({ active, payload }) => {
+        const CustomTooltipLineMonteCarloVsBayesian = ({ active, payload }) => {
             if (active && payload && payload.length) {
                 const data = payload[0].payload;
                 return (
@@ -389,7 +389,7 @@ if (type === 'bar_ReplacementPrediction') {
                             <YAxis>
                                 <Label value="Probability (%)" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipLine_MonteCarloVsBayesian />} />
+                            <Tooltip content={<CustomTooltipLineMonteCarloVsBayesian />} />
                             <Legend verticalAlign="top" align="center" layout="horizontal" />
                             <Line
                                 type="monotone"
@@ -448,7 +448,7 @@ if (type === 'bar_ReplacementPrediction') {
             );
         };
     
-        const CustomTooltipPie_MaterialStatusTransitions = ({ active, payload }) => {
+        const CustomTooltipPieMaterialStatusTransitions = ({ active, payload }) => {
             if (active && payload && payload.length) {
                 const data = payload[0].payload;
                 const statusLabel = materialStatusMap[data.status] || data.status;
@@ -477,35 +477,35 @@ if (type === 'bar_ReplacementPrediction') {
     
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                        <Pie
-                            data={pieData}
-                            dataKey="count"
-                            nameKey="status"
-                            cx="50%"
-                            cy="50%"
-                            innerRadius="40%"
-                            outerRadius="70%"
-                            labelLine={true}
-                            label={renderCustomizedLabel}
-                            onClick={handleClick}
-                        >
-                            {pieData.map((entry, index) => {
-                                const isSelected = selectedItem === entry.status;
-                                const fillColor = isSelected ? '#00ffff' : COLORS[index % COLORS.length];
-                                const opacity = selectedItem && !isSelected ? 0.3 : 1;
-                                return (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={fillColor}
-                                        stroke={isSelected ? '#00ffff' : '#444'}
-                                        strokeWidth={isSelected ? 2 : 0}
-                                        opacity={opacity}
-                                        style={isSelected ? { filter: 'drop-shadow(0 0 6px #00ffff)' } : {}}
-                                    />
-                                );
-                            })}
-                        </Pie>
-                        <Tooltip content={<CustomTooltipPie_MaterialStatusTransitions />} />
+                    <Pie
+                        data={pieData}
+                        dataKey="count"
+                        nameKey="status"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius="40%"
+                        outerRadius="70%"
+                        labelLine={true}
+                        label={renderCustomizedLabel}
+                    >
+                        {pieData.map((entry, index) => {
+                            const isSelected = selectedItem === entry.status;
+                            const fillColor = isSelected ? '#00ffff' : COLORS[index % COLORS.length];
+                            const opacity = selectedItem && !isSelected ? 0.3 : 1;
+                            return (
+                                <Cell
+                                    key={`cell-${index}`}
+                                    fill={fillColor}
+                                    stroke={isSelected ? '#00ffff' : '#444'}
+                                    strokeWidth={isSelected ? 2 : 0}
+                                    opacity={opacity}
+                                    style={isSelected ? { filter: 'drop-shadow(0 0 6px #00ffff)' } : {}}
+                                    onClick={() => onItemClick(isSelected ? null : entry.status)} // ✅ Fix: add this
+                                />
+                            );
+                        })}
+                    </Pie>
+                        <Tooltip content={<CustomTooltipPieMaterialStatusTransitions />} />
                     </PieChart>
                 </ResponsiveContainer>
             </div>
@@ -542,6 +542,12 @@ if (type === 'bar_ReplacementPrediction') {
             }
             return null;
         };
+
+        const handleClick = (payload) => {
+            if (!payload?.description) return;
+            onItemClick(prev => (prev === payload.description ? null : payload.description));
+        };
+        
     
         const CustomShape = ({ cx, cy, size, payload, index }) => {
             if (typeof cx !== 'number' || typeof cy !== 'number' || typeof size !== 'number') return null;

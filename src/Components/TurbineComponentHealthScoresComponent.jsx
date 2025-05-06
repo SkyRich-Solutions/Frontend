@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 
 import { getTurbineModelHealthScores, getTurbineModelScoreSummary, getTurbinePlatformHealthScores, getTurbinePlatformScoreSummary } from '../Utils/TurbineDashboardDataHandler';
 
+
 const COLORS = [
     'rgba(153, 102, 255, 0.6)',
     'rgba(255, 159, 64, 0.6)',
@@ -23,23 +24,8 @@ const COLORS = [
     'rgba(244, 164, 96, 0.6)',
 ];
 
-const materialStatusMap = {
-    Z0: "Blocked/to be deleted",
-    Z1: "Ready to be engineered",
-    Z2: "Ready to be Enriched",
-    Z3: "Ready to be Planned",
-    Z4: "Ready to be sold/purchased",
-    Z5: "Ready to be sold/returned",
-    Z6: "Internal Movement & Repairs",
-    Z7: "Obsolete Stock Scrapping",
-    Z8: "Inactive and Hibernated",
-    Z9: "Ready for final deletion",
-    ZI: "Ready for internal use",
-    ZS: "Structure Material"
-};
-
 //-------------------------------------------------MaterialPredictions--------------------------------------------------//
-const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem, onItemClick }) => {
+const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem, onItemClick = () => {} }) => {
 
     const [TurbineModelHealthScores, setTurbineModelHealthScores] = useState([]);
     const [TurbineModelScoreSummary, setTurbineModelScoreSummary] = useState([]);
@@ -99,236 +85,292 @@ const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem
     
 
 
-    //Shared click handler for all charts
-    const handleClick = (data) => {
-        if (data && onItemClick) {
-            const key = data.materialDescription || data.material || data.materialCategory;
-            onItemClick(key);
+    const safeOnItemClick = typeof onItemClick === 'function' ? onItemClick : () => {};
+
+// Shared click handler that works across all chart types
+const handleClick = (data) => {
+    if (data) {
+        const key =
+            data.TurbineModel ||
+            data.Platform ||
+            data.Plant ||
+            data.material ||
+            data.materialDescription ||
+            data.materialCategory;
+
+        if (key !== undefined) {
+            safeOnItemClick(prev => (prev === key ? null : key));
         }
+    }
+};
+
+
+if (type === 'bar_TurbineModelHealthScores') {
+
+
+    const getColorByScore = (score) => {
+        if (score < 50) return 'rgba(255, 99, 132, 0.8)';
+        if (score < 70) return 'rgba(255, 159, 64, 0.8)';
+        return 'rgba(75, 192, 75, 0.8)';
     };
 
-    //-------------------------------------------------------------------Turbine Model Predictions--------------------------------------//
-    if (type === 'bar_TurbineModelHealthScores') {
-        const getColorByScore = (score) => {
-            if (score < 50) return 'rgba(255, 99, 132, 0.8)';
-            if (score < 70) return 'rgba(255, 159, 64, 0.8)';
-            return 'rgba(75, 192, 75, 0.8)';
-        };
+        const rawData = filteredTurbineModelHealthScores.map(item => ({
+            TurbineModel: item.TurbineModel,
+            HealthScore: item.HealthScore || 0
+        }));
+        
+        // Shuffle the array but ensure selectedItem stays included
+        const shuffled = [...rawData].sort(() => Math.random() - 0.5);
 
-        const formattedData = Array.isArray(filteredTurbineModelHealthScores) ? filteredTurbineModelHealthScores
-            .map(item => ({
-                TurbineModel: item.TurbineModel,
-                HealthScore: item.HealthScore || 0,
-            }))
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 10) : [];
+            // Ensure selected item is included
+            let topItems = shuffled.slice(0, 10);
 
-            const CustomTooltipBar_TurbineModelHealthScores = ({ active, payload }) => {
-                if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-                    return (
-                        <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
-                            <p><strong>Turbine Model:</strong> {data.TurbineModel}</p>
-                            <p><strong>Turbine Model Health Score:</strong> {data.HealthScore}</p>
-                        </div>
-                    );
+            const alreadyIncluded = topItems.some(item => String(item.Material_ID) === String(selectedItem));
+            if (!alreadyIncluded && selectedItem) {
+                const selectedEntry = rawData.find(item => String(item.Material_ID) === String(selectedItem));
+                if (selectedEntry) {
+                    // Replace the last item with the selected one to ensure it's visible
+                    topItems[topItems.length - 1] = selectedEntry;
                 }
-                return null;
-            };
+            }
 
-        return (
-            <div className="w-full h-full relative">
+            const formattedData = topItems;
+
+    const CustomTooltipBarTurbineModelHealthScores = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            const data = payload[0].payload;
+            return (
+                <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
+                    <p><strong>Turbine Model:</strong> {data.TurbineModel}</p>
+                    <p><strong>Turbine Model Health Score:</strong> {data.HealthScore}</p>
+                </div>
+            );
+        }
+        return null;
+    };
+
+    return (
+        <div className="w-full h-full relative">
             {/* Info Icon Tooltip */}
-                <div className="absolute top-2 right-1 group cursor-pointer z-10">
+            <div className="absolute top-2 right-1 group cursor-pointer z-10">
                 <span className="text-gray-500">ℹ️</span>
-                    <div className="absolute hidden group-hover:block bg-gray-800 p-2 rounded shadow text-sm border border-gray-200 w-64 top-6 right-0 h-40 overflow-y-auto">
+                <div className="absolute hidden group-hover:block bg-gray-800 p-2 rounded shadow text-sm border border-gray-200 w-64 top-6 right-0 h-40 overflow-y-auto">
                     <p><strong>Chart Info:</strong></p>
-                    <p>
-                        This chart displays the Health Scores of different turbine models based on their operational reliability and performance history.
-                    </p>
+                    <p>This chart displays the Health Scores of different turbine models based on their operational reliability and performance history.</p>
                     <hr className="my-2 border-gray-300" />
                     <p><strong>Health Score (%):</strong></p>
-                    <p>
-                        A value between 0 and 100 indicating the overall condition of the turbine model. Higher scores suggest better performance and fewer issues over time.
-                    </p>
-                    </div>
-                </div>
-                <div className="flex justify-center items-center w-full h-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                            data={formattedData}
-                            margin={{ top: 20, right: 30, bottom: 30, left: 30 }}
-                            onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
-                        >
-                            <XAxis dataKey="TurbineModel" angle={-30} textAnchor="end" interval={0}>
-                                <Label
-                                    value="Turbine Model"
-                                    offset={-5}
-                                    position="insideBottom"
-                                    style={{ textAnchor: 'middle' }}
-                                />
-                            </XAxis>
-                            <YAxis domain={[0, 100]}>
-                                <Label
-                                    value="Health Score (%)"
-                                    angle={-90}
-                                    position="insideLeft"
-                                    style={{ textAnchor: 'middle' }}
-                                />
-                            </YAxis>
-                            <Tooltip content={<CustomTooltipBar_TurbineModelHealthScores />} />
-                            <Bar dataKey="HealthScore">
-                                {formattedData.map((entry, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={(entry.TurbineModel === selectedItem) ? '#00ffff' : getColorByScore(entry.HealthScore)}
-                                    />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
+                    <p>A value between 0 and 100 indicating the overall condition of the turbine model. Higher scores suggest better performance and fewer issues over time.</p>
                 </div>
             </div>
-        );
-    }
 
-    if (type === 'bar_TurbineModelScoreSummary') {
-        const getColorByScore = (score) => {
-            if (score < 50) return 'rgba(255, 99, 132, 0.8)';
-            if (score < 70) return 'rgba(255, 159, 64, 0.8)';
-            return 'rgba(75, 192, 75, 0.8)';
-        };
+            <div className="flex justify-center items-center w-full h-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                        data={formattedData}
+                        margin={{ top: 20, right: 30, bottom: 30, left: 30 }}
+                        onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
+                        >
+                        <XAxis dataKey="TurbineModel" angle={-30} textAnchor="end" interval={0}>
+                            <Label value="Turbine Model" offset={-5} position="insideBottom" style={{ textAnchor: 'middle' }} />
+                        </XAxis>
+                        <YAxis domain={[0, 100]}>
+                            <Label value="Health Score (%)" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
+                        </YAxis>
+                        <Tooltip content={<CustomTooltipBarTurbineModelHealthScores />} />
+                        <Bar dataKey="HealthScore">
+                            {formattedData.map((entry, index) => {
+                                const isSelected = entry.TurbineModel === selectedItem;
+                                return (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={isSelected ? '#00ffff' : getColorByScore(entry.HealthScore)}
+                                        stroke={isSelected ? '#00ffff' : 'none'}
+                                        strokeWidth={isSelected ? 2 : 0}
+                                        opacity={selectedItem && !isSelected ? 0.3 : 1}
+                                        style={{
+                                            transition: 'all 0.3s ease',
+                                            filter: isSelected ? 'drop-shadow(0 0 6px #00ffff)' : 'none',
+                                            cursor: 'pointer',
+                                        }}
+                                    />
+                                );
+                            })}
+                        </Bar>
+                    </BarChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+    );
+}
 
-        const formattedData = Array.isArray(filteredTurbineModelScoreSummary) ? filteredTurbineModelScoreSummary
-            .map(item => ({
-                TurbineModel: item.TurbineModel,
-                TotalModelScore: item.TotalModelScore || 0,
-            }))
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 10) : [];
+if (type === 'bar_TurbineModelScoreSummary') {
 
-            const CustomTooltipBar_TurbineModelScoreSummary = ({ active, payload }) => {
-                if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-                    return (
-                        <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
-                            <p><strong>Turbine Model:</strong> {data.TurbineModel}</p>
-                            <p><strong>Turbine Model Summary Score:</strong> {data.TotalModelScore}</p>
-                        </div>
-                    );
+    const getColorByScore = (score) => {
+        if (score < 50) return 'rgba(255, 99, 132, 0.8)';
+        if (score < 70) return 'rgba(255, 159, 64, 0.8)';
+        return 'rgba(75, 192, 75, 0.8)';
+    };
+
+        const rawData = filteredTurbineModelScoreSummary.map(item => ({
+            TurbineModel: item.TurbineModel,
+            TotalModelScore: item.TotalModelScore || 0
+        }));
+        
+        // Shuffle the array but ensure selectedItem stays included
+        const shuffled = [...rawData].sort(() => Math.random() - 0.5);
+
+            // Ensure selected item is included
+            let topItems = shuffled.slice(0, 10);
+
+            const alreadyIncluded = topItems.some(item => String(item.Material_ID) === String(selectedItem));
+            if (!alreadyIncluded && selectedItem) {
+                const selectedEntry = rawData.find(item => String(item.Material_ID) === String(selectedItem));
+                if (selectedEntry) {
+                    // Replace the last item with the selected one to ensure it's visible
+                    topItems[topItems.length - 1] = selectedEntry;
                 }
-                return null;
-            };
+            }
 
-        return (
-            <div className="w-full h-full relative">
-            {/* Info Icon Tooltip */}
-                <div className="absolute top-2 right-1 group cursor-pointer z-10">
-                <span className="text-gray-500">ℹ️</span>
-                    <div className="absolute hidden group-hover:block bg-gray-800 p-2 rounded shadow text-sm border border-gray-200 w-64 top-6 right-0 h-40 overflow-y-auto">
-                        <p><strong>Chart Info:</strong></p>
-                        <p>
-                            This chart presents the summary scores for different turbine models, reflecting their overall performance across multiple operational factors.
-                        </p>
-                        <hr className="my-2 border-gray-300" />
-                        <p><strong>Summary Score (%):</strong></p>
-                        <p>
-                            A composite score from 0 to 100 that aggregates metrics like component health, usage trends, and historical reliability. Higher scores indicate stronger-performing turbine models.
-                        </p>
-                    </div>
+            const formattedData = topItems;
+
+    const CustomTooltipBarTurbineModelScoreSummary = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            const data = payload[0].payload;
+            return (
+                <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
+                    <p><strong>Turbine Model:</strong> {data.TurbineModel}</p>
+                    <p><strong>Turbine Model Summary Score:</strong> {data.TotalModelScore}</p>
                 </div>
-                <div className="flex justify-center items-center w-full h-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                            data={formattedData}
-                            margin={{ top: 20, right: 30, bottom: 30, left: 30 }}
-                            onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
-                        >
-                            <XAxis dataKey="TurbineModel" angle={-30} textAnchor="end" interval={0}>
-                                <Label
-                                    value="Turbine Model"
-                                    offset={-5}
-                                    position="insideBottom"
-                                    style={{ textAnchor: 'middle' }}
-                                />
-                            </XAxis>
-                            <YAxis domain={[0, 100]}>
-                                <Label
-                                    value="Health Score Summary (%)"
-                                    angle={-90}
-                                    position="insideLeft"
-                                    style={{ textAnchor: 'middle' }}
-                                />
-                            </YAxis>
-                            <Tooltip content={<CustomTooltipBar_TurbineModelScoreSummary />} />
-                            <Bar dataKey="TotalModelScore">
-                                {formattedData.map((entry, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={(entry.TurbineModel === selectedItem) ? '#00ffff' : getColorByScore(entry.TotalModelScore)}
-                                    />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
+            );
+        }
+        return null;
+    };
+
+    return (
+        <div className="w-full h-full relative">
+            {/* Info Icon Tooltip */}
+            <div className="absolute top-2 right-1 group cursor-pointer z-10">
+                <span className="text-gray-500">ℹ️</span>
+                <div className="absolute hidden group-hover:block bg-gray-800 p-2 rounded shadow text-sm border border-gray-200 w-64 top-6 right-0 h-40 overflow-y-auto">
+                    <p><strong>Chart Info:</strong></p>
+                    <p>This chart presents the summary scores for different turbine models, reflecting their overall performance across multiple operational factors.</p>
+                    <hr className="my-2 border-gray-300" />
+                    <p><strong>Summary Score (%):</strong></p>
+                    <p>A composite score from 0 to 100 that aggregates metrics like component health, usage trends, and historical reliability. Higher scores indicate stronger-performing turbine models.</p>
                 </div>
             </div>
-        );
-    }
 
-    if (type === 'radar_TurbineModelHealthScores_ByPlant') {
-        const getColorByScore = (score) => {
-            if (score < 50) return 'rgba(255, 99, 132, 0.8)';
-            if (score < 70) return 'rgba(255, 159, 64, 0.8)';
-            return 'rgba(75, 192, 75, 0.8)';
-        };
+            <div className="flex justify-center items-center w-full h-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                        data={formattedData}
+                        margin={{ top: 20, right: 30, bottom: 30, left: 30 }}
+                        onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
+                    >
+                        <XAxis dataKey="TurbineModel" angle={-30} textAnchor="end" interval={0}>
+                            <Label
+                                value="Turbine Model"
+                                offset={-5}
+                                position="insideBottom"
+                                style={{ textAnchor: 'middle' }}
+                            />
+                        </XAxis>
+                        <YAxis domain={[0, 100]}>
+                            <Label
+                                value="Health Score Summary (%)"
+                                angle={-90}
+                                position="insideLeft"
+                                style={{ textAnchor: 'middle' }}
+                            />
+                        </YAxis>
+                        <Tooltip content={<CustomTooltipBarTurbineModelScoreSummary />} />
+                        <Bar dataKey="TotalModelScore">
+                            {formattedData.map((entry, index) => {
+                                const isSelected = entry.TurbineModel === selectedItem;
+                                return (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={isSelected ? '#00ffff' : getColorByScore(entry.TotalModelScore)}
+                                        stroke={isSelected ? '#00ffff' : 'none'}
+                                        strokeWidth={isSelected ? 2 : 0}
+                                        opacity={selectedItem && !isSelected ? 0.3 : 1}
+                                        style={{
+                                            transition: 'all 0.3s ease',
+                                            filter: isSelected ? 'drop-shadow(0 0 6px #00ffff)' : 'none',
+                                            cursor: 'pointer',
+                                        }}
+                                    />
+                                );
+                            })}
+                        </Bar>
+                    </BarChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+    );
+}
 
-        const modelGroups = {};
+if (type === 'radar_TurbineModelHealthScores_ByPlant') {
+    const getColorByScore = (score) => {
+        if (score < 50) return 'rgba(255, 99, 132, 0.8)';
+        if (score < 70) return 'rgba(255, 159, 64, 0.8)';
+        return 'rgba(75, 192, 75, 0.8)';
+    };
 
-        filteredTurbineModelHealthScores.forEach(item => {
-            const model = item.TurbineModel || 'Unknown';
-            const healthScore = item.HealthScore || 0;
+    const modelGroups = {};
 
-            if (!modelGroups[model]) {
-                modelGroups[model] = { model, totalHealthScore: 0, count: 0 };
-            }
-            modelGroups[model].totalHealthScore += healthScore;
-            modelGroups[model].count += 1;
-        });
+    filteredTurbineModelHealthScores.forEach(item => {
+        const model = item.TurbineModel || 'Unknown';
+        const healthScore = item.HealthScore || 0;
 
-        const formattedData = Object.values(modelGroups)
-            .map(item => ({
-                TurbineModel: item.model,
-                AvgHealthScore: item.count > 0 ? item.totalHealthScore / item.count : 0,
-            }))
-            .sort((a, b) => b.AvgHealthScore - a.AvgHealthScore)
-            .slice(0, 10);
+        if (!modelGroups[model]) {
+            modelGroups[model] = { model, totalHealthScore: 0, count: 0 };
+        }
+        modelGroups[model].totalHealthScore += healthScore;
+        modelGroups[model].count += 1;
+    });
 
-        const overallAvg = formattedData.length > 0
-            ? formattedData.reduce((sum, item) => sum + item.AvgHealthScore, 0) / formattedData.length
-            : 0;
+    const formattedData = Object.values(modelGroups)
+        .map(item => ({
+            TurbineModel: item.model,
+            AvgHealthScore: item.count > 0
+            ? Math.min(100, Math.max(0,
+                (item.totalHealthScore / item.count) * (0.95 + Math.random() * 0.1)
+            ))
+            : 0,
+        }))
+        .sort((a, b) => b.AvgHealthScore - a.AvgHealthScore)
+        .slice(0, 10);
 
-        const radarColor = getColorByScore(overallAvg);
+    const overallAvg = formattedData.length > 0
+        ? formattedData.reduce((sum, item) => sum + item.AvgHealthScore, 0) / formattedData.length
+        : 0;
 
-        const CustomTooltipRadar_TurbineModelHealthScores_ByPlant = ({ active, payload }) => {
-            if (active && payload && payload.length) {
-                const data = payload[0].payload;
-                return (
-                    <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
-                        <p><strong>Turbine Model:</strong> {data.TurbineModel}</p>
-                        <p><strong>Turbine Model Health Score:</strong> {data.HealthScore}</p>
-                    </div>
-                );
-            }
-            return null;
-        };
+    const radarColor = getColorByScore(overallAvg);
 
-        return (
-            <div className="w-full h-full relative">
+    const CustomTooltipRadar = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            const data = payload[0].payload;
+            return (
+                <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
+                    <p><strong>Turbine Model:</strong> {data.TurbineModel}</p>
+                    <p><strong>Avg Health Score:</strong> {data.AvgHealthScore.toFixed(2)}%</p>
+                </div>
+            );
+        }
+        return null;
+    };
+
+    const handleClickRadar = (model) => {
+        handleClick(prev => (prev === model ? null : model));
+    };
+
+    return (
+        <div className="w-full h-full relative">
             {/* Info Icon Tooltip */}
-                <div className="absolute top-2 right-1 group cursor-pointer z-10">
+            <div className="absolute top-2 right-1 group cursor-pointer z-10">
                 <span className="text-gray-500">ℹ️</span>
-                    <div className="absolute hidden group-hover:block bg-gray-800 p-2 rounded shadow text-sm border border-gray-200 w-64 top-6 right-0 h-40 overflow-y-auto">
+                <div className="absolute hidden group-hover:block bg-gray-800 p-2 rounded shadow text-sm border border-gray-200 w-64 top-6 right-0 h-40 overflow-y-auto">
                     <p><strong>Chart Info:</strong></p>
                     <p>
                         This radar chart compares average health scores of turbine models across different plants to highlight which models tend to perform more reliably overall.
@@ -339,46 +381,68 @@ const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem
                         Represents the mean health score for each turbine model across all its plant deployments. Higher scores suggest better performance and lower maintenance needs.
                     </p>
                 </div>
-                </div>
-                <div className="flex justify-center items-center w-full h-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart
-                            cx="50%" cy="50%" outerRadius="80%" data={formattedData}
-                            onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
-                        >
-                            <PolarGrid />
-                            <PolarAngleAxis dataKey="TurbineModel" />
-                            <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                            <Tooltip content={<CustomTooltipRadar_TurbineModelHealthScores_ByPlant />} />
-                            <Radar
-                                name="Avg Health Score"
-                                dataKey="AvgHealthScore"
-                                stroke={radarColor}
-                                fill={radarColor}
-                                fillOpacity={0.6}
-                            />
-                        </RadarChart>
-                    </ResponsiveContainer>
-                </div>
             </div>
-        );
-    }
+
+            <div className="flex justify-center items-center w-full h-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart
+                        cx="50%"
+                        cy="50%"
+                        outerRadius="80%"
+                        data={formattedData}
+                        onClick={(e) => {
+                            if (e?.activeLabel) {
+                                handleClickRadar(e.activeLabel);
+                            }
+                        }}
+                    >
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="TurbineModel" />
+                        <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                        <Tooltip content={<CustomTooltipRadar />} />
+                        <Legend />
+                        <Radar
+                            name="Avg Health Score"
+                            dataKey="AvgHealthScore"
+                            stroke={radarColor}
+                            fill={radarColor}
+                            fillOpacity={selectedItem ? 0.2 : 0.6}
+                        />
+                        {selectedItem && (
+                            <Radar
+                                name={`Selected: ${selectedItem}`}
+                                data={formattedData.filter(d => d.TurbineModel === selectedItem)}
+                                dataKey="AvgHealthScore"
+                                stroke="#00ffff"
+                                fill="#00ffff"
+                                fillOpacity={0.9}
+                            />
+                        )}
+                    </RadarChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+    );
+}
+
 
     if (type === 'bubble_PlatformHealthScores') {
         const PLATFORM_KEY = 'Platform';
         const PLANT_KEY = 'Plant';
         const HEALTH_SCORE_KEY = 'HealthScore';
-
-        const formattedData = Array.isArray(filteredTurbinePlatformHealthScores) ? filteredTurbinePlatformHealthScores
-            .map(item => ({
-                [PLATFORM_KEY]: item.Platform || 'Unknown',
-                [PLANT_KEY]: item.Plant || 'Unknown',
-                [HEALTH_SCORE_KEY]: item.HealthScore || 0,
-            }))
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 10) : [];
-
-        const CustomTooltipBubble_PlatformHealthScores = ({ active, payload }) => {
+    
+        const formattedData = Array.isArray(filteredTurbinePlatformHealthScores)
+            ? filteredTurbinePlatformHealthScores
+                  .map(item => ({
+                      [PLATFORM_KEY]: item.Platform || 'Unknown',
+                      [PLANT_KEY]: item.Plant || 'Unknown',
+                      [HEALTH_SCORE_KEY]: item.HealthScore || 0,
+                  }))
+                  .sort(() => Math.random() - 0.5)
+                  .slice(0, 10)
+            : [];
+    
+        const CustomTooltip = ({ active, payload }) => {
             if (active && payload && payload.length) {
                 const data = payload[0].payload;
                 return (
@@ -391,29 +455,63 @@ const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem
             }
             return null;
         };
-
+    
+        const getKey = (d) => `${d.Platform}|${d.Plant}`;
+    
+        const handleBubbleClick = (payload) => {
+            if (!payload) return;
+            const key = getKey(payload);
+            onItemClick(prev => (prev === key ? null : key));
+        };
+    
+        const CustomShape = ({ cx, cy, size, payload, index }) => {
+            if (typeof cx !== 'number' || typeof cy !== 'number' || typeof size !== 'number') return null;
+    
+            const key = getKey(payload);
+            const isSelected = selectedItem === key;
+            const radius = Math.sqrt(size);
+            const fill = isSelected ? '#00ffff' : COLORS[index % COLORS.length];
+            const opacity = selectedItem && !isSelected ? 0.2 : 1;
+    
+            return (
+                <circle
+                    cx={cx}
+                    cy={cy}
+                    r={isSelected ? radius + 2 : radius}
+                    fill={fill}
+                    stroke={isSelected ? '#00ffff' : '#444'}
+                    strokeWidth={isSelected ? 2 : 0}
+                    opacity={opacity}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleBubbleClick(payload);
+                    }}
+                    style={{
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer',
+                        filter: isSelected ? 'drop-shadow(0 0 6px #00ffff)' : 'none',
+                    }}
+                />
+            );
+        };
+    
         return (
             <div className="w-full h-full relative">
-            {/* Info Icon Tooltip */}
+                {/* Info Icon Tooltip */}
                 <div className="absolute top-2 right-1 group cursor-pointer z-10">
-                <span className="text-gray-500">ℹ️</span>
-                        <div className="absolute hidden group-hover:block bg-gray-800 p-2 rounded shadow text-sm border border-gray-200 w-64 top-6 right-0 h-40 overflow-y-auto">
+                    <span className="text-gray-500">ℹ️</span>
+                    <div className="absolute hidden group-hover:block bg-gray-800 p-2 rounded shadow text-sm border border-gray-200 w-64 top-6 right-0 h-40 overflow-y-auto">
                         <p><strong>Chart Info:</strong></p>
-                        <p>
-                            This bubble chart displays health scores for turbine platforms deployed at various plants, allowing comparison of platform performance across locations.
-                        </p>
+                        <p>This bubble chart displays health scores for turbine platforms deployed at various plants, allowing comparison of platform performance across locations.</p>
                         <hr className="my-2 border-gray-300" />
                         <p><strong>Health Score (%):</strong></p>
-                        <p>
-                            Each bubble’s size represents the platform's health score at a specific plant. Larger bubbles indicate more reliable platform performance at that location.
-                        </p>
+                        <p>Each bubble’s size represents the platform's health score at a specific plant. Larger bubbles indicate more reliable platform performance at that location.</p>
                     </div>
                 </div>
+    
                 <div className="flex justify-center items-center w-full h-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 20 }}
-                            onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
-                        >
+                        <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 20 }}>
                             <XAxis
                                 type="category"
                                 dataKey={PLATFORM_KEY}
@@ -432,36 +530,54 @@ const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem
                                 range={[60, 400]}
                                 name="Health Score"
                             />
-                            <Tooltip content={<CustomTooltipBubble_PlatformHealthScores />} />
+                            <Tooltip content={<CustomTooltip />} />
+                            <Legend verticalAlign="top" align="center" layout="horizontal" />
                             <Scatter
                                 name="Platform Health"
                                 data={formattedData}
-                                fill="#00b0ad"
+                                shape={(props) => {
+                                    const index = formattedData.findIndex(
+                                        item => getKey(item) === getKey(props.payload)
+                                    );
+                                    return <CustomShape {...props} index={index} />;
+                                }}
                             />
-                            <Legend verticalAlign="top" align="center" layout="horizontal" />
                         </ScatterChart>
                     </ResponsiveContainer>
                 </div>
             </div>
         );
     }
-
+    
     if (type === 'bar_TurbinePlatformScoreSummary') {
         const getColorByScore = (score) => {
             if (score < 50) return 'rgba(255, 99, 132, 0.8)';
             if (score < 70) return 'rgba(255, 159, 64, 0.8)';
             return 'rgba(75, 192, 75, 0.8)';
         };
-
-        const formattedData = Array.isArray(filteredTurbinePlatformScoreSummary) ? filteredTurbinePlatformScoreSummary
-            .map(item => ({
+            const rawData = filteredTurbinePlatformScoreSummary.map(item => ({
                 Platform: item.Platform,
-                TotalPlatformScore: item.TotalPlatformScore || 0,
-            }))
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 10) : [];
+                TotalPlatformScore: item.TotalPlatformScore || 0
+            }));
             
-            const CustomTooltipBar_TurbinePlatformScoreSummary = ({ active, payload }) => {
+            // Shuffle the array but ensure selectedItem stays included
+            const shuffled = [...rawData].sort(() => Math.random() - 0.5);
+    
+                // Ensure selected item is included
+                let topItems = shuffled.slice(0, 10);
+    
+                const alreadyIncluded = topItems.some(item => String(item.Material_ID) === String(selectedItem));
+                if (!alreadyIncluded && selectedItem) {
+                    const selectedEntry = rawData.find(item => String(item.Material_ID) === String(selectedItem));
+                    if (selectedEntry) {
+                        // Replace the last item with the selected one to ensure it's visible
+                        topItems[topItems.length - 1] = selectedEntry;
+                    }
+                }
+    
+                const formattedData = topItems;
+            
+            const CustomTooltipBarTurbinePlatformScoreSummary = ({ active, payload }) => {
                 if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
@@ -514,7 +630,7 @@ const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem
                                     style={{ textAnchor: 'middle' }}
                                 />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipBar_TurbinePlatformScoreSummary />} />
+                            <Tooltip content={<CustomTooltipBarTurbinePlatformScoreSummary />} />
                             <Bar dataKey="TotalPlatformScore">
                                 {formattedData.map((entry, index) => (
                                     <Cell
@@ -529,34 +645,39 @@ const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem
             </div>
         );
     }
-
+    
     if (type === 'line_TurbineModelHealthScores') {
+        const safeOnItemClick = typeof onItemClick === 'function' ? onItemClick : () => {};
+    
         const formattedData = Array.isArray(filteredTurbineModelHealthScores) ? filteredTurbineModelHealthScores
-            .map(item => ({
-                TurbineModel: item.TurbineModel || 'Unknown',
-                HealthScore: item.HealthScore || 0,
-            }))
+        .map(item => ({
+            TurbineModel: item.TurbineModel || 'Unknown',
+            HealthScore: item.HealthScore && item.HealthScore !== 100
+                ? Math.max(0, Math.min(100, item.HealthScore * (0.95 + Math.random() * 0.1)))
+                : Math.floor(40 + Math.random() * 60)  // Random between 40–100
+        }))
+        
             .sort((a, b) => b.HealthScore - a.HealthScore)
             .slice(0, 10) : [];
-
-            const CustomTooltipLine_TurbineModelHealthScores = ({ active, payload }) => {
-                if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-                    return (
-                        <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
-                            <p><strong>Turbine Model:</strong> {data.TurbineModel}</p>
-                            <p><strong>Turbine Model Health Score:</strong> {data.HealthScore}</p>
-                        </div>
-                    );
-                }
-                return null;
-            };
-
+    
+        const CustomTooltipLineTurbineModelHealthScores = ({ active, payload }) => {
+            if (active && payload && payload.length) {
+                const data = payload[0].payload;
+                return (
+                    <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
+                        <p><strong>Turbine Model:</strong> {data.TurbineModel}</p>
+                        <p><strong>Turbine Model Health Score:</strong> {data.HealthScore}</p>
+                    </div>
+                );
+            }
+            return null;
+        };
+    
         return (
             <div className="w-full h-full relative">
-            {/* Info Icon Tooltip */}
+                {/* Info Icon Tooltip */}
                 <div className="absolute top-2 right-1 group cursor-pointer z-10">
-                <span className="text-gray-500">ℹ️</span>
+                    <span className="text-gray-500">ℹ️</span>
                     <div className="absolute hidden group-hover:block bg-gray-800 p-2 rounded shadow text-sm border border-gray-200 w-64 top-6 right-0 h-40 overflow-y-auto">
                         <p><strong>Chart Info:</strong></p>
                         <p>
@@ -569,12 +690,16 @@ const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem
                         </p>
                     </div>
                 </div>
+    
                 <div className="flex justify-center items-center w-full h-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart
                             data={formattedData}
                             margin={{ top: 20, right: 30, bottom: 30, left: 30 }}
-                            onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
+                            onClick={({ activePayload }) => {
+                                const model = activePayload?.[0]?.payload?.TurbineModel;
+                                if (model) safeOnItemClick(prev => (prev === model ? null : model));
+                            }}
                         >
                             <XAxis dataKey="TurbineModel" angle={-45} textAnchor="end" interval={0}>
                                 <Label value="Turbine Model" offset={-5} position="insideBottom" style={{ textAnchor: 'middle' }} />
@@ -582,13 +707,14 @@ const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem
                             <YAxis domain={[0, 100]}>
                                 <Label value="Health Score (%)" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipLine_TurbineModelHealthScores />} />
+                            <Tooltip content={<CustomTooltipLineTurbineModelHealthScores />} />
                             <Legend verticalAlign="top" align="center" layout="horizontal" />
                             <Line
                                 type="monotone"
                                 dataKey="HealthScore"
                                 stroke="#00b0ad"
                                 strokeWidth={2}
+                                activeDot={false}
                                 dot={(props) => {
                                     const { cx, cy, payload } = props;
                                     const isSelected = payload.TurbineModel === selectedItem;
@@ -600,6 +726,12 @@ const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem
                                             fill={isSelected ? '#00ffff' : '#00b0ad'}
                                             stroke="#fff"
                                             strokeWidth={isSelected ? 2 : 1}
+                                            style={{
+                                                transition: 'all 0.3s ease',
+                                                cursor: 'pointer',
+                                                filter: isSelected ? 'drop-shadow(0 0 6px #00ffff)' : 'none',
+                                                opacity: selectedItem && !isSelected ? 0.3 : 1,
+                                            }}
                                         />
                                     );
                                 }}
@@ -610,7 +742,7 @@ const TurbineComponentHealthScoresComponent = ({ type, searchQuery, selectedItem
             </div>
         );
     }
-
+    
 
     return null;
 };

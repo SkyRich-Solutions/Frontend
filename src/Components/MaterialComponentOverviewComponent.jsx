@@ -80,7 +80,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
         statusCount
     }));
 
-    const CustomTooltipBar_PlantSpecificMaterialStatus = ({ active, payload }) => {
+    const CustomTooltipBarPlantSpecificMaterialStatus = ({ active, payload }) => {
         if (active && payload && payload.length) {
             const data = payload[0].payload;
             return (
@@ -123,7 +123,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
                             <YAxis>
                                 <Label value="Material Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipBar_PlantSpecificMaterialStatus />} /> 
+                            <Tooltip content={<CustomTooltipBarPlantSpecificMaterialStatus />} /> 
                             <Bar
                             dataKey='statusCount'
                             isAnimationActive={false}
@@ -161,7 +161,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
             .sort((a, b) => b.count - a.count)
             .slice(0, 15);
 
-            const CustomTooltipBar_MaterialByPlant = ({ active, payload }) => {
+            const CustomTooltipBarMaterialByPlant = ({ active, payload }) => {
                 if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
@@ -204,7 +204,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
                             <YAxis>
                                 <Label value="Material Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipBar_MaterialByPlant />} />      
+                            <Tooltip content={<CustomTooltipBarMaterialByPlant />} />      
                             <Bar
                                 dataKey='count'
                                 isAnimationActive={false}
@@ -242,7 +242,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
             .sort((a, b) => b.count - a.count)
             .slice(0, 15);
 
-            const CustomTooltipBar_MaterialCount = ({ active, payload }) => {
+            const CustomTooltipBarMaterialCount = ({ active, payload }) => {
                 if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
@@ -285,7 +285,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
                             <YAxis>
                                 <Label value="Value Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipBar_MaterialCount />} /> 
+                            <Tooltip content={<CustomTooltipBarMaterialCount />} /> 
                             <Bar
                                 dataKey='count'
                                 isAnimationActive={false}
@@ -342,7 +342,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
             formattedData.some(row => typeof row[category] === 'number' && row[category] > 0)
         );
     
-        const CustomTooltipLine_MaterialCategoryCount = ({ active, payload, label }) => {
+        const CustomTooltipLineMaterialCategoryCount = ({ active, payload, label }) => {
             if (active && payload && payload.length) {
                 const { name: category, value } = payload[0];
                 return (
@@ -404,7 +404,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
                             <YAxis>
                                 <Label value="Material Category Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipLine_MaterialCategoryCount />} />
+                            <Tooltip content={<CustomTooltipLineMaterialCategoryCount />} />
                             {categoriesArray.map((category, index) => (
                                 <Line
                                 key={category}
@@ -453,7 +453,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
             .sort((a, b) => b.count - a.count)
             .slice(0, 15);
     
-        const CustomTooltipLine_TopMaterialByReplacementParts = ({ active, payload, label }) => {
+        const CustomTooltipLineTopMaterialByReplacementParts = ({ active, payload, label }) => {
             if (active && payload && payload.length) {
                 const { value } = payload[0];
                 return (
@@ -504,7 +504,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
                             <YAxis>
                                 <Label value="Replacement Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipLine_TopMaterialByReplacementParts />} />
+                            <Tooltip content={<CustomTooltipLineTopMaterialByReplacementParts />} />
                             <Line
                                 type="monotone"
                                 dataKey="count"
@@ -546,7 +546,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
             .sort((a, b) => b.count - a.count)
             .slice(0, 15);
     
-        const CustomTooltipLine_ReplacementPartsByPlant = ({ active, payload, label }) => {
+        const CustomTooltipLineReplacementPartsByPlant = ({ active, payload, label }) => {
             if (active && payload && payload.length) {
                 const { value } = payload[0];
                 return (
@@ -607,7 +607,7 @@ const MaterialComponentOverviewComponent = ({ type, searchQuery = '', selectedIt
                                     style={{ textAnchor: 'middle' }}
                                 />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipLine_ReplacementPartsByPlant />} />
+                            <Tooltip content={<CustomTooltipLineReplacementPartsByPlant />} />
                             <Line
                                 type="monotone"
                                 dataKey="count"

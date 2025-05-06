@@ -25,7 +25,7 @@ const MaterialComponentHealthScoreDashboard = () => {
     const [MaintenanceForecasts, setMaintenanceForecasts] = useState([]);
 
     const handleItemClick = (item) => {
-        setSelectedItem(item);
+        setSelectedItem(prev => (prev === item ? null : item));
     };
 
     const searchWrapperRef = useRef(null);
@@ -158,7 +158,7 @@ const MaterialComponentHealthScoreDashboard = () => {
                                             : 'bar_MaterialCategoryScoreSummary'
                                 }
                                 selectedItem={selectedItem}
-                                handleClick={handleItemClick}
+                                onItemClick={handleItemClick}
                                 searchQuery={searchQuery}
                             />
                         </div>
@@ -178,7 +178,7 @@ const MaterialComponentHealthScoreDashboard = () => {
                                             : 'line_MaterialCategoryPredictions'
                                     }
                                     selectedItem={selectedItem}
-                                    handleClick={handleItemClick}
+                                    onItemClick={handleItemClick}
                                     searchQuery={searchQuery}
                                 />
                             </div>
@@ -191,7 +191,7 @@ const MaterialComponentHealthScoreDashboard = () => {
                             <MaterialComponentHealthScoresComponent
                                 type="table_MaintenanceForecasts"
                                 selectedItem={selectedItem}
-                                handleClick={handleItemClick}
+                                onItemClick={handleItemClick}
                                 searchQuery={searchQuery}
                             />
                         </div>

@@ -62,7 +62,7 @@ const TurbineOverviewComponent = ({ type, searchQuery = '', selectedItem, handle
         .sort((a, b) => b.regionCount - a.regionCount)
         .slice(0, 15);
 
-    const CustomTooltipBar_FunctionalLocByRegion = ({ active, payload }) => {
+    const CustomTooltipBarFunctionalLocByRegion = ({ active, payload }) => {
         if (active && payload && payload.length) {
             const data = payload[0].payload;
             return (
@@ -119,7 +119,7 @@ const TurbineOverviewComponent = ({ type, searchQuery = '', selectedItem, handle
                                 style={{ textAnchor: 'middle' }}
                             />
                         </YAxis>
-                        <Tooltip content={<CustomTooltipBar_FunctionalLocByRegion />} />
+                        <Tooltip content={<CustomTooltipBarFunctionalLocByRegion />} />
                         <Bar
   dataKey="regionCount"
   isAnimationActive={false}
@@ -171,7 +171,7 @@ if (type === 'scatter_TurbinePowerVsHubHeight') {
         .sort((a, b) => b.nominalPower - a.nominalPower)
         .slice(0, 15);
 
-    const CustomTooltipScatter_TurbinePowerVsHubHeight = ({ active, payload }) => {
+    const CustomTooltipScatterTurbinePowerVsHubHeight = ({ active, payload }) => {
         if (active && payload && payload.length) {
             const data = payload[0].payload;
             return (
@@ -233,21 +233,25 @@ if (type === 'scatter_TurbinePowerVsHubHeight') {
                                 style={{ textAnchor: 'middle' }}
                             />
                         </YAxis>
-                        <Tooltip content={<CustomTooltipScatter_TurbinePowerVsHubHeight />} />
-                        <Scatter
-                            name="Turbines"
-                            data={topScatterData}
-                        >
-                            {topScatterData.map((entry, index) => (
-                                <Cell
-                                    key={`cell-${index}`}
-                                    fill={
-                                        selectedItem === entry.turbine
-                                            ? '#00ffff' // highlight
-                                            : '#00b0ad'
-                                    }
-                                />
-                            ))}
+                        <Tooltip content={<CustomTooltipScatterTurbinePowerVsHubHeight />} />
+                        <Scatter name="Turbines" data={topScatterData}>
+                            {topScatterData.map((entry, index) => {
+                                const isSelected = selectedItem === entry.turbine;
+                                return (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={isSelected ? '#00ffff' : '#00b0ad'}
+                                        stroke={isSelected ? '#00ffff' : '#333'}
+                                        strokeWidth={isSelected ? 2 : 0}
+                                        opacity={selectedItem && !isSelected ? 0.3 : 1}
+                                        style={{
+                                            filter: isSelected ? 'drop-shadow(0 0 6px #00ffff)' : 'none',
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => handleClick(isSelected ? null : entry.turbine)}
+                                    />
+                                );
+                            })}
                         </Scatter>
                     </ScatterChart>
                 </ResponsiveContainer>
@@ -255,9 +259,6 @@ if (type === 'scatter_TurbinePowerVsHubHeight') {
         </div>
     );
 }
-
-
-
 
 if (type === 'donut_TurbineCountByManufacturer') {
     const manufacturerCounts = (filteredTurbineData ?? []).reduce((acc, item) => {
@@ -271,7 +272,7 @@ if (type === 'donut_TurbineCountByManufacturer') {
         .sort((a, b) => b.count - a.count)
         .slice(0, 15);
 
-    const CustomTooltipDonut_TurbineCountByManufacturer = ({ active, payload }) => {
+    const CustomTooltipDonutTurbineCountByManufacturer = ({ active, payload }) => {
         if (active && payload && payload.length) {
             const data = payload[0].payload;
             return (
@@ -324,18 +325,22 @@ if (type === 'donut_TurbineCountByManufacturer') {
                             innerRadius={50}
                             paddingAngle={5}
                         >
-                            {formattedData.map((entry, index) => (
-                                <Cell
-                                    key={`cell-${index}`}
-                                    fill={
-                                        selectedItem === entry.manufacturer
-                                            ? 'rgba(0, 255, 255, 0.9)' // Highlight selected slice
-                                            : COLORS[index % COLORS.length]
-                                    }
-                                />
-                            ))}
+                            {formattedData.map((entry, index) => {
+                                const isSelected = selectedItem === entry.manufacturer;
+                                return (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={isSelected ? 'rgba(0, 255, 255, 0.9)' : COLORS[index % COLORS.length]}
+                                        stroke={isSelected ? '#00ffff' : '#333'}
+                                        strokeWidth={isSelected ? 2 : 0}
+                                        opacity={selectedItem && !isSelected ? 0.3 : 1}
+                                        style={isSelected ? { filter: 'drop-shadow(0 0 6px #00ffff)' } : {}}
+                                        onClick={() => handleClick(isSelected ? null : entry.manufacturer)}
+                                    />
+                                );
+                            })}
                         </Pie>
-                        <Tooltip content={<CustomTooltipDonut_TurbineCountByManufacturer />} />
+                        <Tooltip content={<CustomTooltipDonutTurbineCountByManufacturer />} />
                         <Legend verticalAlign="bottom" height={36} />
                     </PieChart>
                 </ResponsiveContainer>
@@ -343,9 +348,6 @@ if (type === 'donut_TurbineCountByManufacturer') {
         </div>
     );
 }
-
-
-
 
 if (type === 'radar_MaintPlant_PlanningPlant_ByPlatform') {
     const platformGroups = {};
@@ -367,7 +369,7 @@ if (type === 'radar_MaintPlant_PlanningPlant_ByPlatform') {
         .sort((a, b) => b.MaintPlantCount - a.MaintPlantCount)
         .slice(0, 15);
 
-    const CustomTooltipRadar_MaintPlant_PlanningPlant_ByPlatform = ({ active, payload, label }) => {
+    const CustomTooltipRadarMaintPlantPlanningPlantByPlatform = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
                 <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
@@ -381,6 +383,10 @@ if (type === 'radar_MaintPlant_PlanningPlant_ByPlatform') {
             );
         }
         return null;
+    };
+
+    const handleClickRadar = (platform) => {
+    handleClick(prev => (prev === platform ? null : platform));
     };
 
     return (
@@ -414,29 +420,44 @@ if (type === 'radar_MaintPlant_PlanningPlant_ByPlatform') {
                         data={formattedData}
                         onClick={(e) => {
                             if (e?.activeLabel) {
-                                handleClick(e.activeLabel);
+                                handleClickRadar(e.activeLabel);
                             }
                         }}
                     >
                         <PolarGrid />
                         <PolarAngleAxis dataKey="platform" />
                         <PolarRadiusAxis />
-                        <Tooltip content={<CustomTooltipRadar_MaintPlant_PlanningPlant_ByPlatform />} />
+                        <Tooltip content={<CustomTooltipRadarMaintPlantPlanningPlantByPlatform />} />
                         <Legend />
                         <Radar
                             name="MaintPlant"
                             dataKey="MaintPlantCount"
                             stroke="#00b0ad"
                             fill="#00b0ad"
-                            fillOpacity={0.6}
-                        />
-                        <Radar
+                            fillOpacity={selectedItem ? 0.2 : 0.6}
+                            />
+                            <Radar
                             name="PlanningPlant"
                             dataKey="PlanningPlantCount"
                             stroke="#ff7f0e"
                             fill="#ff7f0e"
-                            fillOpacity={0.6}
-                        />
+                            fillOpacity={selectedItem ? 0.2 : 0.6}
+                            />
+                            <Radar
+                            name={`Selected: ${selectedItem}`}
+                            dataKey="MaintPlantCount"
+                            data={formattedData.filter(d => d.platform === selectedItem)}
+                            stroke="#00ffff"
+                            fill="#00ffff"
+                            fillOpacity={0.9}
+                            />
+                            <Radar
+                            dataKey="PlanningPlantCount"
+                            data={formattedData.filter(d => d.platform === selectedItem)}
+                            stroke="#facc15"
+                            fill="#facc15"
+                            fillOpacity={0.9}
+                            />
                     </RadarChart>
                 </ResponsiveContainer>
             </div>
@@ -461,7 +482,7 @@ if (type === 'line_CumulativeTurbineCount_ByPlatform') {
         return { platform, cumulativeCount: cumulativeSum };
     });
 
-    const CustomTooltipLine_CumulativeTurbineCount_ByPlatform = ({ active, payload, label }) => {
+    const CustomTooltipLineCumulativeTurbineCountByPlatform = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             const data = payload[0].payload;
             return (
@@ -535,7 +556,7 @@ if (type === 'line_CumulativeTurbineCount_ByPlatform') {
                                 style={{ textAnchor: 'middle' }}
                             />
                         </YAxis>
-                        <Tooltip content={<CustomTooltipLine_CumulativeTurbineCount_ByPlatform />} />
+                        <Tooltip content={<CustomTooltipLineCumulativeTurbineCountByPlatform />} />
                         <Legend />
                         <Line
                             type="monotone"
@@ -587,7 +608,7 @@ if (type === 'bubble_TurbinePowerByRegion') {
         fill: selectedItem === entry.region ? '#00ffff' : COLORS[index % COLORS.length]
     }));
 
-    const CustomTooltipBubble_TurbinePowerByRegion = ({ active, payload }) => {
+    const CustomTooltipBubbleTurbinePowerByRegion = ({ active, payload }) => {
         if (active && payload && payload.length) {
             const data = payload[0].payload;
             return (
@@ -657,8 +678,29 @@ if (type === 'bubble_TurbinePowerByRegion') {
                             range={[100, 500]}
                             name="Turbine Count"
                         />
-                        <Tooltip content={<CustomTooltipBubble_TurbinePowerByRegion />} />
-                        <Scatter name="Turbines by Region" data={coloredData} />
+                        <Tooltip content={<CustomTooltipBubbleTurbinePowerByRegion />} />
+                        <Scatter name="Turbines by Region" data={coloredData}>
+                            {coloredData.map((entry, index) => {
+                                const isSelected = selectedItem === entry.region;
+                                return (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={isSelected ? '#00ffff' : COLORS[index % COLORS.length]}
+                                        stroke={isSelected ? '#00ffff' : '#444'}
+                                        strokeWidth={isSelected ? 2 : 0}
+                                        opacity={selectedItem && !isSelected ? 0.3 : 1}
+                                        style={{
+                                            filter: isSelected ? 'drop-shadow(0 0 6px #00ffff)' : 'none',
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleClick(isSelected ? null : entry.region);
+                                        }}
+                                    />
+                                );
+                            })}
+                        </Scatter>
                     </ScatterChart>
                 </ResponsiveContainer>
             </div>

@@ -113,20 +113,6 @@ const CategoryClassificationComponent = ({
         });
     }, [filteredMaterialCategoryClassificationsData]);
 
-    const donutData = useMemo(() => {
-        let unclassified = 0, newlyDiscovered = 0;
-        filteredMaterialCategoryClassificationsData.forEach(item => {
-            if (item.MaterialCategory === 'Unclassified') unclassified++;
-            else if (item.MaterialCategory === 'Newly Discovered') newlyDiscovered++;
-        });
-        const others = filteredMaterialCategoryClassificationsData.length - unclassified - newlyDiscovered;
-        return [
-            { name: 'Unclassified', value: unclassified },
-            { name: 'Newly Discovered', value: newlyDiscovered },
-            { name: 'Others', value: others }
-        ];
-    }, [filteredMaterialCategoryClassificationsData]);
-
     const unclassifiedCount = useMemo(() =>
         filteredMaterialCategoryClassificationsData.filter(item => item.MaterialCategory === 'Unclassified').length
     , [filteredMaterialCategoryClassificationsData]);
@@ -285,23 +271,7 @@ const CategoryClassificationComponent = ({
                     {/* Right-aligned reclassification button */}
                     {(selectedFilter === 'Unclassified' || selectedFilter === 'Newly Discovered') && (
                         <button
-                            onClick={async () => {
-                                setIsReclassifying(true);
-                                setSuccessMessage('');
-                                try {
-                                    await axios.post('http://localhost:4000/api/run-python-human-in-the-loop');
-                                    setSuccessMessage('Reclassification triggered successfully!');
-                                    setTimeout(() => {
-                                        setSuccessMessage('');
-                                        setRefreshKey(prev => prev + 1);
-                                    }, 3000);
-                                } catch (err) {
-                                    console.error('Reclassification error:', err);
-                                    alert(err.response?.data?.message || 'Failed to trigger reclassification.');
-                                } finally {
-                                    setIsReclassifying(false);
-                                }
-                            }}
+                        onClick={handleReclassification}
                             disabled={isReclassifying}
                             className={`px-4 py-2 rounded font-bold text-white flex items-center justify-center gap-2 ${
                                 isReclassifying ? 'bg-gray-500' : 'bg-purple-600 hover:bg-purple-700'
@@ -386,7 +356,7 @@ const CategoryClassificationComponent = ({
     
     if (type === 'Line_chart_UnclassifiedNewlyDiscovered') {
 
-        const CustomTooltipLine_UnclassifiedNewlyDiscovered = ({ active, payload, label }) => {
+        const CustomTooltipLineUnclassifiedNewlyDiscovered = ({ active, payload, label }) => {
             if (active && payload && payload.length) {
                 const { name: category, value } = payload[0];
                 return (
@@ -436,7 +406,7 @@ const CategoryClassificationComponent = ({
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="index" />
                         <YAxis />
-                        <Tooltip content={<CustomTooltipLine_UnclassifiedNewlyDiscovered />} /> 
+                        <Tooltip content={<CustomTooltipLineUnclassifiedNewlyDiscovered />} /> 
                         <Legend />
                         <Area
                             type="monotone"
@@ -464,7 +434,7 @@ const CategoryClassificationComponent = ({
 
     if (type === 'donut_UnclassifiedNewlyDiscovered') {
 
-        const CustomTooltipDonut_MaterialCategorySummary = ({ active, payload }) => {
+        const CustomTooltipDonutMaterialCategorySummary = ({ active, payload }) => {
             if (active && payload && payload.length) {
                 const { name, value } = payload[0];
                 return (
@@ -534,7 +504,7 @@ const CategoryClassificationComponent = ({
                                 />
                             ))}
                         </Pie>
-                        <Tooltip content={<CustomTooltipDonut_MaterialCategorySummary />} /> 
+                        <Tooltip content={<CustomTooltipDonutMaterialCategorySummary />} /> 
                         <Legend verticalAlign="bottom" height={90} />
                     </PieChart>
                 </ResponsiveContainer>

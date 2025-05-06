@@ -25,20 +25,15 @@ const COLORS = [
     'rgba(244, 164, 96, 0.6)',
 ];
 
-const materialStatusMap = {
-    Z0: "Blocked/to be deleted",
-    Z1: "Ready to be engineered",
-    Z2: "Ready to be Enriched",
-    Z3: "Ready to be Planned",
-    Z4: "Ready to be sold/purchased",
-    Z5: "Ready to be sold/returned",
-    Z6: "Internal Movement & Repairs",
-    Z7: "Obsolete Stock Scrapping",
-    Z8: "Inactive and Hibernated",
-    Z9: "Ready for final deletion",
-    ZI: "Ready for internal use",
-    ZS: "Structure Material"
-};
+const isSelected = (entry, selectedItem) =>
+    String(entry.Material_ID) === String(selectedItem) ||
+    String(entry.Category) === String(selectedItem) ||
+    String(entry.Material) === String(selectedItem) ||
+    String(entry.material) === String(selectedItem) ||
+    String(entry.Platform) === String(selectedItem) ||
+    String(entry.Plant) === String(selectedItem) ||
+    String(entry.Plant_ID) === String(selectedItem);
+
 
 //-------------------------------------------------MaterialPredictions--------------------------------------------------//
 const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedItem, onItemClick }) => {
@@ -120,10 +115,23 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
     //Shared click handler for all charts
     const handleClick = (data) => {
         if (data && onItemClick) {
-            const key = data.materialDescription || data.material || data.materialCategory;
-            onItemClick(key);
+            const key =
+                data.Material_ID ??
+                data.Category ??
+                data.Material ??
+                data.Platform ??
+                data.material ??
+                null;
+    
+            // Toggle selection
+            if (key === selectedItem) {
+                onItemClick(null); // deselect
+            } else {
+                onItemClick(key);
+            }
         }
     };
+    
 
     if (type === 'bar_MaterialComponentScoreSummary') {
         const getColorByScore = (score) => {
@@ -132,15 +140,29 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
             return 'rgba(75, 192, 75, 0.8)';
         };
 
-        const formattedData = filteredMaterialComponentScoreSummary
-            .map(item => ({
-                Material_ID: item.Material_ID,
-                TotalComponentScore: item.TotalComponentScore || 0,
-            }))
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 10);
+        const rawData = filteredMaterialComponentScoreSummary.map(item => ({
+            Material_ID: item.Material_ID,
+            TotalComponentScore: item.TotalComponentScore || 0
+        }));
+        
+        // Shuffle the array but ensure selectedItem stays included
+        const shuffled = [...rawData].sort(() => Math.random() - 0.5);
 
-        const CustomTooltipBar_MaterialComponentScoreSummary = ({ active, payload }) => {
+            // Ensure selected item is included
+            let topItems = shuffled.slice(0, 10);
+
+            const alreadyIncluded = topItems.some(item => String(item.Material_ID) === String(selectedItem));
+            if (!alreadyIncluded && selectedItem) {
+                const selectedEntry = rawData.find(item => String(item.Material_ID) === String(selectedItem));
+                if (selectedEntry) {
+                    // Replace the last item with the selected one to ensure it's visible
+                    topItems[topItems.length - 1] = selectedEntry;
+                }
+            }
+
+            const formattedData = topItems;
+
+        const CustomTooltipBarMaterialComponentScoreSummary = ({ active, payload }) => {
             if (active && payload && payload.length) {
                 const data = payload[0].payload;
                 return (
@@ -175,7 +197,6 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                         <BarChart
                             data={formattedData}
                             margin={{ top: 20, right: 30, bottom: 30, left: 30 }}
-                            onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
                         >
                             <XAxis dataKey="Material_ID">
                                 <Label value="Material ID" offset={-5} position="insideBottom" style={{ textAnchor: 'middle' }} />
@@ -183,15 +204,17 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                             <YAxis domain={[0, 100]}>
                                 <Label value="Total Component Score" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                        <Tooltip content={<CustomTooltipBar_MaterialComponentScoreSummary />} />
-                            <Bar dataKey="TotalComponentScore">
+                        <Tooltip content={<CustomTooltipBarMaterialComponentScoreSummary />} />
+                        <Bar dataKey="TotalComponentScore">
                                 {formattedData.map((entry, index) => (
                                     <Cell
-                                        key={`cell-${index}`}
-                                        fill={(entry.Material_ID === selectedItem) ? '#00ffff' : getColorByScore(entry.TotalComponentScore)}
+                                    key={`cell-${index}`}
+                                    fill={isSelected(entry, selectedItem) ? '#00ffff' : getColorByScore(entry.TotalComponentScore)}
+                                    onClick={() => handleClick(entry)}
+                                    style={{ cursor: 'pointer' }}
                                     />
                                 ))}
-                            </Bar>
+                                </Bar>
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
@@ -206,15 +229,29 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
             return 'rgba(75, 192, 75, 0.8)';
         };
 
-        const formattedData = filteredMaterialComponentHealthScores
-            .map(item => ({
-                Material_ID: item.Material_ID,
-                HealthScore: item.HealthScore || 0,
-            }))
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 10);
+        const rawData = filteredMaterialComponentHealthScores.map(item => ({
+            Material_ID: item.Material_ID,
+            HealthScore: item.HealthScore || 0
+        }));
+        
+        // Shuffle the array but ensure selectedItem stays included
+        const shuffled = [...rawData].sort(() => Math.random() - 0.5);
 
-            const CustomTooltipBar_MaterialComponentHealthScores = ({ active, payload }) => {
+            // Ensure selected item is included
+            let topItems = shuffled.slice(0, 10);
+
+            const alreadyIncluded = topItems.some(item => String(item.Material_ID) === String(selectedItem));
+            if (!alreadyIncluded && selectedItem) {
+                const selectedEntry = rawData.find(item => String(item.Material_ID) === String(selectedItem));
+                if (selectedEntry) {
+                    // Replace the last item with the selected one to ensure it's visible
+                    topItems[topItems.length - 1] = selectedEntry;
+                }
+            }
+
+            const formattedData = topItems;
+
+            const CustomTooltipBarMaterialComponentHealthScores = ({ active, payload }) => {
                 if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
@@ -249,7 +286,6 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                         <BarChart
                             data={formattedData}
                             margin={{ top: 20, right: 30, bottom: 30, left: 30 }}
-                            onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
                         >
                             <XAxis dataKey="Material_ID">
                                 <Label value="Material ID" offset={-5} position="insideBottom" style={{ textAnchor: 'middle' }} />
@@ -257,15 +293,17 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                             <YAxis domain={[0, 100]}>
                                 <Label value="Summary Component Score" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipBar_MaterialComponentHealthScores />} />
+                            <Tooltip content={<CustomTooltipBarMaterialComponentHealthScores />} />
                             <Bar dataKey="HealthScore">
                                 {formattedData.map((entry, index) => (
                                     <Cell
-                                        key={`cell-${index}`}
-                                        fill={(entry.Material_ID === selectedItem) ? '#00ffff' : getColorByScore(entry.HealthScore)}
+                                    key={`cell-${index}`}
+                                    fill={isSelected(entry, selectedItem) ? '#00ffff' : getColorByScore(entry.HealthScore)}
+                                    onClick={() => handleClick(entry)}
+                                    style={{ cursor: 'pointer' }}
                                     />
                                 ))}
-                            </Bar>
+                                </Bar>
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
@@ -280,15 +318,29 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
             return 'rgba(75, 192, 75, 0.8)';
         };
 
-        const formattedData = filteredMaterialCategoryScoreSummary
-            .map(item => ({
-                Category: item.Category,
-                TotalCategoryScore: item.TotalCategoryScore || 0,
-            }))
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 10);
+        const rawData = filteredMaterialCategoryScoreSummary.map(item => ({
+            Category: item.Category,
+            TotalCategoryScore: item.TotalCategoryScore || 0
+        }));
+        
+        // Shuffle the array but ensure selectedItem stays included
+        const shuffled = [...rawData].sort(() => Math.random() - 0.5);
 
-            const CustomTooltipBar_MaterialCategoryScoreSummary = ({ active, payload }) => {
+        // Ensure selected item is included
+        let topItems = shuffled.slice(0, 10);
+        
+        const alreadyIncluded = topItems.some(item => String(item.Material_ID) === String(selectedItem));
+        if (!alreadyIncluded && selectedItem) {
+            const selectedEntry = rawData.find(item => String(item.Material_ID) === String(selectedItem));
+            if (selectedEntry) {
+                // Replace the last item with the selected one to ensure it's visible
+                topItems[topItems.length - 1] = selectedEntry;
+            }
+        }
+        
+        const formattedData = topItems;
+
+            const CustomTooltipBarMaterialCategoryScoreSummary = ({ active, payload }) => {
                 if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
@@ -323,7 +375,6 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                         <BarChart
                             data={formattedData}
                             margin={{ top: 20, right: 30, bottom: 30, left: 30 }}
-                            onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
                         >
                             <XAxis dataKey="Category">
                                 <Label value="Category" offset={-5} position="insideBottom" style={{ textAnchor: 'middle' }} />
@@ -331,15 +382,17 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                             <YAxis domain={[0, 100]}>
                                 <Label value="Total Category Score" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipBar_MaterialCategoryScoreSummary />} />
+                            <Tooltip content={<CustomTooltipBarMaterialCategoryScoreSummary />} />
                             <Bar dataKey="TotalCategoryScore">
                                 {formattedData.map((entry, index) => (
                                     <Cell
-                                        key={`cell-${index}`}
-                                        fill={(entry.Material_ID === selectedItem) ? '#00ffff' : getColorByScore(entry.TotalCategoryScore)}
+                                    key={`cell-${index}`}
+                                    fill={isSelected(entry, selectedItem) ? '#00ffff' : getColorByScore(entry.TotalCategoryScore)}
+                                    onClick={() => handleClick(entry)}
+                                    style={{ cursor: 'pointer' }}
                                     />
                                 ))}
-                            </Bar>
+                                </Bar>
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
@@ -353,52 +406,61 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
             if (score < 70) return 'rgba(255, 159, 64, 0.8)';
             return 'rgba(75, 192, 75, 0.8)';
         };
-
-        const formattedData = filteredMaterialCategoryHealthScores
-            .map(item => ({
-                Category: item.Category,
-                HealthScore: item.HealthScore || 0,
-            }))
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 10);
-
-            const CustomTooltipBar_MaterialCategoryHealthScores = ({ active, payload }) => {
-                if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-                    return (
-                        <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
-                            <p><strong>Category:</strong> {data.Category}</p>
-                            <p><strong>Total Category Score:</strong> {data.HealthScore}</p>
-                        </div>
-                    );
+    
+        const rawData = Object.values(
+            filteredMaterialCategoryHealthScores.reduce((acc, item) => {
+                const key = item.Category;
+                if (!acc[key]) {
+                    acc[key] = {
+                        Category: key,
+                        HealthScore: item.HealthScore || 0
+                    };
                 }
-                return null;
-            };
-
-
+                return acc;
+            }, {})
+        );
+    
+        // Conditionally filter for selected item or show a shuffled sample
+        const formattedData = selectedItem
+            ? rawData.filter(item => String(item.Category) === String(selectedItem))
+            : [...rawData].sort(() => Math.random() - 0.5).slice(0, 10);
+    
+        const CustomTooltipBarMaterialCategoryHealthScores = ({ active, payload }) => {
+            if (active && payload && payload.length) {
+                const data = payload[0].payload;
+                return (
+                    <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
+                        <p><strong>Category:</strong> {data.Category}</p>
+                        <p><strong>Total Category Score:</strong> {data.HealthScore}</p>
+                    </div>
+                );
+            }
+            return null;
+        };
+    
         return (
             <div className="w-full h-full relative">
-            {/* Info Icon Tooltip */}
+                {/* Info Icon Tooltip */}
                 <div className="absolute top-2 right-1 group cursor-pointer z-10">
-                <span className="text-gray-500">ℹ️</span>
+                    <span className="text-gray-500">ℹ️</span>
                     <div className="absolute hidden group-hover:block bg-gray-800 p-2 rounded shadow text-sm border border-gray-200 w-64 top-6 right-0 h-40 overflow-y-auto">
-                    <p><strong>Chart Info:</strong></p>
-                    <p>
-                        This chart visualizes the Category Health Score for selected materials, reflecting their reliability and usage trends within their classification group.
-                    </p>
-                    <hr className="my-2 border-gray-300" />
-                    <p><strong>Category Health Score:</strong></p>
-                    <p>
-                        A score from 0 to 100 that combines replacement frequency, usage rate, and performance within a material category. Higher scores suggest better overall health and lower maintenance risk.
-                    </p>
+                        <p><strong>Chart Info:</strong></p>
+                        <p>
+                            This chart visualizes the Category Health Score for selected materials, reflecting their reliability and usage trends within their classification group.
+                        </p>
+                        <hr className="my-2 border-gray-300" />
+                        <p><strong>Category Health Score:</strong></p>
+                        <p>
+                            A score from 0 to 100 that combines replacement frequency, usage rate, and performance within a material category. Higher scores suggest better overall health and lower maintenance risk.
+                        </p>
                     </div>
                 </div>
+    
                 <div className="flex justify-center items-center w-full h-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                             data={formattedData}
                             margin={{ top: 20, right: 30, bottom: 30, left: 30 }}
-                            onClick={({ activePayload }) => handleClick(activePayload?.[0]?.payload)}
                         >
                             <XAxis dataKey="Category">
                                 <Label value="Category" offset={-5} position="insideBottom" style={{ textAnchor: 'middle' }} />
@@ -406,12 +468,14 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                             <YAxis domain={[0, 100]}>
                                 <Label value="Total Material Category Score" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipBar_MaterialCategoryHealthScores />} />
+                            <Tooltip content={<CustomTooltipBarMaterialCategoryHealthScores />} />
                             <Bar dataKey="HealthScore">
                                 {formattedData.map((entry, index) => (
                                     <Cell
                                         key={`cell-${index}`}
-                                        fill={(entry.Material_ID === selectedItem) ? '#00ffff' : getColorByScore(entry.HealthScore)}
+                                        fill={isSelected(entry, selectedItem) ? '#00ffff' : getColorByScore(entry.HealthScore)}
+                                        onClick={() => handleClick(entry)}
+                                        style={{ cursor: 'pointer' }}
                                     />
                                 ))}
                             </Bar>
@@ -421,7 +485,7 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
             </div>
         );
     }
-
+    
     if (type === 'table_MaintenanceForecasts') {
         const forecastData = Array.isArray(filteredMaintenanceForecasts) ? filteredMaintenanceForecasts : [];
 
@@ -465,8 +529,8 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                             forecastData.map((item, index) => (
                                 <tr
                                     key={index}
-                                    className={`cursor-pointer ${(item.Material_ID === selectedItem) ? 'bg-yellow-600' : (index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900')
-                                        }`}
+                                    className={`cursor-pointer ${String(item.Material_ID) === String(selectedItem) ? 'bg-cyan-700 text-white' : index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900'}`}
+
                                     onClick={() => handleClick(item)}
                                 >
                                     <td className="px-4 py-2">{item.Forecast_ID}</td>
@@ -494,7 +558,7 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
     if (type === 'line_MaterialCategoryPredictions') {
         const formattedData = Array.isArray(filteredMaterialCategoryPredictions) ? filteredMaterialCategoryPredictions : [];
 
-        const CustomTooltipBar_MaterialCategoryHealthScores = ({ active, payload }) => {
+        const CustomTooltipBarMaterialCategoryHealthScores = ({ active, payload }) => {
             if (active && payload && payload.length) {
                 const data = payload[0].payload;
                 return (
@@ -510,15 +574,16 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
         const CustomDot = ({ cx, cy, payload }) => {
             if (typeof cx !== 'number' || typeof cy !== 'number') return null;
         
-            const isSelected = selectedItem === payload.material;
+            const isSelected = selectedItem === payload.Category;
             return (
                 <circle
                     cx={cx}
                     cy={cy}
                     r={isSelected ? 2 : 2}
-                    stroke={isSelected ? '#00ffff' : '#444'}
                     strokeWidth={isSelected ? 3 : 1}
+                    stroke={isSelected ? '#00ffff' : '#444'}
                     fill={isSelected ? '#00ffff' : '#00b0ad'}
+
                 />
             );
         };
@@ -572,7 +637,7 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                                     style={{ textAnchor: 'middle' }}
                                 />
                             </YAxis>
-                            <Tooltip content={<CustomTooltipBar_MaterialCategoryHealthScores />} />
+                            <Tooltip content={<CustomTooltipBarMaterialCategoryHealthScores />} />
                             <Legend verticalAlign="top" align="center" layout="horizontal" />
                             <Line
                                 type="monotone"
