@@ -62,65 +62,65 @@ const UploadPage = () => {
     };
 
     const fetchData = async () => {
-        if (!fileType) {
-            setError(
-                'Unknown file type. Make sure the filename includes "material" or "turbine".'
-            );
-            return;
-        }
-
-        const apiPrefix = fileType === 'material' ? 'Material' : 'Turbine';
-
         try {
-            const [unprocessedRes, processedRes] = await Promise.all([
-                axios.get(
-                    `http://localhost:4000/api/fetch_Unprocessed${apiPrefix}Data`
-                ),
-                axios.get(
-                    `http://localhost:4000/api/fetch_Processed${apiPrefix}Data`
-                )
-            ]);
-
-            setUnprocessedData(unprocessedRes.data.data);
-            setProcessedData(processedRes.data.data);
-            console.log(processedRes.data.data);
+            const tryFetch = async (type) => {
+                const apiPrefix = type === 'material' ? 'Material' : 'Turbine';
+                const [unprocessedRes, processedRes] = await Promise.all([
+                    axios.get(`http://localhost:4000/api/fetch_Unprocessed${apiPrefix}Data`),
+                    axios.get(`http://localhost:4000/api/fetch_Processed${apiPrefix}Data`)
+                ]);
+                setFileType(type); // Set detected type
+                setUnprocessedData(unprocessedRes.data.data);
+                setProcessedData(processedRes.data.data);
+                console.log(processedRes.data.data);
+            };
+    
+            if (fileType) {
+                await tryFetch(fileType);
+            } else {
+                // Try both if no type is defined
+                try {
+                    await tryFetch('material');
+                } catch {
+                    await tryFetch('turbine');
+                }
+            }
         } catch (err) {
             setError('Error fetching data.');
             console.error(err);
         }
     };
+    
 
     const handleRunScript = async () => {
         setLoading(true);
         setLoadingProgress(0);
-
+        setError(null);
+        setOutput('');
+    
         let progress = 0;
         const interval = setInterval(() => {
             progress += 10;
             setLoadingProgress(progress);
             if (progress >= 100) clearInterval(interval);
         }, 200);
-
+    
         try {
             const response = await axios.post(
-                'http://localhost:4000/api/run-python',
-                {
-                    withCredentials: true
-                }
+                'http://localhost:4000/api/run-python-both',
+                {},
+                { withCredentials: true }
             );
-
+    
             if (response.data) {
                 await fetchData();
-                setOutput(response.data);
+                setOutput('Data cleaned successfully ✅');
             } else if (response.data.error) {
-                console.error(
-                    'Error running Python script:',
-                    response.data.error
-                );
+                console.error('Error from script:', response.data.error);
             }
         } catch (error) {
-            console.error('Error making request:', error);
-            setError('Error running script.');
+            console.error('Error calling backend:', error);
+            setError('Error running both scripts.');
         } finally {
             setTimeout(() => {
                 setLoading(false);
@@ -128,6 +128,8 @@ const UploadPage = () => {
             }, 2000);
         }
     };
+    
+    
 
     return (
         <div className="flex-1 overflow-auto z-10 min-h-screen space-y-4">
@@ -173,15 +175,15 @@ const UploadPage = () => {
                     </div>
 
                     <div className={`bg-gray-500 text-center px-4 py-3 rounded-lg cursor-${Loading ? 'pointer' : ''}`}>
-                        <button
-                            onClick={handleRunScript}
-                            // className='flex gap-1 cursor-pointer'
-                            className={`flex gap-1 rounded cursor-${Loading ? 'pointer' : 'not-allowed'} ${!Loading && 'opacity-50'}`}
-                            disabled={!Loading}
-                        >
-                            <WandSparklesIcon />
-                            Clean Data
-                        </button>
+                    <button
+                        onClick={handleRunScript}
+                        disabled={Loading}
+                        className={`flex gap-1 rounded px-4 py-2 font-bold text-white 
+                            ${Loading ? 'bg-gray-500 cursor-not-allowed opacity-50' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}`}>
+                        <WandSparklesIcon />
+                        Clean Data
+                    </button>
+
                     </div>
                 </div>
 

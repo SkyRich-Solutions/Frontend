@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Header from '../Components/Layout/Header';
-import PredictionsChartComponent from '../Components/PredictionsChartComponent';
+import MaterialComponentPredictionsComponent from '../Components/MaterialComponentPredictionsComponent';
 import Fuse from 'fuse.js';
 
 import {
@@ -11,7 +11,7 @@ import {
     getMonteCarloDominance,
 } from '../Utils/MaterialDashboardDataHandler';
 
-const MaterialPredictionsDashboard = () => {
+const MaterialComponentPredictionsDashboard = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -145,7 +145,7 @@ const MaterialPredictionsDashboard = () => {
                         key={index}
                         className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[20rem] flex items-center justify-center rounded-lg"
                     >
-                        <PredictionsChartComponent
+                        <MaterialComponentPredictionsComponent
                             type={
                                 index === 0
                                     ? 'bar_ReplacementPrediction'
@@ -166,7 +166,7 @@ const MaterialPredictionsDashboard = () => {
                             key={index}
                             className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[18rem] flex items-center justify-center rounded-lg"
                         >
-                            <PredictionsChartComponent
+                            <MaterialComponentPredictionsComponent
                                 type={
                                     index === 3
                                         ? 'pie_MaterialStatusTransitions'
@@ -181,8 +181,8 @@ const MaterialPredictionsDashboard = () => {
                 </div>
 
                 <div className="flex flex-col gap-6 col-span-2">
-                    <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[18rem] flex items-center justify-center rounded-lg">
-                        <PredictionsChartComponent
+                    <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[18rem] flex items-center justify-center rounded-lg overflow-auto">
+                        <MaterialComponentPredictionsComponent
                             type="table_MaterialStatusTransitions"
                             selectedItem={selectedItem}
                             onItemClick={handleItemClick}
@@ -191,7 +191,7 @@ const MaterialPredictionsDashboard = () => {
                     </div>
 
                     <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[18rem] flex items-center justify-center rounded-lg overflow-auto">
-                        <PredictionsChartComponent
+                        <MaterialComponentPredictionsComponent
                             type="table_MaterialPredictions"
                             selectedItem={selectedItem}
                             onItemClick={handleItemClick}
@@ -204,4 +204,4 @@ const MaterialPredictionsDashboard = () => {
     );
 };
 
-export default MaterialPredictionsDashboard;
+export default MaterialComponentPredictionsDashboard;

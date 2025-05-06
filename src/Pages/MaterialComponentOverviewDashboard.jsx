@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Header from '../Components/Layout/Header';
-import ChartComponent from '../Components/ChartComponent';
+import MaterialComponentOverviewComponent from '../Components/MaterialComponentOverviewComponent';
 import Fuse from 'fuse.js';
 import { getPredictionMaterialData } from '../Utils/MaterialDashboardDataHandler';
 
 
-const Dashboard = () => {
+const MaterialComponentOverviewDashboard = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -120,7 +120,7 @@ const Dashboard = () => {
                             key={index}
                             className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[20rem] flex items-center justify-center rounded-lg"
                         >
-                            <ChartComponent
+                            <MaterialComponentOverviewComponent
                                 type={
                                     index === 0
                                         ? 'bar_PlantSpecificMaterialStatus'
@@ -136,7 +136,7 @@ const Dashboard = () => {
                     ))}
         
                     <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 flex items-center justify-center rounded-lg col-span-2 row-span-2 h-[38rem]">
-                        <ChartComponent
+                        <MaterialComponentOverviewComponent
                             type="line_TopMaterialByReplacementParts"
                             selectedItem={selectedItem}
                             handleClick={handleItemClick}
@@ -150,7 +150,7 @@ const Dashboard = () => {
                                 key={index}
                                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[18rem] flex items-center justify-center rounded-lg"
                             >
-                                <ChartComponent
+                                <MaterialComponentOverviewComponent
                                     type={index === 3 ? 'line_ReplacementPartsByPlant' : 'bar_MaterialCount'}
                                     selectedItem={selectedItem}
                                     handleClick={handleItemClick}
@@ -164,4 +164,4 @@ const Dashboard = () => {
         );
     };        
 
-export default Dashboard;
+export default MaterialComponentOverviewDashboard;

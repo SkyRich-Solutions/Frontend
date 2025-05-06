@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Header from '../Components/Layout/Header';
-import PredictionsChartComponent from '../Components/PredictionsChartComponent';
+import TurbineComponentHealthScoresComponent from '../Components/TurbineComponentHealthScoresComponent';
 import Fuse from 'fuse.js';
 import { getTurbineModelHealthScores, getTurbineModelScoreSummary, getTurbinePlatformHealthScores, getTurbinePlatformScoreSummary } from '../Utils/TurbineDashboardDataHandler';
 
@@ -134,7 +134,7 @@ const TurbinePredictionsDashboard = () => {
                         key={index}
                         className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[20rem] flex items-center justify-center rounded-lg'
                     >
-                        <PredictionsChartComponent
+                        <TurbineComponentHealthScoresComponent
                             type={
                                 index === 0
                                     ? 'bar_TurbineModelHealthScores'
@@ -156,7 +156,7 @@ const TurbinePredictionsDashboard = () => {
                             key={index}
                             className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[18rem] flex items-center justify-center rounded-lg'
                         >
-                            <PredictionsChartComponent
+                            <TurbineComponentHealthScoresComponent
                                 type={index === 3
                                     ? 'bubble_PlatformHealthScores'
                                     : 'bar_TurbinePlatformScoreSummary'
@@ -171,7 +171,7 @@ const TurbinePredictionsDashboard = () => {
 
                 {/* Large square chart on the right */}
                 <div className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 flex items-center justify-center rounded-lg col-span-2 row-span-2 h-[38rem]'>
-                    <PredictionsChartComponent
+                    <TurbineComponentHealthScoresComponent
                         type='radar_TurbineModelHealthScores_ByPlant'
                         selectedItem={selectedItem}
                         handleClick={handleItemClick}

@@ -7,8 +7,8 @@ jest.mock('../../Components/Layout/Header', () => ({ title }) => (
   <div data-testid="header">Header: {title}</div>
 ));
 
-// Mock ChartComponent to avoid rendering Recharts internals
-jest.mock('../../Components/ChartComponent', () => ({ type }) => (
+// Mock MaterialComponentOverviewComponent to avoid rendering Recharts internals
+jest.mock('../../Components/MaterialComponentOverviewComponent', () => ({ type }) => (
   <div data-testid={`chart-${type}`}>Chart Type: {type}</div>
 ));
 

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Header from '../Components/Layout/Header';
-import PredictionsChartComponent from '../Components/PredictionsChartComponent';
+import MaterialComponentHealthScoresComponent from '../Components/MaterialComponentHealthScoresComponent';
 import Fuse from 'fuse.js';
 
 import {
@@ -12,7 +12,7 @@ import {
     getMaintenanceForecasts
 } from '../Utils/MaterialDashboardDataHandler';
 
-const MaterialPredictionsDashboard2 = () => {
+const MaterialComponentHealthScoreDashboard = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -149,7 +149,7 @@ const MaterialPredictionsDashboard2 = () => {
                             key={index}
                             className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg h-full min-h-[18rem]"
                         >
-                            <PredictionsChartComponent
+                            <MaterialComponentHealthScoresComponent
                                 type={
                                     index === 0
                                         ? 'bar_MaterialComponentScoreSummary'
@@ -171,7 +171,7 @@ const MaterialPredictionsDashboard2 = () => {
                                 key={index}
                                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[19rem] flex items-center justify-center rounded-lg"
                             >
-                                <PredictionsChartComponent
+                                <MaterialComponentHealthScoresComponent
                                     type={
                                         index === 3
                                             ? 'bar_MaterialCategoryHealthScores'
@@ -188,7 +188,7 @@ const MaterialPredictionsDashboard2 = () => {
                     {/* Large Forecast Table */}
                     <div className="col-span-2 row-span-2 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 h-[38rem] rounded-lg h-full overflow-auto">
                         <div className="min-w-full">
-                            <PredictionsChartComponent
+                            <MaterialComponentHealthScoresComponent
                                 type="table_MaintenanceForecasts"
                                 selectedItem={selectedItem}
                                 handleClick={handleItemClick}
@@ -202,4 +202,4 @@ const MaterialPredictionsDashboard2 = () => {
     );
 };
 
-export default MaterialPredictionsDashboard2;
+export default MaterialComponentHealthScoreDashboard;

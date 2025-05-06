@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Header from '../Components/Layout/Header';
-import ChartComponent from '../Components/ChartComponent';
+import TurbineOverviewComponent from '../Components/TurbineOverviewComponent';
 import Fuse from 'fuse.js';
 import { getPredictionTurbineData } from '../Utils/TurbineDashboardDataHandler';
 
@@ -116,7 +116,7 @@ const TurbineDashboard = () => {
                             key={index}
                             className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg h-full min-h-[18rem]"
                         >
-                            <ChartComponent
+                            <TurbineOverviewComponent
                                 type={
                                     index === 0
                                         ? 'bar_FunctionalLocByRegion'
@@ -138,7 +138,7 @@ const TurbineDashboard = () => {
                                 key={index}
                                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-[20rem] flex items-center justify-center rounded-lg"
                             >
-                                <ChartComponent
+                                <TurbineOverviewComponent
                                     type={
                                         index === 3
                                             ? 'radar_MaintPlant_PlanningPlant_ByPlatform'
@@ -154,7 +154,7 @@ const TurbineDashboard = () => {
 
                     {/* Large chart on the right side */}
                     <div className="col-span-2 row-span-2 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg h-full">
-                        <ChartComponent
+                        <TurbineOverviewComponent
                             type="bubble_TurbinePowerByRegion"
                             selectedItem={selectedItem}
                             handleClick={handleItemClick}

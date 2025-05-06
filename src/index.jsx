@@ -4,15 +4,15 @@ import './index.css';
 import { RouterProvider, createHashRouter } from 'react-router';
 import App from './App';
 import UploadPage from './Pages/Upload';
-import Dashboard from './Pages/Dashboard';
+import MaterialComponentOverviewDashboard from './Pages/MaterialComponentOverviewDashboard';
 import TurbineDashboard from './Pages/TurbineDashboard';
-import MaterialPredictionsDashboard from './Pages/MaterialPredictionsDashboard';
-import MaterialPredictionsDashboard2 from './Pages/MaterialPredictionsDashboard2';
+import MaterialComponentPredictionsDashboard from './Pages/MaterialComponentPredictionsDashboard';
+import MaterialComponentHealthScoreDashboard from './Pages/MaterialComponentHealthScoreDashboard';
 import TurbinePredictionsDashboard from './Pages/TurbinePredictionsDashboard';
 import CategoryClassificationDashboard from './Pages/CategoryClassificationDashboard';
 import Map from './Pages/Map';
 import FaultReport from './Pages/FaultReport';
-import MainPage from './Pages/MainPage';
+import DataOverviewOfComplianceDashboard from './Pages/DataOverviewOfComplianceDashboard';
 
 const router = createHashRouter([
     {
@@ -20,8 +20,8 @@ const router = createHashRouter([
         element: <App />,
         children: [
             {
-                path: '/uploadedDataOverview',
-                element: <MainPage />
+                path: '/DataOverviewOfComplianceDashboard',
+                element: <DataOverviewOfComplianceDashboard />
             },
 
             {
@@ -29,20 +29,20 @@ const router = createHashRouter([
                 element: <UploadPage />
             },
             {
-                path: '/materialDashboard',
-                element: <Dashboard />
+                path: '/MaterialComponentOverviewDashboard',
+                element: <MaterialComponentOverviewDashboard />
             },
             {
                 path: '/turbineDashboard',
                 element: <TurbineDashboard />
             },
             {
-                path: '/materialPredictionsDashboard',
-                element: <MaterialPredictionsDashboard />
+                path: '/MaterialComponentPredictionsDashboard',
+                element: <MaterialComponentPredictionsDashboard />
             },
             {
-                path: '/materialPredictionsDashboard2',
-                element: <MaterialPredictionsDashboard2 />
+                path: '/MaterialComponentHealthScoreDashboard',
+                element: <MaterialComponentHealthScoreDashboard />
             },
             {
                 path: '/turbinePredictionsDashboard',

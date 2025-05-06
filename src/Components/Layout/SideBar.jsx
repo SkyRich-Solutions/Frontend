@@ -20,7 +20,7 @@ const SIDEBAR_ITEMS = [
         name: 'Overview of Compliance',
         icon: BarChart2, // Represents analytics overview
         color: '#9966FF',
-        href: '/uploadedDataOverview'
+        href: '/DataOverviewOfComplianceDashboard'
     },
     {
         name: 'Map Overview',
@@ -32,7 +32,7 @@ const SIDEBAR_ITEMS = [
         name: 'Material Component Overview',
         icon: PackageIcon, // Suits materials/components
         color: '#FFCE56',
-        href: '/materialDashboard'
+        href: '/MaterialComponentOverviewDashboard'
     },
     {
         name: 'Turbine Design Overview',
@@ -44,13 +44,13 @@ const SIDEBAR_ITEMS = [
         name: 'Material Component Predictions',
         icon: TrendingUp, // For predictions/trends
         color: '#4BC04B',
-        href: '/materialPredictionsDashboard'
+        href: '/MaterialComponentPredictionsDashboard'
     },
     {
         name: 'Material Component Health Scores',
         icon: PackageCheckIcon, // Checked package for health
         color: '#008080',
-        href: '/materialPredictionsDashboard2'
+        href: '/MaterialComponentHealthScoreDashboard'
     },
     {
         name: 'Turbine Model Health Scores',

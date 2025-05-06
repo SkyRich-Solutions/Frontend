@@ -4,7 +4,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
-const PieChart = ({ chartData, text, searchQuery }) => {
+const PieChart = ({ chartData, text, searchQuery, infoText }) => {
     const defaultData = {
         labels: ['No Data'],
         datasets: [
@@ -34,7 +34,7 @@ const PieChart = ({ chartData, text, searchQuery }) => {
         }
     };
 
-    // 🧠 Filtering logic (only applied if chartData and searchQuery are valid)
+    // Filtering logic (if chartData and searchQuery are valid)
     const filteredData = React.useMemo(() => {
         if (!chartData || !searchQuery) return chartData;
 
@@ -66,7 +66,24 @@ const PieChart = ({ chartData, text, searchQuery }) => {
         };
     }, [chartData, searchQuery]);
 
-    return <Pie data={filteredData || defaultData} options={options} />;
+    return (
+        <div className="relative w-full h-full flex items-center justify-center">
+            {/* Info Icon */}
+            {infoText && (
+                <div className="absolute top-2 right-2 group cursor-pointer z-10">
+                    <span className="text-gray-500">ℹ️</span>
+                    <div className="absolute hidden group-hover:block bg-gray-800 text-gray-100 p-2 rounded shadow text-sm border border-gray-600 w-64 top-6 right-0 z-20 overflow-y-auto max-h-40">
+                        {infoText.split('\n').map((line, idx) => (
+                            <p key={idx} className="mb-1">{line}</p>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Chart */}
+            <Pie data={filteredData || defaultData} options={options} />
+        </div>
+    );
 };
 
 export default PieChart;

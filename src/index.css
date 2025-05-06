@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.recharts-bar .recharts-rectangle,
+.recharts-bar rect,
+.recharts-bar-rectangle,
+.recharts-rectangle,
+.recharts-bar-rectangle:hover,
+.recharts-rectangle:hover,
+.recharts-bar rect:hover {
+    filter: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    stroke: none !important;
+    fill-opacity: 1 !important;
+    transition: none !important;
+}
+svg rect {
+    filter: none !important;
+    stroke: none !important;
+}

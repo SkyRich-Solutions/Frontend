@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import MainPage from '../MainPage';
+import DataOverviewOfComplianceDashboard from '../DataOverviewOfComplianceDashboard';
 
-// Mock Header and PieChart to isolate MainPage logic
+// Mock Header and PieChart to isolate DataOverviewOfComplianceDashboard logic
 jest.mock('../../Components/Layout/Header', () => ({ title }) => (
   <div data-testid="header">Header: {title}</div>
 ));
@@ -11,14 +11,14 @@ jest.mock('../../Components/ReUseable/PieChart', () => ({ text }) => (
   <div data-testid="pie-chart">{text}</div>
 ));
 
-describe('MainPage', () => {
+describe('DataOverviewOfComplianceDashboard', () => {
   it('renders the Header with correct title', () => {
-    render(<MainPage />);
+    render(<DataOverviewOfComplianceDashboard />);
     expect(screen.getByTestId('header')).toHaveTextContent('Overview');
   });
 
   it('renders all PieChart components with correct labels', () => {
-    render(<MainPage />);
+    render(<DataOverviewOfComplianceDashboard />);
     const pieCharts = screen.getAllByTestId('pie-chart');
     expect(pieCharts).toHaveLength(6);
 
