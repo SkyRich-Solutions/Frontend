@@ -12,7 +12,8 @@ const routeTitles = {
     '/turbinePredictionsDashboard': 'Turbine Predictions Dashboard',
     '/categoryClassificationDashboard': 'Category Classification Dashboard',
     '/map': 'Map Overview',
-    '/fault-report': 'Fault Report'
+    '/fault-report': 'Fault Report',
+    '/': 'Start Page',
 };
 
 export default function RouteTitleManager() {
