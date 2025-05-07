@@ -1,8 +1,6 @@
-"use client"
-
 import { useState, useMemo, useEffect, useRef } from "react"
 import Header from "../Components/Layout/Header"
-import ChartComponent from "../Components/ChartComponent"
+import TurbineOverviewComponent from "../Components/TurbineOverviewComponent"
 import Fuse from "fuse.js"
 import { getPredictionTurbineData } from "../Utils/TurbineDashboardDataHandler"
 
@@ -123,7 +121,7 @@ const TurbineDashboard = () => {
               key={index}
               className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg h-[calc(33vh-2.5rem)]"
             >
-              <ChartComponent
+              <TurbineOverviewComponent
                 type={
                   index === 0
                     ? "bar_FunctionalLocByRegion"
@@ -132,7 +130,7 @@ const TurbineDashboard = () => {
                       : "donut_TurbineCountByManufacturer"
                 }
                 selectedItem={selectedItem}
-                handleClick={handleItemClick}
+                onItemClick={handleItemClick}
                 searchQuery={searchQuery}
               />
             </div>
@@ -145,12 +143,12 @@ const TurbineDashboard = () => {
                 key={index}
                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex-1 flex items-center justify-center rounded-lg"
               >
-                <ChartComponent
+                <TurbineOverviewComponent
                   type={
                     index === 3 ? "radar_MaintPlant_PlanningPlant_ByPlatform" : "line_CumulativeTurbineCount_ByPlatform"
                   }
                   selectedItem={selectedItem}
-                  handleClick={handleItemClick}
+                  onItemClick={handleItemClick}
                   searchQuery={searchQuery}
                 />
               </div>
@@ -159,10 +157,10 @@ const TurbineDashboard = () => {
 
           {/* Large chart on the right side - consistent spacing */}
           <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg col-span-1 md:col-span-2 h-[calc(66vh-5rem)]">
-            <ChartComponent
+            <TurbineOverviewComponent
               type="bubble_TurbinePowerByRegion"
               selectedItem={selectedItem}
-              handleClick={handleItemClick}
+              onItemClick={handleItemClick}
               searchQuery={searchQuery}
             />
           </div>

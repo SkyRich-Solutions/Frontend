@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import ChartComponent from '../ChartComponent';
+import MaterialComponentOverviewComponent from '../MaterialComponentOverviewComponent';
 import TurbineData from '../../MockData/TurbineData.json';
 import '@testing-library/jest-dom';
 
@@ -21,9 +21,9 @@ jest.mock('recharts', () => {
   };
 });
 
-describe('ChartComponent', () => {
+describe('MaterialComponentOverviewComponent', () => {
   it('renders a bar chart when type is "bar"', () => {
-    render(<ChartComponent type="bar" />);
+    render(<MaterialComponentOverviewComponent type="bar" />);
     expect(screen.getByTestId('responsive-container')).toBeInTheDocument();
     expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
     expect(screen.getByTestId('bar')).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe('ChartComponent', () => {
   });
 
   it('renders a line chart when type is "line"', () => {
-    render(<ChartComponent type="line" />);
+    render(<MaterialComponentOverviewComponent type="line" />);
     expect(screen.getByTestId('responsive-container')).toBeInTheDocument();
     expect(screen.getByTestId('line-chart')).toBeInTheDocument();
     expect(screen.getByTestId('line')).toBeInTheDocument();
@@ -45,7 +45,7 @@ describe('ChartComponent', () => {
   });
 
   it('renders nothing if type is not specified', () => {
-    const { container } = render(<ChartComponent />);
+    const { container } = render(<MaterialComponentOverviewComponent />);
     expect(container.firstChild).toBeNull();
   });
 

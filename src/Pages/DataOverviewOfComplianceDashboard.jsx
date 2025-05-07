@@ -137,4 +137,4 @@ const DataOverviewOfComplianceDashboard = () => {
     );
 };
 
-export default MainPage;
+export default DataOverviewOfComplianceDashboard;

@@ -1,8 +1,6 @@
-"use client"
-
 import { useState, useMemo, useEffect, useRef } from "react"
 import Header from "../Components/Layout/Header"
-import PredictionsChartComponent from "../Components/PredictionsChartComponent"
+import TurbineComponentHealthScoresComponent from "../Components/TurbineComponentHealthScoresComponent"
 import Fuse from "fuse.js"
 import {
   getTurbineModelHealthScores,
@@ -21,22 +19,26 @@ const TurbinePredictionsDashboard = () => {
   const [TurbinePlatformHealthScores, setTurbinePlatformHealthScores] = useState([])
   const [TurbinePlatformScoreSummary, setTurbinePlatformScoreSummary] = useState([])
 
-  const handleItemClick = (item) => {
-    setSelectedItem(item)
-  }
+    const handleItemClick = (item) => {
+        setSelectedItem(prev => (prev === item ? null : item));
+    };
+    
+    const searchWrapperRef = useRef(null);
+    const chartContainerRef = useRef(null);
 
-  const searchWrapperRef = useRef(null)
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchWrapperRef.current && !searchWrapperRef.current.contains(event.target)) {
-        setShowSuggestions(false)
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    useEffect(() => {
+        const handleOutsideClick = (e) => {
+            if (chartContainerRef.current && !chartContainerRef.current.contains(e.target)) {
+                setSelectedItem(null); // Clear selection
+            }
+        };
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => {
+            document.removeEventListener('mousedown', handleOutsideClick);
+        };
+    }, []);
+    
 
   useEffect(() => {
     const fetchData = async () => {
@@ -140,7 +142,7 @@ const TurbinePredictionsDashboard = () => {
               key={index}
               className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg flex items-center justify-center h-[calc(33vh-2.5rem)]"
             >
-              <PredictionsChartComponent
+              <TurbineComponentHealthScoresComponent
                 type={
                   index === 0
                     ? "bar_TurbineModelHealthScores"
@@ -149,7 +151,7 @@ const TurbinePredictionsDashboard = () => {
                       : "bar_TurbineModelScoreSummary"
                 }
                 selectedItem={selectedItem}
-                handleClick={handleItemClick}
+                onItemClick={handleItemClick}
                 searchQuery={searchQuery}
               />
             </div>
@@ -162,10 +164,10 @@ const TurbinePredictionsDashboard = () => {
                 key={index}
                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg flex-1 flex items-center justify-center"
               >
-                <PredictionsChartComponent
+                <TurbineComponentHealthScoresComponent
                   type={index === 3 ? "bubble_PlatformHealthScores" : "bar_TurbinePlatformScoreSummary"}
                   selectedItem={selectedItem}
-                  handleClick={handleItemClick}
+                  onItemClick={handleItemClick}
                   searchQuery={searchQuery}
                 />
               </div>
@@ -174,10 +176,10 @@ const TurbinePredictionsDashboard = () => {
 
           {/* Large square chart - spans 2 columns on larger screens */}
           <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg flex items-center justify-center col-span-1 md:col-span-2 h-[calc(66vh-5rem)]">
-            <PredictionsChartComponent
+            <TurbineComponentHealthScoresComponent
               type="radar_TurbineModelHealthScores_ByPlant"
               selectedItem={selectedItem}
-              handleClick={handleItemClick}
+              onItemClick={handleItemClick}
               searchQuery={searchQuery}
             />
           </div>

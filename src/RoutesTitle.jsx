@@ -3,12 +3,12 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 const routeTitles = {
-    '/uploadedDataOverview': 'Overview of Compliance',
+    '/DataOverviewOfComplianceDashboard': 'Overview of Compliance Dashboard',
     '/upload': 'Upload Page',
-    '/materialDashboard': 'Dashboard',
+    '/MaterialComponentOverviewDashboard': 'Material Component Overview Dashboard',
     '/turbineDashboard': 'Turbine Dashboard',
-    '/materialPredictionsDashboard': 'Material Predictions Dashboard',
-    '/materialPredictionsDashboard2': 'Material Predictions Dashboard 2',
+    '/MaterialComponentPredictionsDashboard': 'Material Component Predictions Dashboard',
+    '/MaterialComponentHealthScoreDashboard': 'Material Component Health Score Dashboard',
     '/turbinePredictionsDashboard': 'Turbine Predictions Dashboard',
     '/categoryClassificationDashboard': 'Category Classification Dashboard',
     '/map': 'Map Overview',
