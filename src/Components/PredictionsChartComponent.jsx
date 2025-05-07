@@ -513,44 +513,53 @@ const PredictionsChartComponent = ({ type, searchQuery, selectedItem, onItemClic
     }
 
 
-    if (type === 'table_MaterialPredictions') {
+    if (type === "table_MaterialPredictions") {
         return (
-            <div className="w-full h-full overflow-y-auto">
-                <table className="min-w-full table-auto text-sm text-gray-300">
-                    <thead className="bg-gray-700">
-                        <tr>
-                            <th className="px-4 py-2">Material ID</th>
-                            <th className="px-4 py-2">A9B Number</th>
-                            <th className="px-4 py-2">Category</th>
-                            <th className="px-4 py-2">Description</th>
-                            <th className="px-4 py-2">Batch Managed</th>
-                            <th className="px-4 py-2">Future Replacement Probability</th>
-                            <th className="px-4 py-2">Total Replacements</th>
-                            <th className="px-4 py-2">Total Usage</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredMaterialPredictions.map((item, index) => (
-                            <tr
-                                key={index}
-                                className={`cursor-pointer ${(item.Material_Description === selectedItem) ? 'bg-yellow-600' : (index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900')
-                                    }`}
-                                onClick={() => handleClick(item)}
-                            >
-                                <td className="px-4 py-2">{item.Material_ID}</td>
-                                <td className="px-4 py-2">{item.Material_A9B_Number}</td>
-                                <td className="px-4 py-2">{item.MaterialCategory}</td>
-                                <td className="px-4 py-2">{item.Material_Description}</td>
-                                <td className="px-4 py-2">{item.Is_Batch_Managed ? 'Yes' : 'No'}</td>
-                                <td className="px-4 py-2">{(item.Future_Replacement_Probability * 100).toFixed(2)}%</td>
-                                <td className="px-4 py-2">{item.TotalReplacementCount}</td>
-                                <td className="px-4 py-2">{item.TotalUsageCount}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+          <div className="w-full h-full">
+            <div className="overflow-x-auto">
+              <table className="w-full table-auto text-sm text-gray-300">
+                <thead className="bg-gray-700 sticky top-0">
+                  <tr>
+                    <th className="px-4 py-2 whitespace-nowrap">Material ID</th>
+                    <th className="px-4 py-2 whitespace-nowrap">A9B Number</th>
+                    <th className="px-4 py-2 whitespace-nowrap">Category</th>
+                    <th className="px-4 py-2 whitespace-nowrap">Description</th>
+                    <th className="px-4 py-2 whitespace-nowrap">Batch Managed</th>
+                    <th className="px-4 py-2 whitespace-nowrap">Future Replacement Probability</th>
+                    <th className="px-4 py-2 whitespace-nowrap">Total Replacements</th>
+                    <th className="px-4 py-2 whitespace-nowrap">Total Usage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredMaterialPredictions.map((item, index) => (
+                    <tr
+                      key={index}
+                      className={`cursor-pointer ${
+                        item.Material_Description === selectedItem
+                          ? "bg-yellow-600"
+                          : index % 2 === 0
+                            ? "bg-gray-800"
+                            : "bg-gray-900"
+                      }`}
+                      onClick={() => handleClick(item)}
+                    >
+                      <td className="px-4 py-2 whitespace-nowrap">{item.Material_ID}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{item.Material_A9B_Number}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{item.MaterialCategory}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{item.Material_Description}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{item.Is_Batch_Managed ? "Yes" : "No"}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        {(item.Future_Replacement_Probability * 100).toFixed(2)}%
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap">{item.TotalReplacementCount}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{item.TotalUsageCount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-        );
+          </div>
+        )
     }
 
 
