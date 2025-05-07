@@ -23,7 +23,7 @@ const COLORS = [
 ];
 
 
-const TurbineOverviewComponent = ({ type, searchQuery = '', selectedItem, handleClick }) => {
+const TurbineOverviewComponent = ({ type, searchQuery = '', selectedItem, onItemClick }) => {
 
     const [TurbineData, setTurbineData] = useState([]);
 
@@ -74,6 +74,7 @@ const TurbineOverviewComponent = ({ type, searchQuery = '', selectedItem, handle
         }
         return null;
     };
+    
 
     return (
         <div className="w-full h-full relative">
@@ -99,7 +100,7 @@ const TurbineOverviewComponent = ({ type, searchQuery = '', selectedItem, handle
                         margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
                         onClick={(e) => {
                             if (e && e.activeLabel) {
-                                handleClick(e.activeLabel);
+                                onItemClick(e.activeLabel);
                             }
                         }}
                     >
@@ -212,7 +213,7 @@ if (type === 'scatter_TurbinePowerVsHubHeight') {
                         margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
                         onClick={(e) => {
                             if (e && e.activePayload?.[0]?.payload?.turbine) {
-                                handleClick(e.activePayload[0].payload.turbine);
+                                onItemClick(e.activePayload[0].payload.turbine);
                             }
                         }}
                     >
@@ -248,7 +249,7 @@ if (type === 'scatter_TurbinePowerVsHubHeight') {
                                             filter: isSelected ? 'drop-shadow(0 0 6px #00ffff)' : 'none',
                                             cursor: 'pointer'
                                         }}
-                                        onClick={() => handleClick(isSelected ? null : entry.turbine)}
+                                        onClick={() => onItemClick(isSelected ? null : entry.turbine)}
                                     />
                                 );
                             })}
@@ -311,7 +312,7 @@ if (type === 'donut_TurbineCountByManufacturer') {
                     <PieChart
                         onClick={(e) => {
                             if (e && e.activeLabel) {
-                                handleClick(e.activeLabel);
+                                onItemClick(e.activeLabel);
                             }
                         }}
                     >
@@ -335,7 +336,7 @@ if (type === 'donut_TurbineCountByManufacturer') {
                                         strokeWidth={isSelected ? 2 : 0}
                                         opacity={selectedItem && !isSelected ? 0.3 : 1}
                                         style={isSelected ? { filter: 'drop-shadow(0 0 6px #00ffff)' } : {}}
-                                        onClick={() => handleClick(isSelected ? null : entry.manufacturer)}
+                                        onClick={() => onItemClick(isSelected ? null : entry.manufacturer)}
                                     />
                                 );
                             })}
@@ -386,7 +387,7 @@ if (type === 'radar_MaintPlant_PlanningPlant_ByPlatform') {
     };
 
     const handleClickRadar = (platform) => {
-    handleClick(prev => (prev === platform ? null : platform));
+        onItemClick(prev => (prev === platform ? null : platform));
     };
 
     return (
@@ -535,7 +536,7 @@ if (type === 'line_CumulativeTurbineCount_ByPlatform') {
                         margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
                         onClick={(e) => {
                             if (e?.activeLabel) {
-                                handleClick(e.activeLabel);
+                                onItemClick(e.activeLabel);
                             }
                         }}
                     >
@@ -650,7 +651,7 @@ if (type === 'bubble_TurbinePowerByRegion') {
                         margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
                         onClick={(e) => {
                             if (e && e.activePayload?.[0]?.payload?.region) {
-                                handleClick(e.activePayload[0].payload.region);
+                                onItemClick(e.activePayload[0].payload.region);
                             }
                         }}
                     >
@@ -695,7 +696,7 @@ if (type === 'bubble_TurbinePowerByRegion') {
                                         }}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleClick(isSelected ? null : entry.region);
+                                            onItemClick(isSelected ? null : entry.region);
                                         }}
                                     />
                                 );

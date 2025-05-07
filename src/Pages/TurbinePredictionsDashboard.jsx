@@ -15,21 +15,25 @@ const TurbinePredictionsDashboard = () => {
     const [TurbinePlatformScoreSummary, setTurbinePlatformScoreSummary] = useState([]);
 
     const handleItemClick = (item) => {
-        setSelectedItem(item);
+        setSelectedItem(prev => (prev === item ? null : item));
     };
-
+    
     const searchWrapperRef = useRef(null);
+    const chartContainerRef = useRef(null);
+
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (searchWrapperRef.current && !searchWrapperRef.current.contains(event.target)) {
-                setShowSuggestions(false);
+        const handleOutsideClick = (e) => {
+            if (chartContainerRef.current && !chartContainerRef.current.contains(e.target)) {
+                setSelectedItem(null); // Clear selection
             }
         };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => {
+            document.removeEventListener('mousedown', handleOutsideClick);
+        };
     }, []);
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -79,7 +83,7 @@ const TurbinePredictionsDashboard = () => {
         ? fuse.search(searchQuery).map(res => res.item).slice(0, 5)
         : [];
     return (
-        <div className="flex flex-col h-screen w-screen bg-gray-950 pb-4 overflow-hidden">
+        <div className="flex flex-col h-screen w-screen bg-gray-950 pb-4 overflow-hidden ref={chartContainerRef}">
             <div className="flex justify-between items-center px-6 py-4 bg-gray-900 bg-opacity-90 z-10 relative">
                 <Header title="Turbine Model Health Scores" />
                 <div className="relative w-1/2 max-w-md" ref={searchWrapperRef}>
