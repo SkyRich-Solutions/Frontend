@@ -13,6 +13,8 @@ import CategoryClassificationDashboard from './Pages/CategoryClassificationDashb
 import Map from './Pages/Map';
 import FaultReport from './Pages/FaultReport';
 import MainPage from './Pages/MainPage';
+import 'leaflet/dist/leaflet.css';
+
 
 const router = createHashRouter([
     {
