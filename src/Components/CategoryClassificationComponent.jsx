@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Pie, Cell, PieChart
 } from 'recharts';
@@ -53,7 +53,6 @@ const materialStatusMap = {
 
 const CategoryClassificationComponent = ({
     type,
-    refreshKey,
     setRefreshKey,
     editingUnlocked,
     setEditingUnlocked,
@@ -61,74 +60,73 @@ const CategoryClassificationComponent = ({
     setSelectedRows,
     selectedCategory,
     setSelectedCategory,
-    searchQuery
+    data, 
+    onSave 
 }) => {
-    const [MaterialCategoryClassificationsData, setMaterialCategoryClassificationsData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('All');
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [isReclassifying, setIsReclassifying] = useState(false);
     const [selectedRowCategoryMap, setSelectedRowCategoryMap] = useState({});
 
-
-    
-
-    const fetchData = async () => {
-        try {
-            const categoryData = await getProcessedCategoryData();
-            console.log('Fetched category data in component:', categoryData);
-            setMaterialCategoryClassificationsData(categoryData);
-        } catch (error) {
-            console.error('Error fetching category data:', error);
-        }
-    };
-    
-    useEffect(() => {
-        fetchData();
-    }, [refreshKey]);;
-
-     // Normalize search query
-    const query = searchQuery.toLowerCase();
-
     // Apply search filter to material data (search across multiple fields)
-    const filteredMaterialCategoryClassificationsData = MaterialCategoryClassificationsData.filter((item) =>
-        [item.Material, item.MaterialCategory, item.Plant, item.PlantSpecificMaterialStatus]
-            .some(field => field?.toString().toLowerCase().includes(query))
-    );
+    const filteredMaterialCategoryClassificationsData = useMemo(() => {
+        return data ?? [];
+      }, [data]);
+      
 
     const filteredData = useMemo(() => {
         if (selectedFilter === 'All') return filteredMaterialCategoryClassificationsData;
+        if (selectedFilter === 'Unclassified') {
+            return filteredMaterialCategoryClassificationsData.filter(
+                item => item.MaterialCategory === 'Unclassified'
+            );
+        }
+        if (selectedFilter === 'Newly Discovered') {
+            return filteredMaterialCategoryClassificationsData.filter(
+                item => item.NewlyDiscovered === 1 || item.NewlyDiscovered === true
+            );
+        }
         return filteredMaterialCategoryClassificationsData.filter(
             item => item.MaterialCategory === selectedFilter
         );
-    }, [filteredMaterialCategoryClassificationsData, selectedFilter]);
+    }, [filteredMaterialCategoryClassificationsData, selectedFilter]);    
 
     const cumulativeData = useMemo(() => {
         let unclassifiedCount = 0;
         let newlyDiscoveredCount = 0;
         return filteredMaterialCategoryClassificationsData.map((item, index) => {
             if (item.MaterialCategory === 'Unclassified') unclassifiedCount++;
-            if (item.MaterialCategory === 'Newly Discovered') newlyDiscoveredCount++;
-            return { index: index + 1, Unclassified: unclassifiedCount, NewlyDiscovered: newlyDiscoveredCount };
+            if (item.NewlyDiscovered === 1 || item.NewlyDiscovered === true) newlyDiscoveredCount++;
+            return {
+                index: index + 1,
+                Unclassified: unclassifiedCount,
+                NewlyDiscovered: newlyDiscoveredCount
+            };
         });
-    }, [filteredMaterialCategoryClassificationsData]);
+    }, [filteredMaterialCategoryClassificationsData]);    
 
     const unclassifiedCount = useMemo(() =>
         filteredMaterialCategoryClassificationsData.filter(item => item.MaterialCategory === 'Unclassified').length
     , [filteredMaterialCategoryClassificationsData]);
 
     const newlyDiscoveredCount = useMemo(() =>
-        filteredMaterialCategoryClassificationsData.filter(item => item.MaterialCategory === 'Newly Discovered').length
-    , [filteredMaterialCategoryClassificationsData]);
+        filteredMaterialCategoryClassificationsData.filter(item =>
+            item.NewlyDiscovered === 1 || item.NewlyDiscovered === true
+        ).length
+    , [filteredMaterialCategoryClassificationsData]);    
 
     const uniqueCategories = useMemo(() => {
         const set = new Set();
         filteredMaterialCategoryClassificationsData.forEach(item => {
             const category = item.MaterialCategory || 'Unknown';
-            set.add(category);
+            if (category !== 'Unclassified' && category !== 'Newly Discovered') {
+                set.add(category);
+            }
         });
         return Array.from(set);
     }, [filteredMaterialCategoryClassificationsData]);
+    
 
     const toggleRowSelection = (item) => {
         const key = `${item.Material}-${item.Plant}`;
@@ -164,7 +162,9 @@ const CategoryClassificationComponent = ({
             selectedCategory,
             rows: selectedRows.map(row => ({
                 Material: row.Material,
-                Plant: row.Plant
+                Plant: row.Plant,
+                NewlyDiscovered: 0, // Explicitly reset
+                Auto_Classified: 0  // Explicitly reset
             }))
         };
     
@@ -175,25 +175,19 @@ const CategoryClassificationComponent = ({
     
         try {
             await axios.post('http://localhost:4000/api/updateMaterialCategories', payload);
-    
-            await axios.post('http://localhost:4000/api/run-python-human-in-the-loop');
-    
             setSelectedRows([]);
             setSelectedCategory(null);
             setEditingUnlocked(false);
             setSuccessMessage('Categories saved and synced successfully!');
-    
-            setTimeout(() => {
-                setSuccessMessage('');
-                setRefreshKey(prev => prev + 1);
-            }, 3000);
+
+            if (onSave) onSave(); // ✅ Let the parent dashboard handle refresh
         } catch (err) {
             console.error("Update error:", err);
             alert(err.response?.data?.message || 'Failed to update material categories.');
         } finally {
             setLoading(false);
         }
-    };
+    };    
     
 
     const handleReclassification = async () => {
@@ -208,6 +202,7 @@ const CategoryClassificationComponent = ({
             setIsReclassifying(false);
         }
     };
+    
     
     if (type === 'table_MaterialCategoryClassificationsData') {
         return (
@@ -315,6 +310,7 @@ const CategoryClassificationComponent = ({
                             <th className="px-4 py-2 text-left">Replacement Part</th>
                             <th className="px-4 py-2 text-left">Material Category</th>
                             <th className="px-4 py-2 text-left">Auto Classified</th>
+                            <th className="px-4 py-2 text-left">Newly Discovered</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -346,6 +342,7 @@ const CategoryClassificationComponent = ({
                                 <td className="px-4 py-2">{item.ReplacementPart}</td>
                                 <td className="px-4 py-2">{item.MaterialCategory}</td>
                                 <td className="px-4 py-2">{item.Auto_Classified}</td>
+                                <td className="px-4 py-2">{item.NewlyDiscovered ? 'Yes' : 'No'}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -447,8 +444,9 @@ const CategoryClassificationComponent = ({
             return null;
         };
 
-        const categoryCounts = (filteredData  ?? []).reduce((acc, item) => {
-            const category = item.MaterialCategory || 'Unclassified';
+        const categoryCounts = (filteredData ?? []).reduce((acc, item) => {
+            const isNewlyDiscovered = item.NewlyDiscovered === 1 || item.NewlyDiscovered === true;
+            const category = isNewlyDiscovered ? 'Newly Discovered' : (item.MaterialCategory || 'Unclassified');
             acc[category] = (acc[category] || 0) + 1;
             return acc;
         }, {});
@@ -480,34 +478,44 @@ const CategoryClassificationComponent = ({
                         </p>
                     </div>
                 </div>
-                <h2 className="text-lg text-white mb-4">Material Category Overview</h2>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="90%" height="90%">
                     <PieChart>
-                            <Pie
-                            data={donutData}
-                            dataKey="value"
-                            nameKey="name"
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={50}
-                            outerRadius={80}
-                            paddingAngle={3}
-                            label
-                            onClick={(data) => setSelectedCategory(data.name)}
-                            >
-                            {donutData.map((entry, index) => (
-                                <Cell
-                                    key={`cell-${index}`}
-                                    fill={COLORS[index % COLORS.length]}
-                                    stroke={selectedCategory === entry.name ? '#00ffff' : 'none'}
-                                    strokeWidth={selectedCategory === entry.name ? 3 : 1}
-                                />
-                            ))}
+                        <Pie
+                        data={donutData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%" // Shift pie left to make room for legend
+                        cy="50%"
+                        innerRadius="40%"
+                        outerRadius="60%"
+                        paddingAngle={3}
+                        label
+                        onClick={(data) => setSelectedCategory(data.name)}
+                        >
+                        {donutData.map((entry, index) => (
+                            <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                            stroke={selectedCategory === entry.name ? '#00ffff' : 'none'}
+                            strokeWidth={selectedCategory === entry.name ? 3 : 1}
+                            />
+                        ))}
                         </Pie>
-                        <Tooltip content={<CustomTooltipDonutMaterialCategorySummary />} /> 
-                        <Legend verticalAlign="bottom" height={90} />
+                        <Tooltip content={<CustomTooltipDonutMaterialCategorySummary />} />
+                        <Legend
+                        layout="vertical"
+                        align="right"
+                        verticalAlign="middle"
+                        wrapperStyle={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            paddingRight: 5,
+                            maxHeight: '100%',
+                        }}
+                        />
                     </PieChart>
-                </ResponsiveContainer>
+                    </ResponsiveContainer>
             </div>
         );
     }
