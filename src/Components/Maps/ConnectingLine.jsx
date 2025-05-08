@@ -47,6 +47,7 @@ const ConnectionLine = ({ origin, destination }) => {
                     const route = result.routes[0];
                     const leg = route.legs[0];
                     const distance = leg.distance.text;
+                    const duration = leg.duration.text; // Get the driving time
                     const path = route.overview_path;
 
                     const totalLength =
@@ -82,9 +83,27 @@ const ConnectionLine = ({ origin, destination }) => {
 
                     const infoWindow = new window.google.maps.InfoWindow({
                         content: `
-                            <div class="p-2 bg-black bg-opacity-75 text-white rounded-lg shadow-lg text-sm font-medium flex items-center justify-center">
-                                <span class="mr-2">📏</span><span>Distance: ${distance}</span>
+                            <div class="flex flex-col p-3 bg-white rounded-lg shadow-xl border border-gray-200 min-w-[160px]">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="text-sm font-semibold text-gray-700">Route Details</div>
+                                <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
                             </div>
+                            <div class="flex items-center space-x-2 text-gray-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                </svg>
+                                <span class="font-medium">${distance}</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-gray-800 mt-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                </svg>
+                                <span class="font-medium">${duration}</span>
+                            </div>
+                            <div class="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500">
+                                Estimated driving distance and time
+                            </div>
+                        </div>
                         `,
                         position: midpoint
                     });
