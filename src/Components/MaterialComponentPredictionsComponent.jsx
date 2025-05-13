@@ -661,11 +661,12 @@ if (type === 'bar_ReplacementPrediction') {
                         <thead className="bg-gray-700">
                             <tr>
                                 <th className="px-2 py-2 text-left w-20">Material</th>
-                                <th className="px-2 py-2 text-left w-48">Description</th>
-                                <th className="px-2 py-2 text-left w-28">Prev Status</th>
+                                <th className="px-2 py-2 text-left w-44">Description</th>
+                                <th className="px-2 py-2 text-left w-24">Prev Status</th>
                                 <th className="px-2 py-2 text-left w-24">Plant</th>
-                                <th className="px-2 py-2 text-left w-32">Current Status</th>
+                                <th className="px-2 py-2 text-left w-24">Current Status</th>
                                 <th className="px-2 py-2 text-left w-24">Transitions</th>
+                                <th className="px-2 py-2 text-left w-24">Transition Probability </th>
                                 <th className="px-2 py-2 text-left w-24">Direction</th>
                             </tr>
                         </thead>
@@ -682,12 +683,13 @@ if (type === 'bar_ReplacementPrediction') {
                                         className={`cursor-pointer ${isSelected ? 'bg-cyan-700 text-white' : index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900'}`}
                                         onClick={() => onItemClick(isSelected ? null : (item.Description || item.Material || item.PlantSpecificMaterialStatus))}
                                     >
-                                        <td className="px-4 py-2">{item.Material}</td>
+                                        <td className="px-4 py-2 ">{item.Material}</td>
                                         <td className="px-4 py-2">{item.Description}</td>
                                         <td className="px-4 py-2">{item.PrevStatus}</td>
                                         <td className="px-4 py-2">{item.Plant}</td>
                                         <td className="px-4 py-2">{item.PlantSpecificMaterialStatus}</td>
                                         <td className="px-4 py-2">{item.TransitionCount}</td>
+                                        <td className="px-4 py-2">{item.TransitionProbability}</td>
                                         <td className="px-4 py-2 flex items-center justify-center">
                                             {item.Direction === 'left' && <ArrowLeft className="text-red-500" size={20} />}
                                             {item.Direction === 'right' && <ArrowRight className="text-green-500" size={20} />}
