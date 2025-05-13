@@ -56,13 +56,13 @@ const router = createHashRouter([
             {
                 path: '/fault-report',
                 element: <FaultReport />
-            }, 
+            },
             {
                 path: '/categoryClassificationDashboard',
                 element: <CategoryClassificationDashboard />
             },
             {
-                path:'/',
+                path: '/',
                 element: <StartPage />
             }
         ]

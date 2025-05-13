@@ -1,23 +1,43 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import Header from '../Components/Layout/Header';
+import Loader from '../Components/ReUseable/Loader';
+import Pagination from '../Components/ReUseable/Pagination';
 import {
     CircleAlertIcon,
     CircleCheckBigIcon,
     WandSparklesIcon
 } from 'lucide-react';
-// import DiscrepancyCounter from '../Components/DiscrepancyCounter';
 
 const UploadPage = () => {
+    const rowsPerPage = 18;
     const [file, setFile] = useState(null);
-    const [fileType, setFileType] = useState(null); // 'material' or 'turbine'
+    const [fileType, setFileType] = useState(null);
     const [response, setResponse] = useState(null);
-    const [error, setError] = useState(null);
     const [output, setOutput] = useState('');
     const [UnprocessedData, setUnprocessedData] = useState([]);
+    const [UnProcessedPage, setUnProcessedPage] = useState(1);
     const [ProcessedData, setProcessedData] = useState([]);
-    const [loadingProgress, setLoadingProgress] = useState(0);
-    const [Loading, setLoading] = useState(false);
+    const [ProcessedPage, setProcessedPage] = useState(1);
+
+    const [Uploading, setUploading] = useState(false);
+    const [Cleaning, setCleaning] = useState(false);
+    const [error, setError] = useState(null);
+
+    const headerMap = {
+        // Material
+
+        ViolationReplacementPart: 'Violation (Part)',
+        UnknownMaintPlant: 'Maint. Plant Unknown',
+        UnknownPlanningPlant: 'Planning Plant Unknown',
+        UnknownLocation: 'Location Unknown',
+        PlantSpecificMaterialStatus: 'Status',
+        BatchManagementPlant: 'Batch Managed',
+        Serial_No_Profile: ' Serial No. Profile',
+        ReplacementPart: 'Replacement Part',
+        UsedInSBom: 'Used in S-BOM'
+
+        // Add more mappings as needed
+    };
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -47,6 +67,9 @@ const UploadPage = () => {
         const formData = new FormData();
         formData.append('file', file);
 
+        setUploading(true);
+        setCleaning(false); // Prevent accidental overlap
+
         try {
             const res = await axios.post(
                 'http://localhost:4000/api/uploadFile',
@@ -58,6 +81,8 @@ const UploadPage = () => {
         } catch (err) {
             setError(err.response?.data?.message || 'An error occurred.');
             setResponse(null);
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -66,15 +91,19 @@ const UploadPage = () => {
             const tryFetch = async (type) => {
                 const apiPrefix = type === 'material' ? 'Material' : 'Turbine';
                 const [unprocessedRes, processedRes] = await Promise.all([
-                    axios.get(`http://localhost:4000/api/fetch_Unprocessed${apiPrefix}Data`),
-                    axios.get(`http://localhost:4000/api/fetch_Processed${apiPrefix}Data`)
+                    axios.get(
+                        `http://localhost:4000/api/fetch_Unprocessed${apiPrefix}Data`
+                    ),
+                    axios.get(
+                        `http://localhost:4000/api/fetch_Processed${apiPrefix}Data`
+                    )
                 ]);
                 setFileType(type); // Set detected type
                 setUnprocessedData(unprocessedRes.data.data);
                 setProcessedData(processedRes.data.data);
                 console.log(processedRes.data.data);
             };
-    
+
             if (fileType) {
                 await tryFetch(fileType);
             } else {
@@ -90,28 +119,20 @@ const UploadPage = () => {
             console.error(err);
         }
     };
-    
 
     const handleRunScript = async () => {
-        setLoading(true);
-        setLoadingProgress(0);
+        setCleaning(true);
+        setUploading(false); // Prevent overlap
         setError(null);
         setOutput('');
-    
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += 10;
-            setLoadingProgress(progress);
-            if (progress >= 100) clearInterval(interval);
-        }, 200);
-    
+
         try {
             const response = await axios.post(
                 'http://localhost:4000/api/run-python-both',
                 {},
                 { withCredentials: true }
             );
-    
+
             if (response.data) {
                 await fetchData();
                 setOutput('Data cleaned successfully ✅');
@@ -123,22 +144,29 @@ const UploadPage = () => {
             setError('Error running both scripts.');
         } finally {
             setTimeout(() => {
-                setLoading(false);
-                setLoadingProgress(100);
+                setCleaning(false);
             }, 2000);
         }
     };
-    
-    
+
+    // Paginated slices
+    const paginatedUnprocessed = UnprocessedData.slice(
+        (UnProcessedPage - 1) * rowsPerPage,
+        UnProcessedPage * rowsPerPage
+    );
+
+    const paginatedProcessed = ProcessedData.slice(
+        (ProcessedPage - 1) * rowsPerPage,
+        ProcessedPage * rowsPerPage
+    );
 
     return (
-        <div className="flex-1 overflow-auto z-10 min-h-screen space-y-4">
-            <Header title='CSV Upload Dashboard' />
-
-            <div className='items-center justify-center bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-6 h-screen'>
+        <div className='flex-1 overflow-auto z-10 min-h-screen space-y-4'>
+            <div>
+                {/* <Header title='CSV Upload Dashboard' /> */}
                 <div className='bg-gray-900 p-8 rounded-xl shadow-xl text-center flex items-center justify-between'>
                     <h1 className='text-white text-2xl font-semibold'>
-                        Upload CSV File
+                        CSV Upload Dashboard
                     </h1>
                     <div>
                         <form
@@ -153,9 +181,15 @@ const UploadPage = () => {
                             />
                             <button
                                 type='submit'
-                                className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+                                disabled={Uploading || Cleaning}
+                                className={`w-32 flex items-center justify-center gap-2 font-bold py-2 px-4 rounded 
+                                ${
+                                    Uploading || Cleaning
+                                        ? 'bg-blue-500 cursor-not-allowed opacity-50'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                }`}
                             >
-                                Upload
+                                {Uploading ? <Loader upload /> : 'Upload'}
                             </button>
                         </form>
 
@@ -173,145 +207,177 @@ const UploadPage = () => {
                             </div>
                         )}
                     </div>
-
-                    <div className={`bg-gray-500 text-center px-4 py-3 rounded-lg cursor-${Loading ? 'pointer' : ''}`}>
-                    <button
-                        onClick={handleRunScript}
-                        disabled={Loading}
-                        className={`flex gap-1 rounded px-4 py-2 font-bold text-white 
-                            ${Loading ? 'bg-gray-500 cursor-not-allowed opacity-50' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}`}>
-                        <WandSparklesIcon />
-                        Clean Data
-                    </button>
-
+                    <div>
+                        <button
+                            onClick={handleRunScript}
+                            disabled={Uploading || Cleaning}
+                            className={`w-42 flex items-center justify-center gap-2 font-bold py-3 px-4 rounded whitespace-nowrap
+                                ${
+                                    Uploading || Cleaning
+                                        ? 'bg-blue-500 cursor-not-allowed opacity-50'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                }`}
+                        >
+                            <WandSparklesIcon className='w-5 h-5' />
+                            Clean Data
+                        </button>
                     </div>
                 </div>
-
-                {Loading && (
-                    <div className='w-full bg-gray-700 h-4 rounded-md mt-4'>
-                        <div
-                            className='bg-blue-600 h-4 rounded-md'
-                            style={{
-                                width: `${loadingProgress}%`,
-                                transition: 'width 0.3s'
-                            }}
-                        ></div>
-                    </div>
-                )}
-
-                {!Loading && (
+                {!Uploading && (
                     <>
                         <h1 className='text-white text-2xl font-semibold text-center p-2'>
                             {output}
                         </h1>
-                        {/* <span>
-                            <DiscrepancyCounter />
-                        </span> */}
-                        <div className='flex item-center justify-center'>
-                            <h2 className='text-xl w-1/2 font-bold text-center mb-2'>
-                                Unprocessed Data
-                            </h2>
-                            <h2 className='text-xl w-1/2 font-bold text-center mb-2'>
-                                Processed Data
-                            </h2>
-                        </div>
-                        <div className='flex w-full gap-4 overflow-auto'>
-                            <div className='w-1/2 overflow-auto'>
-                                <table className='table-auto border-collapse border border-gray-400 w-full'>
-                                    <thead>
-                                        <tr className='bg-gray-700'>
-                                            {UnprocessedData.length > 0 &&
-                                                Object.keys(
-                                                    UnprocessedData[0]
-                                                ).map((key) => (
-                                                    <th
-                                                        key={key}
-                                                        className='border text-white font-bold px-4 py-2 whitespace-nowrap'
-                                                    >
-                                                        {key.toUpperCase()}
-                                                    </th>
-                                                ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {UnprocessedData.map((item, index) => (
-                                            <tr
+                        {Cleaning ? (
+                            <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
+                                <Loader />
+                            </div>
+                        ) : (
+                            <>
+                                <div className='flex item-center justify-center'>
+                                    <h2 className='text-xl w-1/2 font-bold text-center mb-2'>
+                                        Unprocessed Data
+                                    </h2>
+                                    <h2 className='text-xl w-1/2 font-bold text-center mb-2'>
+                                        Processed Data
+                                    </h2>
+                                </div>
+                                <div className='flex w-full justify-center gap-4 overflow-x-auto py-4 px-4'>
+                                    {[
+                                        {
+                                            title: 'Unprocessed',
+                                            data: paginatedUnprocessed,
+                                            allData: UnprocessedData,
+                                            page: UnProcessedPage,
+                                            setPage: setUnProcessedPage
+                                        },
+                                        {
+                                            title: 'Processed',
+                                            data: paginatedProcessed,
+                                            allData: ProcessedData,
+                                            page: ProcessedPage,
+                                            setPage: setProcessedPage
+                                        }
+                                    ].map(
+                                        (
+                                            {
+                                                title,
+                                                data,
+                                                allData,
+                                                page,
+                                                setPage
+                                            },
+                                            index
+                                        ) => (
+                                            <div
                                                 key={index}
-                                                className='text-center'
+                                                className='w-[50%] h-full overflow-auto'
                                             >
-                                                {Object.values(item).map(
-                                                    (value, i) => (
-                                                        <td
-                                                            key={i}
-                                                            className='border border-gray-400 px-4 py-2 whitespace-nowrap'
-                                                        >
-                                                            {value}
-                                                        </td>
-                                                    )
-                                                )}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                                <div className='overflow-x-auto max-h-[715px]'>
+                                                    <table className='table-auto w-full h-full'>
+                                                        <thead className='sticky top-0 z-10 bg-gray-700 text-white'>
+                                                            <tr>
+                                                                {allData.length >
+                                                                    0 &&
+                                                                    Object.keys(
+                                                                        allData[0]
+                                                                    ).map(
+                                                                        (
+                                                                            key
+                                                                        ) => (
+                                                                            <th
+                                                                                key={
+                                                                                    key
+                                                                                }
+                                                                                className='px-4 py-2 text-sm font-semibold text-left whitespace-nowrap'
+                                                                            >
+                                                                                {headerMap[
+                                                                                    key
+                                                                                ] ||
+                                                                                    key}
+                                                                            </th>
+                                                                        )
+                                                                    )}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {data.map(
+                                                                (
+                                                                    item,
+                                                                    rowIndex
+                                                                ) => {
+                                                                    const shouldHighlight =
+                                                                        title ===
+                                                                            'Processed' &&
+                                                                        ((fileType ===
+                                                                            'material' &&
+                                                                            item.ViolationReplacementPart ===
+                                                                                '1') ||
+                                                                            (fileType ===
+                                                                                'turbine' &&
+                                                                                (item.UnknownMaintPlant ===
+                                                                                    '1' ||
+                                                                                    item.UnknownPlanningPlant ===
+                                                                                        '1' ||
+                                                                                    item.UnknownLocation ===
+                                                                                        '1')));
 
-                            <div className='w-1/2 overflow-auto'>
-                                <table className='table-auto border-collapse border border-gray-400 w-full'>
-                                    <thead>
-                                        <tr className='bg-gray-700'>
-                                            {ProcessedData.length > 0 &&
-                                                Object.keys(
-                                                    ProcessedData[0]
-                                                ).map((key) => (
-                                                    <th
-                                                        key={key}
-                                                        className='border text-white font-bold px-4 py-2 whitespace-nowrap'
-                                                    >
-                                                        {key.toUpperCase()}
-                                                    </th>
-                                                ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {ProcessedData.map((item, index) => {
-                                            const shouldHighlight =
-                                                (fileType === 'material' &&
-                                                    item.ViolationReplacementPart ===
-                                                        '1') ||
-                                                (fileType === 'turbine' &&
-                                                    (item.UnknownMaintPlant ===
-                                                        '1' ||
-                                                        item.UnknownPlanningPlant ===
-                                                            '1' ||
-                                                        item.UnknownLocation ===
-                                                            '1'));
-
-                                            return (
-                                                <tr
-                                                    key={index}
-                                                    className={`text-center ${
-                                                        shouldHighlight
-                                                            ? 'bg-red-500 text-white font-bold'
-                                                            : ''
-                                                    }`}
-                                                >
-                                                    {Object.values(item).map(
-                                                        (value, i) => (
-                                                            <td
-                                                                key={i}
-                                                                className='border border-gray-400 px-4 py-2 whitespace-nowrap'
-                                                            >
-                                                                {value}
-                                                            </td>
-                                                        )
-                                                    )}
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                                                    return (
+                                                                        <tr
+                                                                            key={
+                                                                                rowIndex
+                                                                            }
+                                                                            className={`text-sm ${
+                                                                                shouldHighlight
+                                                                                    ? 'bg-red-500 text-white font-bold'
+                                                                                    : rowIndex %
+                                                                                          2 ===
+                                                                                      0
+                                                                                    ? 'bg-gray-800'
+                                                                                    : 'bg-transparent'
+                                                                            } hover:bg-cyan-800 transition-colors`}
+                                                                        >
+                                                                            {Object.values(
+                                                                                item
+                                                                            ).map(
+                                                                                (
+                                                                                    value,
+                                                                                    cellIndex
+                                                                                ) => (
+                                                                                    <td
+                                                                                        key={
+                                                                                            cellIndex
+                                                                                        }
+                                                                                        className='px-4 py-2 text-left max-w-[150px] truncate'
+                                                                                        title={
+                                                                                            value
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            value
+                                                                                        }
+                                                                                    </td>
+                                                                                )
+                                                                            )}
+                                                                        </tr>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <Pagination
+                                                    currentPage={page}
+                                                    totalItems={allData.length}
+                                                    itemsPerPage={rowsPerPage}
+                                                    onPageChange={setPage}
+                                                />
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            </>
+                        )}
                     </>
                 )}
             </div>
