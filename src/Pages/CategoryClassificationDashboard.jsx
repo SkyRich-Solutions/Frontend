@@ -59,10 +59,14 @@ const CategoryClassificationDashboard = () => {
       })
     }
 
-    extractTerms(MaterialCategoryClassificationsData, ["MaterialCategory"])
+    MaterialCategoryClassificationsData.forEach(item => {
+      if (item.Description) termSet.add(item.Description.toLowerCase());
+      if (item.MaterialCategory) termSet.add(item.MaterialCategory.toLowerCase());
+    });    
 
     return [...termSet]
   }, [MaterialCategoryClassificationsData])
+
 
   // Set up Fuse instance
   const fuse = useMemo(() => new Fuse(allTerms, { includeScore: true, threshold: 0.4 }), [allTerms])
@@ -75,6 +79,35 @@ const CategoryClassificationDashboard = () => {
         .slice(0, 5)
     : []
 
+    const filteredCategoryData = useMemo(() => {
+      if (!searchQuery) return MaterialCategoryClassificationsData;
+    
+      const resultTerms = fuse.search(searchQuery).map(res => res.item.toLowerCase());
+    
+      return MaterialCategoryClassificationsData.filter(row => {
+        const description = (row.Description || '').toLowerCase();
+        const category = (row.MaterialCategory || '').toLowerCase();
+        const material = (row.Material || '').toLowerCase();
+        const plant = (row.Plant || '').toLowerCase();
+        return resultTerms.some(term =>
+          description.includes(term) ||
+          category.includes(term) ||
+          material.includes(term) ||
+          plant.includes(term)
+        );
+      });
+    }, [searchQuery, MaterialCategoryClassificationsData, fuse]);
+
+    const handleDataRefresh = async () => {
+      try {
+        const newData = await getProcessedCategoryData();
+        setMaterialCategoryClassificationsData(newData);
+        setRefreshKey(prev => prev + 1); // 🔥 Trigger component refresh via useEffect
+      } catch (error) {
+        console.error("Failed to refresh data:", error);
+      }
+    };    
+    
   return (
     <div className="flex flex-col min-h-screen w-screen bg-gray-950 pb-4 overflow-hidden">
       <div className="flex justify-between items-center px-4 py-3 bg-gray-900 bg-opacity-90 z-10 relative">
@@ -128,11 +161,49 @@ const CategoryClassificationDashboard = () => {
         {/* TOP SECTION */}
         <div className="flex w-full h-[calc(100vh/3)] gap-4">
           <div className="w-1/2 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
+
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <Loader upload />
               </div>
             ) : (
+
+            <CategoryClassificationComponent
+              refreshKey={refreshKey}
+              setRefreshKey={setRefreshKey}
+              type="Line_chart_UnclassifiedNewlyDiscovered"
+              editingUnlocked={editingUnlocked}
+              setEditingUnlocked={setEditingUnlocked}
+              selectedRows={selectedRows}
+              setSelectedRows={setSelectedRows}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              data={filteredCategoryData}
+              searchQuery={searchQuery}
+              onSave={handleDataRefresh}
+            />
+          </div>
+
+          <div className="w-[30%] bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
+            <CategoryClassificationComponent
+              refreshKey={refreshKey}
+              setRefreshKey={setRefreshKey}
+              type="donut_UnclassifiedNewlyDiscovered"
+              editingUnlocked={editingUnlocked}
+              setEditingUnlocked={setEditingUnlocked}
+              selectedRows={selectedRows}
+              setSelectedRows={setSelectedRows}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              data={filteredCategoryData}
+              searchQuery={searchQuery}
+              onSave={handleDataRefresh}
+            />
+          </div>
+
+          <div className="w-1/5 flex flex-col gap-4">
+            <div className="flex-1 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
+
               <CategoryClassificationComponent
                 refreshKey={refreshKey}
                 setRefreshKey={setRefreshKey}
@@ -143,7 +214,9 @@ const CategoryClassificationDashboard = () => {
                 setSelectedRows={setSelectedRows}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
+                data={filteredCategoryData}
                 searchQuery={searchQuery}
+                onSave={handleDataRefresh}
               />
             )}
           </div>
@@ -164,7 +237,9 @@ const CategoryClassificationDashboard = () => {
                 setSelectedRows={setSelectedRows}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
+                data={filteredCategoryData}
                 searchQuery={searchQuery}
+                onSave={handleDataRefresh}
               />
             )}
           </div>
@@ -217,6 +292,7 @@ const CategoryClassificationDashboard = () => {
         {/* BOTTOM SECTION */}
         <div className="flex w-full h-[calc(100vh-8rem-100vh/3-2rem)] gap-4">
           <div className="w-4/5 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
+
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <Loader upload />
@@ -256,6 +332,7 @@ const CategoryClassificationDashboard = () => {
                 searchQuery={searchQuery}
               />
             )}
+
           </div>
         </div>
       </div>
