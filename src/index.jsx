@@ -15,6 +15,7 @@ import FaultReport from './Pages/FaultReport';
 import DataOverviewOfComplianceDashboard from './Pages/DataOverviewOfComplianceDashboard';
 import StartPage from './Pages/StartPage';
 
+
 const router = createHashRouter([
     {
         path: '/',

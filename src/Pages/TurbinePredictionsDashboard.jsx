@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react"
 import Header from "../Components/Layout/Header"
 import TurbineComponentHealthScoresComponent from "../Components/TurbineComponentHealthScoresComponent"
+import Loader from "../Components/ReUseable/Loader"
 import Fuse from "fuse.js"
 import {
   getTurbineModelHealthScores,
@@ -13,35 +14,35 @@ const TurbinePredictionsDashboard = () => {
   const [selectedItem, setSelectedItem] = useState(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const [TurbineModelHealthScores, setTurbineModelHealthScores] = useState([])
   const [TurbineModelScoreSummary, setTurbineModelScoreSummary] = useState([])
   const [TurbinePlatformHealthScores, setTurbinePlatformHealthScores] = useState([])
   const [TurbinePlatformScoreSummary, setTurbinePlatformScoreSummary] = useState([])
 
-    const handleItemClick = (item) => {
-        setSelectedItem(prev => (prev === item ? null : item));
-    };
-    
-    const searchWrapperRef = useRef(null);
-    const chartContainerRef = useRef(null);
+  const handleItemClick = (item) => {
+    setSelectedItem((prev) => (prev === item ? null : item))
+  }
 
+  const searchWrapperRef = useRef(null)
+  const chartContainerRef = useRef(null)
 
-    useEffect(() => {
-        const handleOutsideClick = (e) => {
-            if (chartContainerRef.current && !chartContainerRef.current.contains(e.target)) {
-                setSelectedItem(null); // Clear selection
-            }
-        };
-        document.addEventListener('mousedown', handleOutsideClick);
-        return () => {
-            document.removeEventListener('mousedown', handleOutsideClick);
-        };
-    }, []);
-    
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (chartContainerRef.current && !chartContainerRef.current.contains(e.target)) {
+        setSelectedItem(null) // Clear selection
+      }
+    }
+    document.addEventListener("mousedown", handleOutsideClick)
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick)
+    }
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true)
       try {
         setTurbineModelHealthScores(await getTurbineModelHealthScores())
         setTurbineModelScoreSummary(await getTurbineModelScoreSummary())
@@ -49,6 +50,8 @@ const TurbinePredictionsDashboard = () => {
         setTurbinePlatformScoreSummary(await getTurbinePlatformScoreSummary())
       } catch (error) {
         console.error("Error fetching data:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -134,7 +137,7 @@ const TurbinePredictionsDashboard = () => {
       </div>
 
       {/* Main content - flexible height */}
-      <div className="flex-1 p-4 overflow-hidden">
+      <div className="flex-1 p-4 overflow-hidden" ref={chartContainerRef}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full">
           {/* Top row charts - responsive layout */}
           {[0, 1, 2].map((index) => (
@@ -142,18 +145,22 @@ const TurbinePredictionsDashboard = () => {
               key={index}
               className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg flex items-center justify-center h-[calc(33vh-2.5rem)]"
             >
-              <TurbineComponentHealthScoresComponent
-                type={
-                  index === 0
-                    ? "bar_TurbineModelHealthScores"
-                    : index === 1
-                      ? "line_TurbineModelHealthScores"
-                      : "bar_TurbineModelScoreSummary"
-                }
-                selectedItem={selectedItem}
-                onItemClick={handleItemClick}
-                searchQuery={searchQuery}
-              />
+              {isLoading ? (
+                <Loader upload />
+              ) : (
+                <TurbineComponentHealthScoresComponent
+                  type={
+                    index === 0
+                      ? "bar_TurbineModelHealthScores"
+                      : index === 1
+                        ? "line_TurbineModelHealthScores"
+                        : "bar_TurbineModelScoreSummary"
+                  }
+                  selectedItem={selectedItem}
+                  onItemClick={handleItemClick}
+                  searchQuery={searchQuery}
+                />
+              )}
             </div>
           ))}
 
@@ -164,24 +171,32 @@ const TurbinePredictionsDashboard = () => {
                 key={index}
                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg flex-1 flex items-center justify-center"
               >
-                <TurbineComponentHealthScoresComponent
-                  type={index === 3 ? "bubble_PlatformHealthScores" : "bar_TurbinePlatformScoreSummary"}
-                  selectedItem={selectedItem}
-                  onItemClick={handleItemClick}
-                  searchQuery={searchQuery}
-                />
+                {isLoading ? (
+                  <Loader upload />
+                ) : (
+                  <TurbineComponentHealthScoresComponent
+                    type={index === 3 ? "bubble_PlatformHealthScores" : "bar_TurbinePlatformScoreSummary"}
+                    selectedItem={selectedItem}
+                    onItemClick={handleItemClick}
+                    searchQuery={searchQuery}
+                  />
+                )}
               </div>
             ))}
           </div>
 
           {/* Large square chart - spans 2 columns on larger screens */}
           <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg flex items-center justify-center col-span-1 md:col-span-2 h-[calc(66vh-5rem)]">
-            <TurbineComponentHealthScoresComponent
-              type="radar_TurbineModelHealthScores_ByPlant"
-              selectedItem={selectedItem}
-              onItemClick={handleItemClick}
-              searchQuery={searchQuery}
-            />
+            {isLoading ? (
+              <Loader upload />
+            ) : (
+              <TurbineComponentHealthScoresComponent
+                type="radar_TurbineModelHealthScores_ByPlant"
+                selectedItem={selectedItem}
+                onItemClick={handleItemClick}
+                searchQuery={searchQuery}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -190,3 +205,4 @@ const TurbinePredictionsDashboard = () => {
 }
 
 export default TurbinePredictionsDashboard
+

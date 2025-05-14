@@ -1,8 +1,7 @@
-
-
 import { useState, useMemo, useEffect, useRef } from "react"
 import Header from "../Components/Layout/Header"
 import MaterialComponentHealthScoresComponent from "../Components/MaterialComponentHealthScoresComponent"
+import Loader from "../Components/ReUseable/Loader"
 import Fuse from "fuse.js"
 
 import {
@@ -18,6 +17,7 @@ const MaterialComponentHealthScoreDashboard = () => {
   const [selectedItem, setSelectedItem] = useState(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const [MaterialComponentScoreSummary, setMaterialComponentScoreSummary] = useState([])
   const [MaterialComponentHealthScores, setMaterialComponentHealthScores] = useState([])
@@ -45,6 +45,7 @@ const MaterialComponentHealthScoreDashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true)
       try {
         setMaterialComponentScoreSummary(await getMaterialComponentScoreSummary())
         setMaterialComponentHealthScores(await getMaterialComponentHealthScores())
@@ -54,6 +55,8 @@ const MaterialComponentHealthScoreDashboard = () => {
         setMaintenanceForecasts(await getMaintenanceForecasts())
       } catch (error) {
         console.error("Error fetching data:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -161,18 +164,22 @@ const MaterialComponentHealthScoreDashboard = () => {
               key={index}
               className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg h-[calc(33vh-2.5rem)]"
             >
-              <MaterialComponentHealthScoresComponent
-                type={
-                  index === 0
-                    ? "bar_MaterialComponentScoreSummary"
-                    : index === 1
-                      ? "bar_MaterialComponentHealthScores"
-                      : "bar_MaterialCategoryScoreSummary"
-                }
-                selectedItem={selectedItem}
-                onItemClick={handleItemClick}
-                searchQuery={searchQuery}
-              />
+              {isLoading ? (
+                <Loader upload />
+              ) : (
+                <MaterialComponentHealthScoresComponent
+                  type={
+                    index === 0
+                      ? "bar_MaterialComponentScoreSummary"
+                      : index === 1
+                        ? "bar_MaterialComponentHealthScores"
+                        : "bar_MaterialCategoryScoreSummary"
+                  }
+                  selectedItem={selectedItem}
+                  onItemClick={handleItemClick}
+                  searchQuery={searchQuery}
+                />
+              )}
             </div>
           ))}
 
@@ -183,12 +190,16 @@ const MaterialComponentHealthScoreDashboard = () => {
                 key={index}
                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex-1 flex items-center justify-center rounded-lg"
               >
-                <MaterialComponentHealthScoresComponent
-                  type={index === 3 ? "bar_MaterialCategoryHealthScores" : "line_MaterialCategoryPredictions"}
-                  selectedItem={selectedItem}
-                  onItemClick={handleItemClick}
-                  searchQuery={searchQuery}
-                />
+                {isLoading ? (
+                  <Loader upload />
+                ) : (
+                  <MaterialComponentHealthScoresComponent
+                    type={index === 3 ? "bar_MaterialCategoryHealthScores" : "line_MaterialCategoryPredictions"}
+                    selectedItem={selectedItem}
+                    onItemClick={handleItemClick}
+                    searchQuery={searchQuery}
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -196,12 +207,16 @@ const MaterialComponentHealthScoreDashboard = () => {
           {/* Large Forecast Table - spans 2 columns on larger screens */}
           <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg col-span-1 md:col-span-2 h-[calc(66vh-5rem)] overflow-hidden">
             <div className="w-full h-full overflow-auto">
-              <MaterialComponentHealthScoresComponent
-                type="table_MaintenanceForecasts"
-                selectedItem={selectedItem}
-                onItemClick={handleItemClick}
-                searchQuery={searchQuery}
-              />
+              {isLoading ? (
+                <Loader upload />
+              ) : (
+                <MaterialComponentHealthScoresComponent
+                  type="table_MaintenanceForecasts"
+                  selectedItem={selectedItem}
+                  onItemClick={handleItemClick}
+                  searchQuery={searchQuery}
+                />
+              )}
             </div>
           </div>
         </div>
