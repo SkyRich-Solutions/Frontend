@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react"
 import Header from "../Components/Layout/Header"
 import TurbineOverviewComponent from "../Components/TurbineOverviewComponent"
+import Loader from "../Components/ReUseable/Loader"// Update this path to match your project structure
 import Fuse from "fuse.js"
 import { getPredictionTurbineData } from "../Utils/TurbineDashboardDataHandler"
 
@@ -9,6 +10,7 @@ const TurbineDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [turbineData, setTurbineData] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const searchWrapperRef = useRef(null)
 
@@ -27,11 +29,14 @@ const TurbineDashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true)
       try {
         const turbines = await getPredictionTurbineData()
         setTurbineData(turbines)
       } catch (error) {
         console.error("Error fetching data:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
     fetchData()
@@ -121,18 +126,22 @@ const TurbineDashboard = () => {
               key={index}
               className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg h-[calc(33vh-2.5rem)]"
             >
-              <TurbineOverviewComponent
-                type={
-                  index === 0
-                    ? "bar_FunctionalLocByRegion"
-                    : index === 1
-                      ? "scatter_TurbinePowerVsHubHeight"
-                      : "donut_TurbineCountByManufacturer"
-                }
-                selectedItem={selectedItem}
-                onItemClick={handleItemClick}
-                searchQuery={searchQuery}
-              />
+              {isLoading ? (
+                <Loader upload />
+              ) : (
+                <TurbineOverviewComponent
+                  type={
+                    index === 0
+                      ? "bar_FunctionalLocByRegion"
+                      : index === 1
+                        ? "scatter_TurbinePowerVsHubHeight"
+                        : "donut_TurbineCountByManufacturer"
+                  }
+                  selectedItem={selectedItem}
+                  onItemClick={handleItemClick}
+                  searchQuery={searchQuery}
+                />
+              )}
             </div>
           ))}
 
@@ -143,26 +152,36 @@ const TurbineDashboard = () => {
                 key={index}
                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex-1 flex items-center justify-center rounded-lg"
               >
-                <TurbineOverviewComponent
-                  type={
-                    index === 3 ? "radar_MaintPlant_PlanningPlant_ByPlatform" : "line_CumulativeTurbineCount_ByPlatform"
-                  }
-                  selectedItem={selectedItem}
-                  onItemClick={handleItemClick}
-                  searchQuery={searchQuery}
-                />
+                {isLoading ? (
+                  <Loader upload />
+                ) : (
+                  <TurbineOverviewComponent
+                    type={
+                      index === 3
+                        ? "radar_MaintPlant_PlanningPlant_ByPlatform"
+                        : "line_CumulativeTurbineCount_ByPlatform"
+                    }
+                    selectedItem={selectedItem}
+                    onItemClick={handleItemClick}
+                    searchQuery={searchQuery}
+                  />
+                )}
               </div>
             ))}
           </div>
 
           {/* Large chart on the right side - consistent spacing */}
           <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg col-span-1 md:col-span-2 h-[calc(66vh-5rem)]">
-            <TurbineOverviewComponent
-              type="bubble_TurbinePowerByRegion"
-              selectedItem={selectedItem}
-              onItemClick={handleItemClick}
-              searchQuery={searchQuery}
-            />
+            {isLoading ? (
+              <Loader upload />
+            ) : (
+              <TurbineOverviewComponent
+                type="bubble_TurbinePowerByRegion"
+                selectedItem={selectedItem}
+                onItemClick={handleItemClick}
+                searchQuery={searchQuery}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -171,3 +190,4 @@ const TurbineDashboard = () => {
 }
 
 export default TurbineDashboard
+

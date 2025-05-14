@@ -15,6 +15,7 @@ import FaultReport from './Pages/FaultReport';
 import DataOverviewOfComplianceDashboard from './Pages/DataOverviewOfComplianceDashboard';
 import StartPage from './Pages/StartPage';
 
+
 const router = createHashRouter([
     {
         path: '/',
@@ -56,13 +57,13 @@ const router = createHashRouter([
             {
                 path: '/fault-report',
                 element: <FaultReport />
-            }, 
+            },
             {
                 path: '/categoryClassificationDashboard',
                 element: <CategoryClassificationDashboard />
             },
             {
-                path:'/',
+                path: '/',
                 element: <StartPage />
             }
         ]

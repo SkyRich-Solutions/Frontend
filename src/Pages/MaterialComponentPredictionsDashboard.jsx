@@ -1,8 +1,7 @@
-"use client"
-
 import { useState, useMemo, useEffect, useRef } from "react"
 import Header from "../Components/Layout/Header"
 import MaterialComponentPredictionsComponent from "../Components/MaterialComponentPredictionsComponent"
+import Loader from "../Components/ReUseable/Loader" // Update this path to match your project structure
 import Fuse from "fuse.js"
 
 import {
@@ -17,6 +16,7 @@ const MaterialComponentPredictionsDashboard = () => {
   const [selectedItem, setSelectedItem] = useState(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const [ReplacementPredictionGlobal, setReplacementPredictionGlobal] = useState([])
   const [ReplacementPredictions, setReplacementPredictions] = useState([])
@@ -43,6 +43,7 @@ const MaterialComponentPredictionsDashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true)
       try {
         setReplacementPredictionGlobal(await getReplacementPredictionGlobal())
         setReplacementPredictions(await getReplacementPredictions())
@@ -51,6 +52,8 @@ const MaterialComponentPredictionsDashboard = () => {
         setMaterialPredictions(await getMaterialPredictions())
       } catch (error) {
         console.error("Error fetching data:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -167,18 +170,22 @@ const MaterialComponentPredictionsDashboard = () => {
               key={index}
               className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg h-[calc(33vh-2.5rem)]"
             >
-              <MaterialComponentPredictionsComponent
-                type={
-                  index === 0
-                    ? "bar_ReplacementPrediction"
-                    : index === 1
-                      ? "line_GlobalMonteCarloVsBayesian"
-                      : "line_MonteCarloVsBayesian"
-                }
-                selectedItem={selectedItem}
-                onItemClick={handleItemClick}
-                searchQuery={searchQuery}
-              />
+              {isLoading ? (
+                <Loader upload />
+              ) : (
+                <MaterialComponentPredictionsComponent
+                  type={
+                    index === 0
+                      ? "bar_ReplacementPrediction"
+                      : index === 1
+                        ? "line_GlobalMonteCarloVsBayesian"
+                        : "line_MonteCarloVsBayesian"
+                  }
+                  selectedItem={selectedItem}
+                  onItemClick={handleItemClick}
+                  searchQuery={searchQuery}
+                />
+              )}
             </div>
           ))}
 
@@ -189,12 +196,16 @@ const MaterialComponentPredictionsDashboard = () => {
                 key={index}
                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex-1 flex items-center justify-center rounded-lg"
               >
-                <MaterialComponentPredictionsComponent
-                  type={index === 3 ? "pie_MaterialStatusTransitions" : "bubble_MonteCarloDominance"}
-                  selectedItem={selectedItem}
-                  onItemClick={handleItemClick}
-                  searchQuery={searchQuery}
-                />
+                {isLoading ? (
+                  <Loader upload />
+                ) : (
+                  <MaterialComponentPredictionsComponent
+                    type={index === 3 ? "pie_MaterialStatusTransitions" : "bubble_MonteCarloDominance"}
+                    selectedItem={selectedItem}
+                    onItemClick={handleItemClick}
+                    searchQuery={searchQuery}
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -207,12 +218,16 @@ const MaterialComponentPredictionsDashboard = () => {
                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex-1 rounded-lg overflow-hidden"
               >
                 <div className="w-full h-full overflow-auto">
-                  <MaterialComponentPredictionsComponent
-                    type={index === 5 ? "table_MaterialStatusTransitions" : "table_MaterialPredictions"}
-                    selectedItem={selectedItem}
-                    onItemClick={handleItemClick}
-                    searchQuery={searchQuery}
-                  />
+                  {isLoading ? (
+                    <Loader upload />
+                  ) : (
+                    <MaterialComponentPredictionsComponent
+                      type={index === 5 ? "table_MaterialStatusTransitions" : "table_MaterialPredictions"}
+                      selectedItem={selectedItem}
+                      onItemClick={handleItemClick}
+                      searchQuery={searchQuery}
+                    />
+                  )}
                 </div>
               </div>
             ))}

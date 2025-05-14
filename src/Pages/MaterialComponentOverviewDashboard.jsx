@@ -1,8 +1,7 @@
-
-
 import { useState, useMemo, useEffect, useRef } from "react"
 import Header from "../Components/Layout/Header"
 import MaterialComponentOverviewComponent from "../Components/MaterialComponentOverviewComponent"
+import Loader from "../Components/ReUseable/Loader"// Update this path to match your project structure
 import Fuse from "fuse.js"
 import { getPredictionMaterialData } from "../Utils/MaterialDashboardDataHandler"
 
@@ -10,8 +9,8 @@ const MaterialComponentOverviewDashboard = () => {
     const [selectedItem, setSelectedItem] = useState(null)
     const [searchQuery, setSearchQuery] = useState("")
     const [showSuggestions, setShowSuggestions] = useState(false)
-
     const [materialData, setMaterialData] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
     const handleItemClick = (item) => {
         setSelectedItem(item)
@@ -35,11 +34,14 @@ const MaterialComponentOverviewDashboard = () => {
     // Fetch data on mount
     useEffect(() => {
         const fetchData = async () => {
+            setIsLoading(true)
             try {
                 const materials = await getPredictionMaterialData()
                 setMaterialData(materials)
             } catch (error) {
                 console.error("Error fetching data:", error)
+            } finally {
+                setIsLoading(false)
             }
         }
         fetchData()
@@ -131,29 +133,37 @@ const MaterialComponentOverviewDashboard = () => {
                             key={index}
                             className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg h-[calc(33vh-2.5rem)]"
                         >
-                            <MaterialComponentOverviewComponent
-                                type={
-                                    index === 0
-                                        ? "bar_PlantSpecificMaterialStatus"
-                                        : index === 1
-                                            ? "line_MaterialCategoryCount"
-                                            : "bar_MaterialByPlant"
-                                }
-                                selectedItem={selectedItem}
-                                handleClick={handleItemClick}
-                                searchQuery={searchQuery}
-                            />
+                            {isLoading ? (
+                                <Loader upload />
+                            ) : (
+                                <MaterialComponentOverviewComponent
+                                    type={
+                                        index === 0
+                                            ? "bar_PlantSpecificMaterialStatus"
+                                            : index === 1
+                                                ? "line_MaterialCategoryCount"
+                                                : "bar_MaterialByPlant"
+                                    }
+                                    selectedItem={selectedItem}
+                                    handleClick={handleItemClick}
+                                    searchQuery={searchQuery}
+                                />
+                            )}
                         </div>
                     ))}
 
                     {/* Large chart - spans 2 columns on larger screens */}
                     <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex items-center justify-center rounded-lg col-span-1 md:col-span-2 h-[calc(66vh-5rem)]">
-                        <MaterialComponentOverviewComponent
-                            type="line_TopMaterialByReplacementParts"
-                            selectedItem={selectedItem}
-                            handleClick={handleItemClick}
-                            searchQuery={searchQuery}
-                        />
+                        {isLoading ? (
+                            <Loader upload />
+                        ) : (
+                            <MaterialComponentOverviewComponent
+                                type="line_TopMaterialByReplacementParts"
+                                selectedItem={selectedItem}
+                                handleClick={handleItemClick}
+                                searchQuery={searchQuery}
+                            />
+                        )}
                     </div>
 
                     {/* Two stacked charts - responsive height */}
@@ -163,12 +173,16 @@ const MaterialComponentOverviewDashboard = () => {
                                 key={index}
                                 className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 flex-1 flex items-center justify-center rounded-lg"
                             >
-                                <MaterialComponentOverviewComponent
-                                    type={index === 3 ? "line_ReplacementPartsByPlant" : "bar_MaterialCount"}
-                                    selectedItem={selectedItem}
-                                    handleClick={handleItemClick}
-                                    searchQuery={searchQuery}
-                                />
+                                {isLoading ? (
+                                    <Loader upload />
+                                ) : (
+                                    <MaterialComponentOverviewComponent
+                                        type={index === 3 ? "line_ReplacementPartsByPlant" : "bar_MaterialCount"}
+                                        selectedItem={selectedItem}
+                                        handleClick={handleItemClick}
+                                        searchQuery={searchQuery}
+                                    />
+                                )}
                             </div>
                         ))}
                     </div>
@@ -179,4 +193,3 @@ const MaterialComponentOverviewDashboard = () => {
 }
 
 export default MaterialComponentOverviewDashboard
-

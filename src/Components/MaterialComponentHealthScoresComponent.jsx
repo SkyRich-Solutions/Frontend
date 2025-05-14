@@ -529,7 +529,7 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                             forecastData.map((item, index) => (
                                 <tr
                                     key={index}
-                                    className={`cursor-pointer ${String(item.Material_ID) === String(selectedItem) ? 'bg-cyan-700 text-white' : index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900'}`}
+                                    className={`cursor-pointer ${String(item.Material_ID) === String(selectedItem) ? 'bg-cyan-800 text-white' : index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900'}`}
 
                                     onClick={() => handleClick(item)}
                                 >

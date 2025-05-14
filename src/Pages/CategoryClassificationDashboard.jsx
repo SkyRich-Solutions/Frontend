@@ -1,8 +1,7 @@
-"use client"
-
 import { useState, useMemo, useEffect, useRef } from "react"
 import Header from "../Components/Layout/Header"
 import CategoryClassificationComponent from "../Components/CategoryClassificationComponent"
+import Loader from "../Components/ReUseable/Loader"
 import Fuse from "fuse.js"
 
 import CategoryClassificationsDataHandler from "../Utils/CategoryClassificationsDataHandler"
@@ -15,6 +14,7 @@ const CategoryClassificationDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
 
   const [MaterialCategoryClassificationsData, setMaterialCategoryClassificationsData] = useState([])
 
@@ -36,10 +36,13 @@ const CategoryClassificationDashboard = () => {
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true)
       try {
         setMaterialCategoryClassificationsData(await getProcessedCategoryData())
       } catch (error) {
         console.error("Error fetching data:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
     fetchData()
@@ -158,6 +161,13 @@ const CategoryClassificationDashboard = () => {
         {/* TOP SECTION */}
         <div className="flex w-full h-[calc(100vh/3)] gap-4">
           <div className="w-1/2 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
+
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader upload />
+              </div>
+            ) : (
+
             <CategoryClassificationComponent
               refreshKey={refreshKey}
               setRefreshKey={setRefreshKey}
@@ -193,10 +203,11 @@ const CategoryClassificationDashboard = () => {
 
           <div className="w-1/5 flex flex-col gap-4">
             <div className="flex-1 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
+
               <CategoryClassificationComponent
                 refreshKey={refreshKey}
                 setRefreshKey={setRefreshKey}
-                type="count_Unclassified"
+                type="Line_chart_UnclassifiedNewlyDiscovered"
                 editingUnlocked={editingUnlocked}
                 setEditingUnlocked={setEditingUnlocked}
                 selectedRows={selectedRows}
@@ -207,23 +218,73 @@ const CategoryClassificationDashboard = () => {
                 searchQuery={searchQuery}
                 onSave={handleDataRefresh}
               />
+            )}
+          </div>
+
+          <div className="w-[30%] bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader upload />
+              </div>
+            ) : (
+              <CategoryClassificationComponent
+                refreshKey={refreshKey}
+                setRefreshKey={setRefreshKey}
+                type="donut_UnclassifiedNewlyDiscovered"
+                editingUnlocked={editingUnlocked}
+                setEditingUnlocked={setEditingUnlocked}
+                selectedRows={selectedRows}
+                setSelectedRows={setSelectedRows}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                data={filteredCategoryData}
+                searchQuery={searchQuery}
+                onSave={handleDataRefresh}
+              />
+            )}
+          </div>
+
+          <div className="w-1/5 flex flex-col gap-4">
+            <div className="flex-1 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <Loader upload />
+                </div>
+              ) : (
+                <CategoryClassificationComponent
+                  refreshKey={refreshKey}
+                  setRefreshKey={setRefreshKey}
+                  type="count_Unclassified"
+                  editingUnlocked={editingUnlocked}
+                  setEditingUnlocked={setEditingUnlocked}
+                  selectedRows={selectedRows}
+                  setSelectedRows={setSelectedRows}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  searchQuery={searchQuery}
+                />
+              )}
             </div>
 
             <div className="flex-1 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
-              <CategoryClassificationComponent
-                refreshKey={refreshKey}
-                setRefreshKey={setRefreshKey}
-                type="count_NewlyDiscovered"
-                editingUnlocked={editingUnlocked}
-                setEditingUnlocked={setEditingUnlocked}
-                selectedRows={selectedRows}
-                setSelectedRows={setSelectedRows}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-                data={filteredCategoryData}
-                searchQuery={searchQuery}
-                onSave={handleDataRefresh}
-              />
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <Loader upload />
+                </div>
+              ) : (
+                <CategoryClassificationComponent
+                  refreshKey={refreshKey}
+                  setRefreshKey={setRefreshKey}
+                  type="count_NewlyDiscovered"
+                  editingUnlocked={editingUnlocked}
+                  setEditingUnlocked={setEditingUnlocked}
+                  selectedRows={selectedRows}
+                  setSelectedRows={setSelectedRows}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  searchQuery={searchQuery}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -231,37 +292,47 @@ const CategoryClassificationDashboard = () => {
         {/* BOTTOM SECTION */}
         <div className="flex w-full h-[calc(100vh-8rem-100vh/3-2rem)] gap-4">
           <div className="w-4/5 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
-            <CategoryClassificationComponent
-              refreshKey={refreshKey}
-              setRefreshKey={setRefreshKey}
-              type="table_MaterialCategoryClassificationsData"
-              editingUnlocked={editingUnlocked}
-              setEditingUnlocked={setEditingUnlocked}
-              selectedRows={selectedRows}
-              setSelectedRows={setSelectedRows}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              data={filteredCategoryData}
-              searchQuery={searchQuery}
-              onSave={handleDataRefresh}
-            />
+
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader upload />
+              </div>
+            ) : (
+              <CategoryClassificationComponent
+                refreshKey={refreshKey}
+                setRefreshKey={setRefreshKey}
+                type="table_MaterialCategoryClassificationsData"
+                editingUnlocked={editingUnlocked}
+                setEditingUnlocked={setEditingUnlocked}
+                selectedRows={selectedRows}
+                setSelectedRows={setSelectedRows}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                searchQuery={searchQuery}
+              />
+            )}
           </div>
 
           <div className="w-1/5 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
-            <CategoryClassificationComponent
-              refreshKey={refreshKey}
-              setRefreshKey={setRefreshKey}
-              type="table_UniqueMaterialCategories"
-              editingUnlocked={editingUnlocked}
-              setEditingUnlocked={setEditingUnlocked}
-              selectedRows={selectedRows}
-              setSelectedRows={setSelectedRows}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              data={filteredCategoryData}
-              searchQuery={searchQuery}
-              onSave={handleDataRefresh}
-            />
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader upload />
+              </div>
+            ) : (
+              <CategoryClassificationComponent
+                refreshKey={refreshKey}
+                setRefreshKey={setRefreshKey}
+                type="table_UniqueMaterialCategories"
+                editingUnlocked={editingUnlocked}
+                setEditingUnlocked={setEditingUnlocked}
+                selectedRows={selectedRows}
+                setSelectedRows={setSelectedRows}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                searchQuery={searchQuery}
+              />
+            )}
+
           </div>
         </div>
       </div>
