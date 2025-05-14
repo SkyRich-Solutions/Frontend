@@ -161,49 +161,11 @@ const CategoryClassificationDashboard = () => {
         {/* TOP SECTION */}
         <div className="flex w-full h-[calc(100vh/3)] gap-4">
           <div className="w-1/2 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
-
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <Loader upload />
               </div>
             ) : (
-
-            <CategoryClassificationComponent
-              refreshKey={refreshKey}
-              setRefreshKey={setRefreshKey}
-              type="Line_chart_UnclassifiedNewlyDiscovered"
-              editingUnlocked={editingUnlocked}
-              setEditingUnlocked={setEditingUnlocked}
-              selectedRows={selectedRows}
-              setSelectedRows={setSelectedRows}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              data={filteredCategoryData}
-              searchQuery={searchQuery}
-              onSave={handleDataRefresh}
-            />
-          </div>
-
-          <div className="w-[30%] bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
-            <CategoryClassificationComponent
-              refreshKey={refreshKey}
-              setRefreshKey={setRefreshKey}
-              type="donut_UnclassifiedNewlyDiscovered"
-              editingUnlocked={editingUnlocked}
-              setEditingUnlocked={setEditingUnlocked}
-              selectedRows={selectedRows}
-              setSelectedRows={setSelectedRows}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              data={filteredCategoryData}
-              searchQuery={searchQuery}
-              onSave={handleDataRefresh}
-            />
-          </div>
-
-          <div className="w-1/5 flex flex-col gap-4">
-            <div className="flex-1 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
-
               <CategoryClassificationComponent
                 refreshKey={refreshKey}
                 setRefreshKey={setRefreshKey}
@@ -261,7 +223,9 @@ const CategoryClassificationDashboard = () => {
                   setSelectedRows={setSelectedRows}
                   selectedCategory={selectedCategory}
                   setSelectedCategory={setSelectedCategory}
+                  data={filteredCategoryData}
                   searchQuery={searchQuery}
+                  onSave={handleDataRefresh}
                 />
               )}
             </div>
@@ -282,7 +246,9 @@ const CategoryClassificationDashboard = () => {
                   setSelectedRows={setSelectedRows}
                   selectedCategory={selectedCategory}
                   setSelectedCategory={setSelectedCategory}
+                  data={filteredCategoryData}
                   searchQuery={searchQuery}
+                  onSave={handleDataRefresh}
                 />
               )}
             </div>
@@ -292,7 +258,6 @@ const CategoryClassificationDashboard = () => {
         {/* BOTTOM SECTION */}
         <div className="flex w-full h-[calc(100vh-8rem-100vh/3-2rem)] gap-4">
           <div className="w-4/5 bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg border border-gray-700 p-4 rounded-lg overflow-auto">
-
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <Loader upload />
@@ -308,7 +273,9 @@ const CategoryClassificationDashboard = () => {
                 setSelectedRows={setSelectedRows}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
+                data={filteredCategoryData}
                 searchQuery={searchQuery}
+                onSave={handleDataRefresh}
               />
             )}
           </div>
@@ -329,10 +296,11 @@ const CategoryClassificationDashboard = () => {
                 setSelectedRows={setSelectedRows}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
+                data={filteredCategoryData}
                 searchQuery={searchQuery}
+                onSave={handleDataRefresh}
               />
             )}
-
           </div>
         </div>
       </div>
