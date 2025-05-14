@@ -1,4 +1,3 @@
-// components/RouteTitleManager.jsx
 import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 

@@ -16,7 +16,7 @@ const TurbineMarkers = ({ filters, allData, setSelectedTurbine }) => {
                         title={turbine.FunctionalLoc}
                         onClick={() => setSelectedTurbine(turbine)}
                     >
-                        <div className='p-1 rounded-full bg-zinc-500'>
+                        <div className='p-1 rounded-full '>
                             <img
                                 src='/icons/turbine.png'
                                 alt='Turbine'
