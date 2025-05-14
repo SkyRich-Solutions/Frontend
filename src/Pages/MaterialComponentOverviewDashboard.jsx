@@ -49,20 +49,21 @@ const MaterialComponentOverviewDashboard = () => {
 
     // Combine terms for fuzzy search
     const allTerms = useMemo(() => {
+        const terms = materialData || [] // Ensure materialData is an array
         return [
             ...new Set(
-                [
-                    ...materialData.flatMap((item) => [
+                terms
+                    .flatMap((item) => [
                         item.Material,
                         item.MaterialCategory,
                         item.Plant,
                         item.PlantSpecificMaterialStatus,
-                    ]),
-                ].filter(Boolean),
+                    ])
+                    .filter(Boolean) // Only filter out falsy values like null, undefined, empty strings, etc.
             ),
         ]
     }, [materialData])
-
+    
     // Set up Fuse instance
     const fuse = useMemo(() => new Fuse(allTerms, { includeScore: true, threshold: 0.4 }), [allTerms])
 

@@ -1,38 +1,49 @@
+"use client"
 
-import React from 'react';
-import { AdvancedMarker } from '@vis.gl/react-google-maps';
-import { Warehouse } from 'lucide-react';
+import { AdvancedMarker } from "@vis.gl/react-google-maps"
+import { Warehouse } from "lucide-react"
+import { useState } from "react"
 
-const isValidLatLng = (lat, lng) =>
-    !isNaN(lat) && !isNaN(lng) && typeof lat === 'number' && typeof lng === 'number';
+const isValidLatLng = (lat, lng) => !isNaN(lat) && !isNaN(lng) && typeof lat === "number" && typeof lng === "number"
 
-const renderMarkers = (data = [], color, prefix) =>
+const WarehouseMarker = ({ plantData = {}, filters, onPlantClick }) => {
+  const [hoveredPlant, setHoveredPlant] = useState(null)
+
+  const renderMarkers = (data = [], colorClass, prefix, handleClick) =>
     data.map((warehouse, index) => {
-        const lat = parseFloat(warehouse.Plant_Latitude);
-        const lng = parseFloat(warehouse.Plant_Longitude);
-        if (!isValidLatLng(lat, lng)) return null;
+      const lat = Number.parseFloat(warehouse.Plant_Latitude)
+      const lng = Number.parseFloat(warehouse.Plant_Longitude)
+      const isHovered = hoveredPlant === `${prefix}-${index}`
 
-        return (
-            <AdvancedMarker
-                key={`${prefix}-${index}`}
-                position={{ lat, lng }}
-                title={warehouse.Plant_Name}
-            >
-                <div className={`p-1 rounded-full ${color} text-white`}>
-                    <Warehouse size={20} color="white" className="m-1" />
-                </div>
-            </AdvancedMarker>
-        );
-    });
+      if (!isValidLatLng(lat, lng)) return null
 
-const WarehouseMarker = ({ plantData = {}, filters }) => {
-    return (
-        <>
-            {filters?.showAll && renderMarkers(plantData.all, 'bg-gray-500', 'warehouse-all')}
-            {filters?.showMaint && renderMarkers(plantData.maint, 'bg-red-500', 'warehouse-maint')}
-            {filters?.showPlanning && renderMarkers(plantData.planning, 'bg-blue-500', 'warehouse-planning')}
-        </>
-    );
-};
+      return (
+        <AdvancedMarker
+          key={`${prefix}-${index}`}
+          position={{ lat, lng }}
+          title={warehouse.Plant_Name}
+          onClick={() => handleClick?.(warehouse)}
+          onMouseOver={() => setHoveredPlant(`${prefix}-${index}`)}
+          onMouseOut={() => setHoveredPlant(null)}
+        >
+          <div
+            className={`flex items-center justify-center p-1 rounded-lg ${colorClass} ${
+              isHovered ? "scale-125 shadow-lg" : "shadow-md"
+            } transition-all duration-200`}
+          >
+            <Warehouse size={isHovered ? 22 : 20} className="text-white m-1" />
+          </div>
+        </AdvancedMarker>
+      )
+    })
 
-export default WarehouseMarker;
+  return (
+    <>
+      {filters?.showAll && renderMarkers(plantData.all, "bg-gray-600", "warehouse-all", onPlantClick)}
+      {filters?.showMaint && renderMarkers(plantData.maint, "bg-red-600", "warehouse-maint", onPlantClick)}
+      {filters?.showPlanning && renderMarkers(plantData.planning, "bg-blue-600", "warehouse-planning", onPlantClick)}
+    </>
+  )
+}
+
+export default WarehouseMarker
