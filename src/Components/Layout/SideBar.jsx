@@ -9,7 +9,8 @@ import {
     PackageIcon,
     PackageCheckIcon,
     WindIcon,
-    ChartNoAxesCombined
+    ChartNoAxesCombined,
+    TriangleAlertIcon
 } from 'lucide-react';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -17,6 +18,13 @@ import { Link } from 'react-router';
 
 const SIDEBAR_ITEMS = [
     {
+        name: 'Warnings',
+        icon: TriangleAlertIcon,
+        color: '#FF4500',
+        href: '/'
+    },
+    {
+    
         name: 'Overview of Compliance',
         icon: BarChart2, // Represents analytics overview
         color: '#9966FF',
@@ -59,7 +67,7 @@ const SIDEBAR_ITEMS = [
         href: '/turbinePredictionsDashboard'
     }, 
     {
-        name: 'Category Classification Dashboard',
+        name: 'Category Classification Overview',
         icon: ChartNoAxesCombined, // Implies grouped data or classification
         color: '#FF4500',
         href: '/categoryClassificationDashboard'
@@ -76,6 +84,7 @@ const SIDEBAR_ITEMS = [
         color: '#6A5ACD',
         href: '/fault-report'
     },
+    
 ];
 
 

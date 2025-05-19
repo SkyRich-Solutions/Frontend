@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 
 import CategorySelectionLegend from './CategorySelectionLegend';
+import Loader from '../Components/ReUseable/Loader';
 
 export const getProcessedCategoryData = async () => {
     try {
@@ -430,7 +431,6 @@ const CategoryClassificationComponent = ({
     }
 
     if (type === 'donut_UnclassifiedNewlyDiscovered') {
-
         const CustomTooltipDonutMaterialCategorySummary = ({ active, payload }) => {
             if (active && payload && payload.length) {
                 const { name, value } = payload[0];
@@ -443,20 +443,30 @@ const CategoryClassificationComponent = ({
             }
             return null;
         };
-
-        const categoryCounts = (filteredData ?? []).reduce((acc, item) => {
+    
+        // Simulate loading state, or replace this with your real one
+        const isLoading = !filteredData || filteredData.length === 0;
+    
+        if (isLoading) {
+            return (
+                <div className="w-full h-full flex items-center justify-center">
+                    <Loader upload/>
+                </div>
+            );
+        }
+    
+        const categoryCounts = filteredData.reduce((acc, item) => {
             const isNewlyDiscovered = item.NewlyDiscovered === 1 || item.NewlyDiscovered === true;
             const category = isNewlyDiscovered ? 'Newly Discovered' : (item.MaterialCategory || 'Unclassified');
             acc[category] = (acc[category] || 0) + 1;
             return acc;
         }, {});
-        
+    
         const donutData = Object.entries(categoryCounts).map(([name, value]) => ({
             name,
             value
         }));
-        
-        
+    
         return (
             <div className="w-full h-full relative">
                 {/* Info Icon Tooltip */}
@@ -478,47 +488,49 @@ const CategoryClassificationComponent = ({
                         </p>
                     </div>
                 </div>
+    
                 <ResponsiveContainer width="90%" height="90%">
                     <PieChart>
                         <Pie
-                        data={donutData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%" // Shift pie left to make room for legend
-                        cy="50%"
-                        innerRadius="40%"
-                        outerRadius="60%"
-                        paddingAngle={3}
-                        label
-                        onClick={(data) => setSelectedCategory(data.name)}
+                            data={donutData}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            innerRadius="40%"
+                            outerRadius="60%"
+                            paddingAngle={3}
+                            label
+                            onClick={(data) => setSelectedCategory(data.name)}
                         >
-                        {donutData.map((entry, index) => (
-                            <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                            stroke={selectedCategory === entry.name ? '#00ffff' : 'none'}
-                            strokeWidth={selectedCategory === entry.name ? 3 : 1}
-                            />
-                        ))}
+                            {donutData.map((entry, index) => (
+                                <Cell
+                                    key={`cell-${index}`}
+                                    fill={COLORS[index % COLORS.length]}
+                                    stroke={selectedCategory === entry.name ? '#00ffff' : 'none'}
+                                    strokeWidth={selectedCategory === entry.name ? 3 : 1}
+                                />
+                            ))}
                         </Pie>
                         <Tooltip content={<CustomTooltipDonutMaterialCategorySummary />} />
                         <Legend
-                        layout="vertical"
-                        align="right"
-                        verticalAlign="middle"
-                        wrapperStyle={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            paddingRight: 5,
-                            maxHeight: '100%',
-                        }}
+                            layout="vertical"
+                            align="right"
+                            verticalAlign="middle"
+                            wrapperStyle={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                paddingRight: 5,
+                                maxHeight: '100%',
+                            }}
                         />
                     </PieChart>
-                    </ResponsiveContainer>
+                </ResponsiveContainer>
             </div>
         );
     }
+    
 
     if (type === 'count_Unclassified') {
         return (
