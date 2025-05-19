@@ -68,8 +68,8 @@ const StartPage = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen w-screen bg-gray-950 pb-4 overflow-auto">
-            <div className="flex justify-between items-center px-6 py-4 bg-gray-900 bg-opacity-90 z-10 relative">
+        <div className="flex flex-col h-screen w-screen bg-gray-950 pb-4 overflow-hidden">
+            <div className="flex justify-between items-center px-4 py-3 bg-gray-900 bg-opacity-90 z-10 relative">
                 <Header title="Warnings" />
             </div>
 
