@@ -27,7 +27,7 @@ const MaterialComponentPredictionsDashboard = () => {
   const searchWrapperRef = useRef(null)
 
   const handleItemClick = (item) => {
-    setSelectedItem(item)
+    setSelectedItem((prev) => (prev === item ? null : item));
   }
 
   useEffect(() => {

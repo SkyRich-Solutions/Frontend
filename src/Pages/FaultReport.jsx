@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import Header from "../Components/Layout/Header"
 import Pagination from "../Components/ReUseable/Pagination"
+import { Filter } from "lucide-react"
 
 const ITEMS_PER_PAGE = 13
 
@@ -11,7 +12,9 @@ const FaultReport = () => {
   const [technicians, setTechnicians] = useState([])
   const [locations, setLocations] = useState([])
   const [faultReports, setFaultReports] = useState([])
+  const [filteredReports, setFilteredReports] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
+  const [statusFilter, setStatusFilter] = useState("All")
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -37,6 +40,7 @@ const FaultReport = () => {
         setTechnicians(techRes.data.data || [])
         setLocations(locRes.data.data || [])
         setFaultReports(reportRes.data.data || [])
+        setFilteredReports(reportRes.data.data || [])
       } catch (err) {
         setError("Failed to load data.")
         console.error("Error fetching data:", err)
@@ -47,6 +51,19 @@ const FaultReport = () => {
 
     fetchData()
   }, [])
+
+  // Apply status filter when statusFilter changes
+  useEffect(() => {
+    if (statusFilter === "All") {
+      setFilteredReports(faultReports)
+    } else {
+      setFilteredReports(faultReports.filter((report) => report.Report_Status === statusFilter))
+    }
+    setCurrentPage(1) // Reset to first page when filter changes
+  }, [statusFilter, faultReports])
+
+  // Get unique status values from reports for the filter dropdown
+  const uniqueStatuses = ["All", ...new Set(faultReports.map((report) => report.Report_Status))].filter(Boolean)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -99,7 +116,33 @@ const FaultReport = () => {
     setCurrentPage(page)
   }
 
-  const paginatedReports = faultReports.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value)
+  }
+
+  const paginatedReports = filteredReports.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+
+  // Get status badge color based on status
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case "Open":
+        return "bg-green-900 text-green-200"
+      case "In Progress":
+        return "bg-blue-900 text-blue-200"
+      case "Waiting for Parts":
+        return "bg-yellow-900 text-yellow-200"
+      case "Under Review":
+        return "bg-purple-900 text-purple-200"
+      case "Resolved":
+        return "bg-teal-900 text-teal-200"
+      case "Closed":
+        return "bg-gray-700 text-gray-200"
+      case "Cancelled":
+        return "bg-red-900 text-red-200"
+      default:
+        return "bg-gray-700 text-gray-200"
+    }
+  }
 
   return (
     <div className="h-screen flex flex-col bg-gray-800 bg-opacity-50 backdrop-blur-md w-full border-gray-700 ">
@@ -239,7 +282,25 @@ const FaultReport = () => {
           {/* Table Section */}
           <div className="lg:w-1/2 flex flex-col h-full">
             <div className="bg-gray-800 rounded-lg shadow-xl border border-gray-700 p-6 flex-1 flex flex-col">
-              <h2 className="text-xl font-semibold mb-6 text-center">Submitted Fault Reports</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold">Submitted Fault Reports</h2>
+
+                {/* Status Filter */}
+                <div className="flex items-center space-x-2">
+                  <Filter className="h-4 w-4 text-gray-400" />
+                  <select
+                    value={statusFilter}
+                    onChange={handleStatusFilterChange}
+                    className="bg-gray-700 border border-gray-600 rounded-md p-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  >
+                    {uniqueStatuses.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
               <div className="flex-1 overflow-hidden">
                 <div className="h-full overflow-auto rounded-md border border-gray-700">
@@ -263,7 +324,9 @@ const FaultReport = () => {
                       ) : paginatedReports.length === 0 ? (
                         <tr>
                           <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
-                            No reports found.
+                            {statusFilter === "All"
+                              ? "No reports found."
+                              : `No reports with status "${statusFilter}" found.`}
                           </td>
                         </tr>
                       ) : (
@@ -275,21 +338,7 @@ const FaultReport = () => {
                             <td className="px-4 py-3 text-sm">{report.Fault_Type}</td>
                             <td className="px-4 py-3 text-sm">
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  report.Report_Status === "Open"
-                                    ? "bg-green-900 text-green-200"
-                                    : report.Report_Status === "In Progress"
-                                      ? "bg-blue-900 text-blue-200"
-                                      : report.Report_Status === "Waiting for Parts"
-                                        ? "bg-yellow-900 text-yellow-200"
-                                        : report.Report_Status === "Under Review"
-                                          ? "bg-purple-900 text-purple-200"
-                                          : report.Report_Status === "Resolved"
-                                            ? "bg-teal-900 text-teal-200"
-                                            : report.Report_Status === "Closed"
-                                              ? "bg-gray-700 text-gray-200"
-                                              : "bg-red-900 text-red-200"
-                                }`}
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(report.Report_Status)}`}
                               >
                                 {report.Report_Status}
                               </span>
@@ -303,11 +352,14 @@ const FaultReport = () => {
               </div>
 
               {/* Pagination */}
-              {!loading && faultReports.length > 0 && (
-                <div className="mt-4">
+              {!loading && filteredReports.length > 0 && (
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="text-sm text-gray-400">
+                    Showing {filteredReports.length} {statusFilter !== "All" ? `${statusFilter}` : ""} reports
+                  </div>
                   <Pagination
                     currentPage={currentPage}
-                    totalItems={faultReports.length}
+                    totalItems={filteredReports.length}
                     itemsPerPage={ITEMS_PER_PAGE}
                     onPageChange={handlePageChange}
                   />

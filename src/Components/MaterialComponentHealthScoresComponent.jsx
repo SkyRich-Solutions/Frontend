@@ -563,8 +563,9 @@ const MaterialComponentHealthScoresComponent = ({ type, searchQuery, selectedIte
                 const data = payload[0].payload;
                 return (
                     <div className="bg-gray-800/80 p-2 rounded shadow text-sm border border-gray-700 text-white">
-                        <p><strong>Material ID:</strong> {data.Material_ID}</p>
-                        <p><strong>Total Category Score:</strong> {data.HealthScore}</p>
+                        <p><strong>Category:</strong> {data.Category}</p>
+                        <p><strong>Bayesian Proabaility:</strong> {data.BayesianProbability.toFixed(2)}</p>
+                        <p><strong>Monte Carlo Estimate:</strong> {data.MonteCarloEstimate.toFixed(2)}</p>
                     </div>
                 );
             }
