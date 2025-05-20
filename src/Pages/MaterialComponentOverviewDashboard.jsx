@@ -13,7 +13,7 @@ const MaterialComponentOverviewDashboard = () => {
     const [isLoading, setIsLoading] = useState(true)
 
     const handleItemClick = (item) => {
-        setSelectedItem(item)
+        setSelectedItem((prev) => (prev === item ? null : item));
     }
 
     const searchWrapperRef = useRef(null)

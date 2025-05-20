@@ -14,8 +14,9 @@ const TurbineDashboard = () => {
 
   const searchWrapperRef = useRef(null)
 
-  const handleItemClick = (item) => setSelectedItem(item)
-
+  const handleItemClick = (item) => {
+    setSelectedItem((prev) => (prev === item ? null : item));
+  }
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchWrapperRef.current && !searchWrapperRef.current.contains(event.target)) {

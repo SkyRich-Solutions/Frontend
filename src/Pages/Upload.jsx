@@ -1,3 +1,4 @@
+"use client"
 
 import { useState } from "react"
 import axios from "axios"
@@ -71,11 +72,7 @@ const UploadPage = () => {
   }
 
   const isTurbineProcessed = (item) => {
-    return (
-      item.UnknownMaintPlant === "1" ||
-      item.UnknownPlanningPlant === "1" ||
-      item.UnknownLocation === "1"
-    )
+    return item.UnknownMaintPlant === "1" || item.UnknownPlanningPlant === "1" || item.UnknownLocation === "1"
   }
 
   const handleFileChange = (e) => {
@@ -130,12 +127,13 @@ const UploadPage = () => {
         setProcessedData(processedRes.data.data)
 
         const rowsWithErrors = processedRes.data.data.filter((item) =>
-          type === "material" ? isMaterialProcessed(item) : isTurbineProcessed(item)
+          type === "material" ? isMaterialProcessed(item) : isTurbineProcessed(item),
         ).length
 
-        setOutput(rowsWithErrors > 0
-          ? `Found ${rowsWithErrors} rows with issues that need cleaning`
-          : "Data is already clean ✅ (No issues found)"
+        setOutput(
+          rowsWithErrors > 0
+            ? `Found ${rowsWithErrors} rows with issues that need cleaning`
+            : "Data is already clean ✅ (No issues found)",
         )
         setHasErrors(rowsWithErrors > 0)
       }
@@ -159,30 +157,30 @@ const UploadPage = () => {
     setUploading(false)
     setError(null)
     setOutput("")
-  
+
     try {
       const response = await axios.post("http://localhost:4000/api/run-python-both", {}, { withCredentials: true })
-  
+
       if (response.data) {
         const apiPrefix = fileType === "material" ? "Material" : "Turbine"
         const [unprocessedRes, processedRes] = await Promise.all([
           axios.get(`http://localhost:4000/api/fetch_Unprocessed${apiPrefix}Data`),
           axios.get(`http://localhost:4000/api/fetch_Processed${apiPrefix}Data`),
         ])
-  
+
         const unprocessed = unprocessedRes.data.data
         const processed = processedRes.data.data
-  
+
         setUnprocessedData(unprocessed)
         setProcessedData(processed)
-  
+
         const totalRows = processed.length
         const cleanedLines = processed.filter((item) =>
-          fileType === "material" ? isMaterialProcessed(item) : isTurbineProcessed(item)
+          fileType === "material" ? isMaterialProcessed(item) : isTurbineProcessed(item),
         ).length
-  
+
         if (cleanedLines > 0) {
-          setOutput(`Data cleaned successfully ✅ (${cleanedLines} lines cleaned out of ${totalRows} total)`)
+          setOutput(`${cleanedLines} Violations out of ${totalRows}`)
           setHasErrors(true)
         } else {
           setOutput("Data was already clean ✅ (No issues found)")
@@ -196,7 +194,6 @@ const UploadPage = () => {
       setTimeout(() => setCleaning(false), 2000)
     }
   }
-  
 
   const unprocessedColumns = UnprocessedData.length > 0 ? Object.keys(UnprocessedData[0]) : []
 
@@ -210,12 +207,12 @@ const UploadPage = () => {
       }
       return false
     })
-  
+
     const pairs = []
-  
+
     processedRows.forEach((processedItem) => {
       let matchFn
-  
+
       if (fileType === "material") {
         matchFn = (unprocessedItem) =>
           unprocessedItem.Material === processedItem.Material &&
@@ -227,9 +224,9 @@ const UploadPage = () => {
           unprocessedItem.MaintPlant === processedItem.MaintPlant &&
           unprocessedItem.PlanningPlant === processedItem.PlanningPlant
       }
-  
+
       const matchingUnprocessed = UnprocessedData.find(matchFn)
-  
+
       if (matchingUnprocessed) {
         pairs.push({
           processed: processedItem,
@@ -237,7 +234,7 @@ const UploadPage = () => {
         })
       }
     })
-  
+
     return pairs
   }
 
@@ -298,7 +295,16 @@ const UploadPage = () => {
 
       {!Uploading && (
         <>
-          <h1 className="text-white text-2xl font-semibold text-center p-2">{output}</h1>
+          {output && (
+            <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-md mx-auto max-w-3xl p-4 mb-4">
+              <div
+                className={`flex items-center justify-center gap-2 ${hasErrors ? "text-amber-400" : "text-green-400"}`}
+              >
+                {hasErrors ? <CircleAlertIcon className="w-5 h-5" /> : <CircleCheckBigIcon className="w-5 h-5" />}
+                <span className="text-sm font-medium">{output}</span>
+              </div>
+            </div>
+          )}
           {Cleaning ? (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
               <Loader />
@@ -306,8 +312,12 @@ const UploadPage = () => {
           ) : hasErrors ? (
             <>
               <div className="flex item-center justify-center">
-                <h2 className="text-xl w-1/2 font-bold text-center mb-2">Unprocessed Data ({matchedPairs.length} rows)</h2>
-                <h2 className="text-xl w-1/2 font-bold text-center mb-2">Processed Data ({matchedPairs.length} rows)</h2>
+                <h2 className="text-xl w-1/2 font-bold text-center mb-2">
+                  Unprocessed Data ({matchedPairs.length} rows)
+                </h2>
+                <h2 className="text-xl w-1/2 font-bold text-center mb-2">
+                  Processed Data ({matchedPairs.length} rows)
+                </h2>
               </div>
               <div className="flex w-full justify-center gap-4 overflow-x-auto py-4 px-4">
                 {[
@@ -341,8 +351,8 @@ const UploadPage = () => {
                                   shouldHighlight
                                     ? "bg-red-500 text-white font-bold"
                                     : rowIndex % 2 === 0
-                                    ? "bg-gray-800"
-                                    : "bg-transparent"
+                                      ? "bg-gray-800"
+                                      : "bg-transparent"
                                 } hover:bg-cyan-800 transition-colors`}
                               >
                                 {unprocessedColumns.map((key, cellIndex) => (
@@ -380,4 +390,3 @@ const UploadPage = () => {
 }
 
 export default UploadPage
-
