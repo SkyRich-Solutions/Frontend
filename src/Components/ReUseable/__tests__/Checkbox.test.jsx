@@ -1,51 +1,59 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import ChechBox from '../ChechBox';
+import { render, fireEvent } from '@testing-library/react';
+import Checkbox from '../ChechBox';
 import '@testing-library/jest-dom';
 
-describe('ChechBox component', () => {
-  const setup = (props = {}) => {
-    const defaultProps = {
-      checked: false,
-      onChange: jest.fn(),
-      name: 'example-checkbox',
-      ...props,
-    };
+// ZOMBIES: Checkbox component test suite
 
-    render(<ChechBox {...defaultProps} />);
-    const checkbox = screen.getByLabelText('', { selector: 'input[type="checkbox"]' });
-    return { checkbox, props: defaultProps };
-  };
-
-  it('renders without crashing', () => {
-    const { checkbox } = setup();
-    expect(checkbox).toBeInTheDocument();
+describe('Checkbox - ZOMBIES', () => {
+  // Z - Zero state: Renders unchecked by default
+  test('Z - renders an unchecked checkbox', () => {
+    const { container } = render(<Checkbox checked={false} onChange={() => {}} name="test" />);
+    const input = container.querySelector('input[type="checkbox"]');
+    expect(input).not.toBeChecked();
   });
 
-  it('renders checked state correctly', () => {
-    const { checkbox } = setup({ checked: true });
-    expect(checkbox).toBeChecked();
+  // O - One state: Renders checked when true
+  test('O - renders a checked checkbox when prop is true', () => {
+    const { container } = render(<Checkbox checked={true} onChange={() => {}} name="test" />);
+    const input = container.querySelector('input[type="checkbox"]');
+    expect(input).toBeChecked();
   });
 
-  it('renders unchecked state correctly', () => {
-    const { checkbox } = setup({ checked: false });
-    expect(checkbox).not.toBeChecked();
+  // M - Multiple interaction: Calls onChange when toggled
+  test('M - clicking checkbox triggers onChange handler', () => {
+    const handleChange = jest.fn();
+    const { container } = render(<Checkbox checked={false} onChange={handleChange} name="test" />);
+    const input = container.querySelector('input[type="checkbox"]');
+    fireEvent.click(input);
+    expect(handleChange).toHaveBeenCalled();
   });
 
-  it('fires onChange when clicked', () => {
-    const { checkbox, props } = setup();
-    fireEvent.click(checkbox);
-    expect(props.onChange).toHaveBeenCalledTimes(1);
+  // B - Boundary: passes the correct name attribute
+  test('B - checkbox includes the provided name attribute', () => {
+    const { container } = render(<Checkbox checked={false} onChange={() => {}} name="boundary-name" />);
+    const input = container.querySelector('input[type="checkbox"]');
+    expect(input).toHaveAttribute('name', 'boundary-name');
   });
 
-  it('assigns the correct name prop', () => {
-    const { checkbox, props } = setup({ name: 'custom-checkbox' });
-    expect(checkbox).toHaveAttribute('name', props.name);
+  // I - Interface: renders all necessary elements
+  test('I - renders input and styled checkmark', () => {
+    const { container } = render(<Checkbox checked={false} onChange={() => {}} name="test" />);
+    expect(container.querySelector('input[type="checkbox"]')).toBeInTheDocument();
+    expect(container.querySelector('.checkmark')).toBeInTheDocument();
   });
 
-  it('renders the custom checkmark element', () => {
-    const { container } = render(<ChechBox checked={false} onChange={() => {}} name="test" />);
-    const checkmark = container.querySelector('.checkmark');
-    expect(checkmark).toBeInTheDocument();
+  // E - Edge Case: handles undefined onChange gracefully
+  test('E - clicking without onChange does not throw error', () => {
+    const { container } = render(<Checkbox checked={false} name="test" />);
+    const input = container.querySelector('input[type="checkbox"]');
+    expect(() => fireEvent.click(input)).not.toThrow();
+  });
+
+  // S - Styling: check styled container and checkmark
+  test('S - renders styled wrapper and container class', () => {
+    const { container } = render(<Checkbox checked={false} onChange={() => {}} name="test" />);
+    expect(container.querySelector('.container')).toBeInTheDocument();
+    expect(container.querySelector('.checkmark')).toBeInTheDocument();
   });
 });

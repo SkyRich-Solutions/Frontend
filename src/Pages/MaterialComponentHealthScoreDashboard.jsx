@@ -3,6 +3,7 @@ import Header from "../Components/Layout/Header"
 import MaterialComponentHealthScoresComponent from "../Components/MaterialComponentHealthScoresComponent"
 import Loader from "../Components/ReUseable/Loader"
 import Fuse from "fuse.js"
+import React from "react"
 
 import {
   getMaterialComponentScoreSummary,

@@ -18,34 +18,63 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-describe('DiscrepancyCounter', () => {
-  it('displays loading state initially', async () => {
+describe('DiscrepancyCounter - ZOMBIES', () => {
+  test('Z - Zero state: displays loading with no data', async () => {
     fetch.mockResolvedValueOnce({
-      json: async () => ({ mistakes: 5 }),
+      json: async () => ({ mistakes: 0 }),
     });
 
     render(<DiscrepancyCounter />);
-
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
 
-    // Wait for the loading state to go away
     await waitFor(() =>
       expect(screen.queryByText(/loading/i)).not.toBeInTheDocument()
     );
+
+    expect(screen.getByTestId('countup')).toHaveTextContent('0');
   });
 
-  it('renders the mistake count from API after loading', async () => {
+  test('O - One item: renders mistake count of 1', async () => {
+    fetch.mockResolvedValueOnce({
+      json: async () => ({ mistakes: 1 }),
+    });
+
+    render(<DiscrepancyCounter />);
+    const countupElement = await screen.findByTestId('countup');
+    expect(countupElement).toHaveTextContent('1');
+  });
+
+  test('M - Many items: renders large mistake count', async () => {
     fetch.mockResolvedValueOnce({
       json: async () => ({ mistakes: 42 }),
     });
 
     render(<DiscrepancyCounter />);
-
     const countupElement = await screen.findByTestId('countup');
     expect(countupElement).toHaveTextContent('42');
   });
 
-  it('handles fetch failure gracefully and stops loading', async () => {
+  test('B - Boundary: handles negative mistake count gracefully', async () => {
+    fetch.mockResolvedValueOnce({
+      json: async () => ({ mistakes: -5 }),
+    });
+
+    render(<DiscrepancyCounter />);
+    const countupElement = await screen.findByTestId('countup');
+    expect(countupElement).toHaveTextContent('-5');
+  });
+
+  test('I - Interface: element renders with proper className', async () => {
+    fetch.mockResolvedValueOnce({
+      json: async () => ({ mistakes: 7 }),
+    });
+
+    render(<DiscrepancyCounter />);
+    const countupElement = await screen.findByTestId('countup');
+    expect(countupElement).toHaveClass('text-red-500'); // or whatever class you use
+  });
+
+  test('E - Error: handles fetch failure gracefully', async () => {
     fetch.mockRejectedValueOnce(new Error('Fetch failed'));
 
     render(<DiscrepancyCounter />);
@@ -54,8 +83,17 @@ describe('DiscrepancyCounter', () => {
       expect(screen.queryByText(/loading/i)).not.toBeInTheDocument()
     );
 
-    // Should still render CountUp with 0
     const countupElement = await screen.findByTestId('countup');
     expect(countupElement).toHaveTextContent('0');
+  });
+
+  test('S - State: updates correctly on state change', async () => {
+    fetch.mockResolvedValueOnce({
+      json: async () => ({ mistakes: 10 }),
+    });
+
+    render(<DiscrepancyCounter />);
+    const countupElement = await screen.findByTestId('countup');
+    expect(countupElement).toHaveTextContent('10');
   });
 });

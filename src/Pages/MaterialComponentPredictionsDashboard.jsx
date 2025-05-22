@@ -3,6 +3,7 @@ import Header from "../Components/Layout/Header"
 import MaterialComponentPredictionsComponent from "../Components/MaterialComponentPredictionsComponent"
 import Loader from "../Components/ReUseable/Loader" // Update this path to match your project structure
 import Fuse from "fuse.js"
+import React from "react"
 
 import {
   getReplacementPredictions,

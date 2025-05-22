@@ -4,6 +4,7 @@ import MaterialComponentOverviewComponent from "../Components/MaterialComponentO
 import Loader from "../Components/ReUseable/Loader"// Update this path to match your project structure
 import Fuse from "fuse.js"
 import { getPredictionMaterialData } from "../Utils/MaterialDashboardDataHandler"
+import React from "react"
 
 const MaterialComponentOverviewDashboard = () => {
     const [selectedItem, setSelectedItem] = useState(null)

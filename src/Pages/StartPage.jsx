@@ -5,6 +5,7 @@ import Header from "../Components/Layout/Header"
 import { getMaterialComponentHealthScores } from "../Utils/MaterialDashboardDataHandler"
 import { getTurbineModelHealthScores } from "../Utils/TurbineDashboardDataHandler"
 import { AlertTriangle, Filter } from "lucide-react"
+import React from "react"
 
 const StartPage = () => {
   const [materialData, setMaterialData] = useState([])

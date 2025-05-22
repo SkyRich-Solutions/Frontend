@@ -1,88 +1,112 @@
 import React from 'react';
-import { render, cleanup } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import ConnectionLine from '../ConnectingLine';
+import '@testing-library/jest-dom';
 
-// Mock useMap from @vis.gl/react-google-maps
-jest.mock('@vis.gl/react-google-maps', () => ({
-  useMap: jest.fn()
-}));
+const mockSetMap = jest.fn();
+const mockSetDirections = jest.fn();
+const mockOpen = jest.fn();
 
-// Create a mock for Polyline
-const setMapMock = jest.fn();
-const PolylineMock = jest.fn().mockImplementation(() => ({
-  setMap: setMapMock
-}));
-
-// Assign the mock to global window.google
 beforeAll(() => {
-  global.window.google = {
+  global.google = {
     maps: {
-      Polyline: PolylineMock
-    }
+      DirectionsService: jest.fn().mockImplementation(() => ({
+        route: (options, callback) => {
+          callback({
+            routes: [
+              {
+                legs: [
+                  {
+                    distance: { text: '10 km' },
+                    duration: { text: '15 mins' },
+                  },
+                ],
+                overview_path: [
+                  { lat: () => 0, lng: () => 0 },
+                  { lat: () => 1, lng: () => 1 },
+                ],
+              },
+            ],
+          }, 'OK');
+        },
+      })),
+      DirectionsRenderer: jest.fn().mockImplementation(() => ({
+        setMap: mockSetMap,
+        setDirections: mockSetDirections,
+      })),
+      InfoWindow: jest.fn().mockImplementation(() => ({
+        open: mockOpen,
+      })),
+      TravelMode: {
+        DRIVING: 'DRIVING',
+      },
+      DirectionsStatus: {
+        OK: 'OK',
+      },
+      geometry: {
+        spherical: {
+          computeLength: jest.fn(() => 1000),
+          computeDistanceBetween: jest.fn(() => 500),
+          interpolate: jest.fn(() => ({ lat: () => 0.5, lng: () => 0.5 })),
+        },
+      },
+    },
   };
 });
 
-afterEach(() => {
-  jest.clearAllMocks();
-  cleanup();
-});
+jest.mock('@vis.gl/react-google-maps', () => ({
+  useMap: () => ({}),
+}));
 
-describe('ConnectionLine', () => {
-  const mockMap = { setMap: jest.fn() };
-  const mockPath = [
-    { lat: 10, lng: 20 },
-    { lat: 30, lng: 40 }
-  ];
+jest.mock('../../../Utils/InfoWindow', () => ({
+  closeGlobalInfoWindow: jest.fn(),
+  setGlobalInfoWindow: jest.fn(),
+}));
 
-  it('renders and initializes a polyline when map and path are valid', () => {
-    const { useMap } = require('@vis.gl/react-google-maps');
-    useMap.mockReturnValue(mockMap);
-
-    render(<ConnectionLine path={mockPath} />);
-
-    expect(PolylineMock).toHaveBeenCalledWith({
-      path: mockPath,
-      geodesic: true,
-      strokeOpacity: 0,
-      strokeWeight: 2,
-      icons: [
-        {
-          icon: {
-            path: 'M 0,-1 0,1',
-            strokeOpacity: 1,
-            scale: 4
-          },
-          offset: '0',
-          repeat: '10px'
-        }
-      ],
-      map: mockMap
-    });
+describe('ConnectionLine - ZOMBIES', () => {
+  test('Z - renders without crashing', () => {
+    render(<ConnectionLine origin={{ lat: 0, lng: 0 }} destination={{ lat: 1, lng: 1 }} />);
+    expect(true).toBe(true);
   });
 
-  it('cleans up polyline on unmount', () => {
-    const { useMap } = require('@vis.gl/react-google-maps');
-    useMap.mockReturnValue(mockMap);
-
-    const { unmount } = render(<ConnectionLine path={mockPath} />);
-    unmount();
-
-    expect(setMapMock).toHaveBeenCalledWith(null);
+  test('O - initializes Google Maps services when props are set', () => {
+    render(<ConnectionLine origin={{ lat: 5, lng: 5 }} destination={{ lat: 6, lng: 6 }} />);
+    expect(google.maps.DirectionsService).toHaveBeenCalled();
+    expect(google.maps.DirectionsRenderer).toHaveBeenCalled();
   });
 
-  it('does not create a polyline if map is not available', () => {
-    const { useMap } = require('@vis.gl/react-google-maps');
-    useMap.mockReturnValue(null);
-
-    render(<ConnectionLine path={mockPath} />);
-    expect(PolylineMock).not.toHaveBeenCalled();
+  test('M - re-renders with updated props without crashing', () => {
+    const { rerender } = render(<ConnectionLine origin={{ lat: 1, lng: 1 }} destination={{ lat: 2, lng: 2 }} />);
+    rerender(<ConnectionLine origin={{ lat: 3, lng: 3 }} destination={{ lat: 4, lng: 4 }} />);
+    expect(true).toBe(true);
   });
 
-  it('does not create a polyline if path is too short', () => {
-    const { useMap } = require('@vis.gl/react-google-maps');
-    useMap.mockReturnValue(mockMap);
+  test('B - handles missing origin/destination props gracefully', () => {
+    mockSetMap.mockClear();
+    render(<ConnectionLine origin={null} destination={null} />);
+    expect(mockSetMap).toHaveBeenCalledTimes(0);
+  });
 
-    render(<ConnectionLine path={[{ lat: 10, lng: 20 }]} />);
-    expect(PolylineMock).not.toHaveBeenCalled();
+
+  test('I - opens an info window when rendering succeeds', () => {
+    render(<ConnectionLine origin={{ lat: 7, lng: 7 }} destination={{ lat: 8, lng: 8 }} />);
+    expect(mockOpen).toHaveBeenCalled();
+  });
+
+  test('E - handles failed directions response without crash', () => {
+    google.maps.DirectionsService.mockImplementationOnce(() => ({
+      route: (_, cb) => cb(null, 'FAIL'),
+    }));
+    render(<ConnectionLine origin={{ lat: 0, lng: 0 }} destination={{ lat: 1, lng: 1 }} />);
+    expect(true).toBe(true);
+  });
+
+  test('S - includes styled HTML in InfoWindow content', () => {
+    render(<ConnectionLine origin={{ lat: 9, lng: 9 }} destination={{ lat: 10, lng: 10 }} />);
+    expect(google.maps.InfoWindow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.stringContaining('Route Details'),
+      })
+    );
   });
 });

@@ -3,6 +3,7 @@ import Header from "../Components/Layout/Header"
 import TurbineComponentHealthScoresComponent from "../Components/TurbineComponentHealthScoresComponent"
 import Loader from "../Components/ReUseable/Loader"
 import Fuse from "fuse.js"
+import React from "react"
 import {
   getTurbineModelHealthScores,
   getTurbineModelScoreSummary,

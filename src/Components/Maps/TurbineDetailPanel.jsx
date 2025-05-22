@@ -1,5 +1,5 @@
 "use client"
-
+import React from "react"
 import { ArrowLeft, Wind, MapPin, Building, Cpu, Zap, Factory, ArrowUpDown, ArrowUp } from "lucide-react"
 
 const TurbineDetailPanel = ({ selectedTurbine, selectedPlant, plantTurbines, onTurbineSelect }) => {

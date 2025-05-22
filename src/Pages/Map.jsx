@@ -1,5 +1,5 @@
 "use client"
-
+import React from "react"
 import { useEffect, useState, lazy, Suspense, useRef } from "react"
 import Header from "../Components/Layout/Header"
 import Loader from "../Components/ReUseable/Loader"

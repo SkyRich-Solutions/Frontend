@@ -6,7 +6,7 @@ on:
       # - Development
       # - Feature
       # - test-branch
-       -main
+       -testingBranch
 
 jobs:
   build:

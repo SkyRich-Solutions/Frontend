@@ -1,90 +1,108 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import FaultReport from '../FaultReport';
-import axios from 'axios';
-jest.mock('axios');
+import React from 'react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import FaultReport from '../FaultReport'
+import axios from 'axios'
+import '@testing-library/jest-dom'
 
-describe('FaultReport Component', () => {
-  const techniciansMock = [
-    { Technician_ID: '1', Name: 'Alice' },
-    { Technician_ID: '2', Name: 'Bob' },
-  ];
+jest.mock('axios')
 
-  const locationsMock = [
-    { Location_ID: '10', Location_Name: 'Wind Farm A' },
-    { Location_ID: '11', Location_Name: 'Wind Farm B' },
-  ];
+const mockTechs = [{ Technician_ID: 'T001', Name: 'Jane', Surname: 'Doe' }]
+const mockLocations = [{ Location_ID: 'L001', Location_Name: 'Site A' }]
+const mockReports = [
+  {
+    Technician_ID: 'T001',
+    TurbineLocation: 'L001',
+    Report_Date: '2024-01-01',
+    Fault_Type: 'Mechanical Fault',
+    Report_Status: 'Open',
+  },
+]
 
-  beforeEach(async () => {
-    axios.get.mockImplementation((url) => {
-      if (url.includes('technicians')) {
-        return Promise.resolve({ data: { data: techniciansMock } });
-      } else if (url.includes('locations')) {
-        return Promise.resolve({ data: { data: locationsMock } });
-      }
-      return Promise.reject(new Error('Unknown endpoint'));
-    });
+beforeEach(() => {
+  axios.get.mockImplementation((url) => {
+    if (url.includes('technicians')) return Promise.resolve({ data: { data: mockTechs } })
+    if (url.includes('locations')) return Promise.resolve({ data: { data: mockLocations } })
+    if (url.includes('getAllFaultReports')) return Promise.resolve({ data: { data: mockReports } })
+  })
+})
 
-    render(<FaultReport />);
-    await waitFor(() => screen.getByRole('button', { name: /submit report/i }));
-  });
-
-  it('renders form fields after loading', async () => {
-    const comboBoxes = screen.getAllByRole('combobox');
-    expect(comboBoxes).toHaveLength(2); // Technician and Turbine Location
-
-    const dateInput = document.querySelector('input[name="Report_Date"]');
-    expect(dateInput).toBeInTheDocument();
-
-    const faultType = document.querySelector('textarea[name="Fault_Type"]');
-    expect(faultType).toBeInTheDocument();
-
-    const reportStatus = document.querySelector('input[name="Report_Status"]');
-    expect(reportStatus).toBeInTheDocument();
-
-    const fileInput = document.querySelector('input[type="file"]');
-    expect(fileInput).toBeInTheDocument();
-  });
-
-  it('alerts if non-PDF file is uploaded', async () => {
-    window.alert = jest.fn();
-    const file = new File(['txt content'], 'report.txt', { type: 'text/plain' });
-
-    const fileInput = document.querySelector('input[type="file"]');
-    fireEvent.change(fileInput, {
-      target: { files: [file] },
-    });
-
-    fireEvent.submit(screen.getByRole('button', { name: /submit report/i }));
-    expect(window.alert).toHaveBeenCalledWith('Only PDF files are allowed.');
-  });
-
-  it('submits form with valid PDF file', async () => {
-    window.alert = jest.fn();
-    axios.post.mockResolvedValue({ data: { message: 'Report submitted successfully!' } });
-
-    const comboBoxes = screen.getAllByRole('combobox');
-    fireEvent.change(comboBoxes[0], { target: { value: '1' } });
-    fireEvent.change(comboBoxes[1], { target: { value: '10' } });
-
-    const dateInput = document.querySelector('input[name="Report_Date"]');
-    fireEvent.change(dateInput, { target: { value: '2025-04-24' } });
-
-    const faultType = document.querySelector('textarea[name="Fault_Type"]');
-    fireEvent.change(faultType, { target: { value: 'Blade crack' } });
-
-    const reportStatus = document.querySelector('input[name="Report_Status"]');
-    fireEvent.change(reportStatus, { target: { value: 'Pending' } });
-
-    const validFile = new File(['pdf content'], 'report.pdf', { type: 'application/pdf' });
-    const fileInput = document.querySelector('input[type="file"]');
-    fireEvent.change(fileInput, {
-      target: { files: [validFile] },
-    });
-
-    fireEvent.submit(screen.getByRole('button', { name: /submit report/i }));
+describe('FaultReport - ZOMBIES', () => {
+  test('Z - Zero state: loads and renders form', async () => {
+    render(<FaultReport />)
+    expect(screen.getByText(/Loading data/i)).toBeInTheDocument()
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('Report submitted successfully!');
-    });
-  });
-});
+      expect(screen.getByText(/Submit New Fault Report/i)).toBeInTheDocument()
+    })
+  })
+
+  test('O - One report is displayed', async () => {
+    render(<FaultReport />)
+    await waitFor(() => {
+      expect(screen.getByText('T001')).toBeInTheDocument()
+      expect(screen.getAllByText('Mechanical Fault').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Open').length).toBeGreaterThan(0)
+    })
+  })
+
+  test('M - Many filter options and filters by status', async () => {
+    render(<FaultReport />)
+    await waitFor(() => screen.getByText('T001'))
+
+    const selects = screen.getAllByRole('combobox')
+    const statusSelect = selects[selects.length - 1]
+    fireEvent.change(statusSelect, { target: { value: 'Open' } })
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Open').length).toBeGreaterThan(1)
+    })
+  })
+
+  test('B - Boundary: no reports returned', async () => {
+    axios.get.mockImplementation((url) => {
+      if (url.includes('getAllFaultReports')) return Promise.resolve({ data: { data: [] } })
+      if (url.includes('technicians')) return Promise.resolve({ data: { data: mockTechs } })
+      if (url.includes('locations')) return Promise.resolve({ data: { data: mockLocations } })
+    })
+
+    render(<FaultReport />)
+    await waitFor(() => {
+      expect(screen.getByText(/No reports found/i)).toBeInTheDocument()
+    })
+  })
+
+  test('I - Interface fields are present', async () => {
+    render(<FaultReport />)
+    await waitFor(() => screen.getByText(/Submit New Fault Report/i))
+
+    expect(screen.getAllByText(/Technician/i).some(el => el.tagName === 'LABEL')).toBe(true)
+    expect(screen.getAllByText(/Turbine Location/i).some(el => el.tagName === 'LABEL')).toBe(true)
+    expect(screen.getAllByText(/Report Date/i).some(el => el.tagName === 'LABEL')).toBe(true)
+    expect(screen.getAllByText(/Fault Type/i).some(el => el.tagName === 'LABEL')).toBe(true)
+    expect(screen.getAllByText(/Report Status/i).some(el => el.tagName === 'LABEL')).toBe(true)
+    expect(screen.getAllByText(/Upload PDF Report/i).some(el => el.tagName === 'LABEL')).toBe(true)
+  })
+
+  test('E - Exception: alerts on non-PDF file', async () => {
+    window.alert = jest.fn()
+    render(<FaultReport />)
+    await waitFor(() => screen.getByText(/Submit New Fault Report/i))
+
+    const fileInput = document.querySelector('input[type="file"]')
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['text'], 'note.txt', { type: 'text/plain' })] },
+    })
+
+    const button = screen.getByRole('button', { name: /submit report/i })
+    fireEvent.click(button)
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith('Only PDF files are allowed.')
+    })
+  })
+
+  test('S - Style: applies correct container class', async () => {
+    render(<FaultReport />)
+    const header = await screen.findByText(/Submit New Fault Report/i)
+    expect(header.closest('div')).toHaveClass('bg-gray-800')
+  })
+})

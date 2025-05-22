@@ -4,15 +4,12 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
 
   transform: {
-    "^.+\\.[t|j]sx?$": "babel-jest"
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest'
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(axios|lucide-react|@vis\\.gl/react-google-maps)/)',
   ],
   moduleFileExtensions: ['js', 'jsx', 'json', 'node'],
-  globals: {
-    'babel-jest': {
-      useESM: true
-    }
-  }
+
+
 };

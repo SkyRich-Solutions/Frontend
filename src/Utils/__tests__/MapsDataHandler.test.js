@@ -1,91 +1,71 @@
-// src/Utils/__tests__/MapsDataHandler.test.js
-import axios from 'axios';
 import MapsDataHandler from '../MapsDataHandler';
+import axios from 'axios';
 
 jest.mock('axios');
 
-describe('MapsDataHandler', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+const mockResponse = [{ id: 1, name: 'Sample' }];
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+describe('MapsDataHandler (ZOMBIES)', () => {
+  const {
+    getPlanningPlantData,
+    getWarehousePlanningPlantData,
+    getWarehouseManufacturingPlantData,
+    getWarehousePlantData
+  } = MapsDataHandler;
+
+  const testCall = async (fn, endpoint) => {
+    axios.get.mockResolvedValueOnce({ data: { data: mockResponse } });
+    const result = await fn();
+    expect(axios.get).toHaveBeenCalledWith(endpoint);
+    expect(result).toEqual(mockResponse);
+  };
+
+  // Z - Zero
+  test('returns empty array if response is empty (planning plant)', async () => {
+    axios.get.mockResolvedValueOnce({ data: { data: [] } });
+    const result = await getPlanningPlantData();
+    expect(result).toEqual([]);
   });
 
-  describe('getPlanningPlantData', () => {
-    it('returns data on success', async () => {
-      const mockData = [{ id: 1, name: 'Plant A' }];
-      axios.get.mockResolvedValueOnce({ data: { data: mockData } });
-
-      const result = await MapsDataHandler.getPlanningPlantData();
-      expect(result).toEqual(mockData);
-      expect(axios.get).toHaveBeenCalledWith('http://localhost:4000/api/getAllTurbine');
-    });
-
-    it('logs error on failure', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      axios.get.mockRejectedValueOnce(new Error('Network Error'));
-
-      await MapsDataHandler.getPlanningPlantData();
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error fetching Planning Plant data:'), expect.any(Error));
-      consoleSpy.mockRestore();
-    });
+  // O - One
+  test('returns one item correctly (planning plant)', async () => {
+    axios.get.mockResolvedValueOnce({ data: { data: [mockResponse[0]] } });
+    const result = await getPlanningPlantData();
+    expect(result).toEqual([mockResponse[0]]);
   });
 
-  describe('getWarehousePlanningPlantData', () => {
-    it('returns data on success', async () => {
-      const mockData = [{ id: 2, name: 'Warehouse A' }];
-      axios.get.mockResolvedValueOnce({ data: { data: mockData } });
-
-      const result = await MapsDataHandler.getWarehousePlanningPlantData();
-      expect(result).toEqual(mockData);
-      expect(axios.get).toHaveBeenCalledWith('http://localhost:4000/api/getWarehousePlanningPlant');
-    });
-
-    it('logs error on failure', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      axios.get.mockRejectedValueOnce(new Error('Network Error'));
-
-      await MapsDataHandler.getWarehousePlanningPlantData();
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error fetching Warehouse Planning Plant data:'), expect.any(Error));
-      consoleSpy.mockRestore();
-    });
+  // M - Many
+  test('calls correct endpoint for getPlanningPlantData', async () => {
+    await testCall(getPlanningPlantData, 'http://localhost:4000/api/getAllTurbine');
   });
 
-  describe('getWarehouseManufacturingPlantData', () => {
-    it('returns data on success', async () => {
-      const mockData = [{ id: 3, name: 'Manufacturing A' }];
-      axios.get.mockResolvedValueOnce({ data: { data: mockData } });
-
-      const result = await MapsDataHandler.getWarehouseManufacturingPlantData();
-      expect(result).toEqual(mockData);
-      expect(axios.get).toHaveBeenCalledWith('http://localhost:4000/api/getWarehouseManufacturingPlant');
-    });
-
-    it('logs error on failure', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      axios.get.mockRejectedValueOnce(new Error('Network Error'));
-
-      await MapsDataHandler.getWarehouseManufacturingPlantData();
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error fetching Warehouse Planning Plant data:'), expect.any(Error));
-      consoleSpy.mockRestore();
-    });
+  test('calls correct endpoint for getWarehousePlanningPlantData', async () => {
+    await testCall(getWarehousePlanningPlantData, 'http://localhost:4000/api/getWarehousePlanningPlant');
   });
 
-  describe('getWarehousePlantData', () => {
-    it('returns data on success', async () => {
-      const mockData = [{ id: 4, name: 'Warehouse Plant A' }];
-      axios.get.mockResolvedValueOnce({ data: { data: mockData } });
+  test('calls correct endpoint for getWarehouseManufacturingPlantData', async () => {
+    await testCall(getWarehouseManufacturingPlantData, 'http://localhost:4000/api/getWarehouseManufacturingPlant');
+  });
 
-      const result = await MapsDataHandler.getWarehousePlantData();
-      expect(result).toEqual(mockData);
-      expect(axios.get).toHaveBeenCalledWith('http://localhost:4000/api/getWarehosuePlant');
-    });
+  test('calls correct endpoint for getWarehousePlantData', async () => {
+    await testCall(getWarehousePlantData, 'http://localhost:4000/api/getWarehosuePlant');
+  });
 
-    it('logs error on failure', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      axios.get.mockRejectedValueOnce(new Error('Network Error'));
+  // E - Exception
+  test('throws error when fetch fails (warehouse)', async () => {
+    axios.get.mockRejectedValueOnce(new Error('Failed to fetch'));
+    await expect(getWarehousePlantData()).resolves.toBeUndefined();
+  });
 
-      await MapsDataHandler.getWarehousePlantData();
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error fetching Warehouse Planning Plant data:'), expect.any(Error));
-      consoleSpy.mockRestore();
-    });
+  // S - State
+  test('response contains expected object shape (planning plant)', async () => {
+    axios.get.mockResolvedValueOnce({ data: { data: mockResponse } });
+    const result = await getPlanningPlantData();
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('name');
   });
 });

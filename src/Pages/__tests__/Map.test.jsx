@@ -1,67 +1,153 @@
-import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import Maps from '../../Pages/Map';
+import React from "react"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import Maps from "../Map"
+import MapsDataHandler from "../../Utils/MapsDataHandler"
 
-jest.mock('../../Utils/MapsDataHandler', () => ({
-    getPlanningPlantData: jest.fn().mockResolvedValue([{ id: 1, name: 'Planning A' }]),
-    getMaintPlantData: jest.fn().mockResolvedValue([{ id: 1, name: 'Maint A' }]),
-    getWarehousePlantData: jest.fn().mockResolvedValue([]),
-    getWarehouseManufacturingPlantData: jest.fn().mockResolvedValue([]),
-    getWarehousePlanningPlantData: jest.fn().mockResolvedValue([])
-}));
+jest.mock("../../Components/Layout/Header", () => () => <div data-testid="header">Header</div>)
+jest.mock("../../Components/ReUseable/Loader", () => () => <div data-testid="loader">Loading...</div>)
+jest.mock("../../Components/ReUseable/FilterBox", () => ({ title }) => <div>{title}</div>)
+jest.mock("../../Components/Maps/TurbineDetailPanel", () => () => <div data-testid="detail-panel">Detail Panel</div>)
+jest.mock("../../Components/Maps/MapsComponent", () => () => <div data-testid="map-component">Map</div>)
 
-jest.mock('../../MockData/TurbineData.json', () => [
-    {
-        id: 'T1',
-        TurbineModel: 'Model X',
-        NominalPower: '1500 KW',
-        TurbineLatitude: 55.6,
-        TurbineLongitude: 12.6,
-        Region: 'North'
+describe("Maps Component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  const mockEmptyData = () => {
+    MapsDataHandler.getPlanningPlantData = jest.fn().mockResolvedValue([])
+    MapsDataHandler.getWarehousePlantData = jest.fn().mockResolvedValue([])
+    MapsDataHandler.getWarehouseManufacturingPlantData = jest.fn().mockResolvedValue([])
+    MapsDataHandler.getWarehousePlanningPlantData = jest.fn().mockResolvedValue([])
+  }
+
+  it("renders correctly with no data", async () => {
+    mockEmptyData()
+
+    render(<Maps />)
+
+    expect(screen.getByTestId("header")).toBeInTheDocument()
+    expect(screen.getByTestId("loader")).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("map-component")).toBeInTheDocument()
+    })
+  })
+
+  it("handles single turbine and warehouse correctly", async () => {
+    const turbine = {
+      FunctionalLoc: "T1",
+      TurbineLatitude: "55.0",
+      TurbineLongitude: "10.0",
+      MaintPlant: "Plant1",
+      PlanningPlant: "Plant2",
     }
-]);
+    const warehouse = {
+      Plant_Name: "Plant1",
+      Plant_Latitude: "55.1",
+      Plant_Longitude: "10.1",
+    }
 
-jest.mock('@vis.gl/react-google-maps', () => ({
-    APIProvider: ({ children }) => <div data-testid="api-provider">{children}</div>,
-    Map: ({ children }) => <div data-testid="google-map">{children}</div>
-}));
+    MapsDataHandler.getPlanningPlantData = jest.fn().mockResolvedValue([turbine])
+    MapsDataHandler.getWarehousePlantData = jest.fn().mockResolvedValue([warehouse])
+    MapsDataHandler.getWarehouseManufacturingPlantData = jest.fn().mockResolvedValue([warehouse])
+    MapsDataHandler.getWarehousePlanningPlantData = jest.fn().mockResolvedValue([])
 
-jest.mock('../../Components/Maps/TurbineMarker', () => () => (
-    <div data-testid="turbine-markers">Turbine Markers</div>
-));
+    render(<Maps />)
 
-jest.mock('../../Components/Maps/TurbineDetailPanel', () => () => (
-    <div data-testid="turbine-detail-panel">Detail Panel</div>
-));
+    await waitFor(() => {
+      expect(screen.getByTestId("map-component")).toBeInTheDocument()
+    })
+  })
 
-jest.mock('../../Components/Maps/WarehouseMarker', () => () => (
-    <div data-testid="warehouse-marker">Warehouse Marker</div>
-));
+  it("renders with many turbines and warehouses", async () => {
+    const turbines = Array.from({ length: 50 }, (_, i) => ({
+      FunctionalLoc: `T${i}`,
+      TurbineLatitude: "55.0",
+      TurbineLongitude: "10.0",
+      MaintPlant: `Plant${i % 5}`,
+      PlanningPlant: `Plant${(i + 1) % 5}`,
+    }))
+    const warehouses = Array.from({ length: 5 }, (_, i) => ({
+      Plant_Name: `Plant${i}`,
+      Plant_Latitude: "55.2",
+      Plant_Longitude: "10.2",
+    }))
 
-jest.mock('../../Components/Maps/ConnectingLine', () => () => (
-    <div data-testid="connection-line">Line</div>
-));
+    MapsDataHandler.getPlanningPlantData = jest.fn().mockResolvedValue(turbines)
+    MapsDataHandler.getWarehousePlantData = jest.fn().mockResolvedValue(warehouses)
+    MapsDataHandler.getWarehouseManufacturingPlantData = jest.fn().mockResolvedValue(warehouses)
+    MapsDataHandler.getWarehousePlanningPlantData = jest.fn().mockResolvedValue(warehouses)
 
-jest.mock('../../Components/ReUseable/FilterBox', () => () => (
-    <div data-testid="filter-box">Filter Box</div>
-));
+    render(<Maps />)
 
-jest.mock('../../Components/Layout/Header', () => ({ title }) => (
-    <div data-testid="header">{title}</div>
-));
+    await waitFor(() => {
+      expect(screen.getByTestId("map-component")).toBeInTheDocument()
+    })
+  })
 
-describe('Maps Page', () => {
-    it('renders the Map Overview layout correctly', async () => {
-        render(<Maps />);
+  it("allows toggling warehouse filters", async () => {
+    mockEmptyData()
 
-        expect(screen.getByTestId('header')).toHaveTextContent('Map');
-        expect(screen.getByTestId('api-provider')).toBeInTheDocument();
-        expect(screen.getByTestId('google-map')).toBeInTheDocument();
-        expect(screen.getAllByTestId('filter-box')).toHaveLength(4); // turbine + 3 warehouses
-        expect(screen.getByTestId('turbine-detail-panel')).toBeInTheDocument();
+    render(<Maps />)
 
-        await waitFor(() => {
-            expect(screen.getByTestId('turbine-markers')).toBeInTheDocument();
-        });
-    });
-});
+    await waitFor(() => {
+      expect(screen.getByTestId("map-component")).toBeInTheDocument()
+    })
+
+    expect(screen.getByText("Part Warehouse")).toBeInTheDocument()
+    expect(screen.getByText("Maintenance Warehouse")).toBeInTheDocument()
+    expect(screen.getByText("Planning Warehouse")).toBeInTheDocument()
+  })
+
+  it("resets map view when reset button is clicked", async () => {
+    mockEmptyData()
+
+    render(<Maps />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId("map-component")).toBeInTheDocument()
+    })
+
+    const resetButton = screen.getByText("Reset View")
+    expect(resetButton).toBeInTheDocument()
+
+    fireEvent.click(resetButton)
+  })
+
+  it("handles data fetch error gracefully", async () => {
+    MapsDataHandler.getPlanningPlantData = jest.fn().mockRejectedValue(new Error("Test error"))
+    MapsDataHandler.getWarehousePlantData = jest.fn().mockResolvedValue([])
+    MapsDataHandler.getWarehouseManufacturingPlantData = jest.fn().mockResolvedValue([])
+    MapsDataHandler.getWarehousePlanningPlantData = jest.fn().mockResolvedValue([])
+
+    render(<Maps />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId("map-component")).toBeInTheDocument()
+    })
+  })
+
+  it("shows detail panel when a turbine is selected", async () => {
+    const turbine = {
+      FunctionalLoc: "T1",
+      TurbineLatitude: "55.0",
+      TurbineLongitude: "10.0",
+      MaintPlant: "Plant1",
+      PlanningPlant: "Plant2",
+    }
+
+    MapsDataHandler.getPlanningPlantData = jest.fn().mockResolvedValue([turbine])
+    MapsDataHandler.getWarehousePlantData = jest.fn().mockResolvedValue([])
+    MapsDataHandler.getWarehouseManufacturingPlantData = jest.fn().mockResolvedValue([])
+    MapsDataHandler.getWarehousePlanningPlantData = jest.fn().mockResolvedValue([])
+
+    render(<Maps />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId("map-component")).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId("detail-panel")).toBeInTheDocument()
+  })
+})

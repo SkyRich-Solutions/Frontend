@@ -1,73 +1,107 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import WarehouseMarker from '../WarehouseMarker';
 import '@testing-library/jest-dom';
 
-// Mock AdvancedMarker and Warehouse icon
 jest.mock('@vis.gl/react-google-maps', () => ({
-  AdvancedMarker: ({ children, position, title }) => (
-    <div
-      data-testid="warehouse-marker"
-      data-lat={position.lat}
-      data-lng={position.lng}
-      title={title}
-    >
+  AdvancedMarker: ({ children, ...props }) => (
+    <div data-testid="advanced-marker" {...props}>
       {children}
     </div>
-  )
+  ),
 }));
 
-jest.mock('lucide-react', () => ({
-  Warehouse: () => <svg data-testid="warehouse-icon" />
-}));
-
-describe('WarehouseMarker Component', () => {
-  const validPlant = {
-    Plant_Name: 'Warehouse A',
-    Plant_Latitude: '56.12',
-    Plant_Longitude: '10.45'
+describe('WarehouseMarker - ZOMBIES', () => {
+  const mockPlantData = {
+    all: [
+      { Plant_Name: 'AllPlant', Plant_Latitude: '56.3', Plant_Longitude: '12.3' }
+    ],
+    maint: [
+      { Plant_Name: 'MaintPlant', Plant_Latitude: '56.4', Plant_Longitude: '12.4' }
+    ],
+    planning: [
+      { Plant_Name: 'PlanningPlant', Plant_Latitude: '56.5', Plant_Longitude: '12.5' }
+    ]
   };
 
-  const invalidPlant = {
-    Plant_Name: 'Broken Warehouse',
-    Plant_Latitude: 'NaN',
-    Plant_Longitude: ''
-  };
+  const mockOnPlantClick = jest.fn();
 
-  const plantData = {
-    all: [validPlant, invalidPlant],
-    maint: [validPlant],
-    planning: [validPlant]
-  };
-
-  it('renders markers only for valid coordinates with showAll', () => {
-    render(<WarehouseMarker plantData={plantData} filters={{ showAll: true }} />);
-    const markers = screen.getAllByTestId('warehouse-marker');
-    expect(markers.length).toBe(1);
-    expect(markers[0]).toHaveAttribute('data-lat', '56.12');
-    expect(markers[0]).toHaveAttribute('data-lng', '10.45');
-    expect(markers[0]).toHaveAttribute('title', 'Warehouse A');
+  // Z - Zero data state
+  test('Z - renders nothing when no filters are true', () => {
+    render(<WarehouseMarker filters={{}} plantData={{}} onPlantClick={mockOnPlantClick} />);
+    expect(screen.queryByTestId('advanced-marker')).not.toBeInTheDocument();
   });
 
-  it('renders markers for showMaint only', () => {
-    render(<WarehouseMarker plantData={plantData} filters={{ showMaint: true }} />);
-    const markers = screen.getAllByTestId('warehouse-marker');
-    expect(markers.length).toBe(1);
+  // O - One marker rendering
+  test('O - renders one marker when one filter is true', () => {
+    render(<WarehouseMarker filters={{ showAll: true }} plantData={mockPlantData} onPlantClick={mockOnPlantClick} />);
+    expect(screen.getByTestId('advanced-marker')).toBeInTheDocument();
   });
 
-  it('renders markers for showPlanning only', () => {
-    render(<WarehouseMarker plantData={plantData} filters={{ showPlanning: true }} />);
-    const markers = screen.getAllByTestId('warehouse-marker');
-    expect(markers.length).toBe(1);
+  // M - Multiple markers rendered
+  test('M - renders multiple markers when multiple filters are true', () => {
+    render(
+      <WarehouseMarker
+        filters={{ showAll: true, showMaint: true, showPlanning: true }}
+        plantData={mockPlantData}
+        onPlantClick={mockOnPlantClick}
+      />
+    );
+    const markers = screen.getAllByTestId('advanced-marker');
+    expect(markers).toHaveLength(3);
   });
 
-  it('renders no markers if all filters are false', () => {
-    render(<WarehouseMarker plantData={plantData} filters={{ showAll: false, showMaint: false, showPlanning: false }} />);
-    expect(screen.queryByTestId('warehouse-marker')).not.toBeInTheDocument();
+  // B - Boundary lat/lng validation
+  test('B - ignores invalid lat/lng values', () => {
+    const invalidData = {
+      all: [{ Plant_Name: 'InvalidPlant', Plant_Latitude: 'NaN', Plant_Longitude: 'NaN' }]
+    };
+    render(
+      <WarehouseMarker
+        filters={{ showAll: true }}
+        plantData={invalidData}
+        onPlantClick={mockOnPlantClick}
+      />
+    );
+    expect(screen.queryByTestId('advanced-marker')).not.toBeInTheDocument();
   });
 
-  it('renders nothing when plantData is empty', () => {
-    render(<WarehouseMarker plantData={{}} filters={{ showAll: true }} />);
-    expect(screen.queryByTestId('warehouse-marker')).not.toBeInTheDocument();
+  // I - Interaction with marker
+  test('I - clicking a marker calls onPlantClick', () => {
+    render(
+      <WarehouseMarker
+        filters={{ showAll: true }}
+        plantData={mockPlantData}
+        onPlantClick={mockOnPlantClick}
+      />
+    );
+    const marker = screen.getByTestId('advanced-marker');
+    fireEvent.click(marker);
+    expect(mockOnPlantClick).toHaveBeenCalledWith(mockPlantData.all[0]);
+  });
+
+  // E - Edge case with empty plantData lists
+  test('E - renders nothing when plantData categories are empty', () => {
+    render(
+      <WarehouseMarker
+        filters={{ showAll: true, showMaint: true, showPlanning: true }}
+        plantData={{ all: [], maint: [], planning: [] }}
+        onPlantClick={mockOnPlantClick}
+      />
+    );
+    expect(screen.queryByTestId('advanced-marker')).not.toBeInTheDocument();
+  });
+
+  // S - Styling check
+  test('S - includes correct Warehouse icon', () => {
+    render(
+      <WarehouseMarker
+        filters={{ showAll: true }}
+        plantData={mockPlantData}
+        onPlantClick={mockOnPlantClick}
+      />
+    );
+    const icon = screen.getByTestId('advanced-marker').querySelector('svg');
+    expect(icon).toBeInTheDocument();
   });
 });

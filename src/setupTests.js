@@ -1,7 +1,7 @@
 global.TextEncoder = require('util').TextEncoder;
-import '@testing-library/jest-dom';
+require('@testing-library/jest-dom');
+require('jest-canvas-mock');
 
-// src/setupTests.js
 
 class IntersectionObserver {
   constructor(callback, options) {
@@ -17,4 +17,9 @@ class IntersectionObserver {
   disconnect() {}
 }
 
+global.ResizeObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
 global.IntersectionObserver = IntersectionObserver;

@@ -3,6 +3,7 @@ import Header from "../Components/Layout/Header"
 import CategoryClassificationComponent from "../Components/CategoryClassificationComponent"
 import Loader from "../Components/ReUseable/Loader"
 import Fuse from "fuse.js"
+import React from "react"
 
 import CategoryClassificationsDataHandler from "../Utils/CategoryClassificationsDataHandler"
 const { getProcessedCategoryData } = CategoryClassificationsDataHandler()

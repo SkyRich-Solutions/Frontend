@@ -3,6 +3,7 @@ import TurbineMarkers from "./TurbineMarker"
 import WarehouseMarker from "./WarehouseMarker"
 import ConnectionLine from "./ConnectingLine"
 import { Compass, ZoomIn, ZoomOut } from "lucide-react"
+import React from "react"
 
 // Custom map controls as a separate component to access map context
 const MapControls = ({ onResetView }) => {

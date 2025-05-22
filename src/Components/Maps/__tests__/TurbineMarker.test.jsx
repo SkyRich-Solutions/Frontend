@@ -3,68 +3,88 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import TurbineMarkers from '../TurbineMarker';
 import '@testing-library/jest-dom';
 
-// Mock the Google Maps components
 jest.mock('@vis.gl/react-google-maps', () => ({
   AdvancedMarker: ({ children, ...props }) => (
-    <div
-      data-testid="advanced-marker"
-      title={props.title}
-      onClick={props.onClick}
-      data-lat={props.position.lat}
-      data-lng={props.position.lng}
-    >
+    <div data-testid="advanced-marker" {...props}>
       {children}
     </div>
   ),
 }));
 
-describe('TurbineMarkers component', () => {
-  const mockTurbine = {
-    FunctionalLoc: 'TURB-123',
-    TurbineLatitude: 56.789,
-    TurbineLongitude: 9.876,
-  };
+describe('TurbineMarkers - ZOMBIES', () => {
+  const mockTurbines = [
+    {
+      FunctionalLoc: 'TURB-001',
+      TurbineLatitude: 56.1,
+      TurbineLongitude: 12.1,
+    },
+    {
+      FunctionalLoc: 'TURB-002',
+      TurbineLatitude: 56.2,
+      TurbineLongitude: 12.2,
+    },
+  ];
 
   const mockSetSelectedTurbine = jest.fn();
 
-  it('renders markers from allData when showAll is true', () => {
+  // Z - Zero data state
+  test('Z - renders nothing when showAll is false', () => {
     render(
-      <TurbineMarkers
-        filters={{ showAll: true }}
-        allData={[mockTurbine]}
-        setSelectedTurbine={mockSetSelectedTurbine}
-      />
+      <TurbineMarkers filters={{ showAll: false }} allData={mockTurbines} setSelectedTurbine={mockSetSelectedTurbine} />
     );
-
-    const marker = screen.getByTestId('advanced-marker');
-    expect(marker).toBeInTheDocument();
-
-    // Check that image is rendered
-    expect(screen.getByRole('img', { name: /turbine/i })).toBeInTheDocument();
-  });
-
-  it('does not render anything when showAll is false', () => {
-    render(
-      <TurbineMarkers
-        filters={{ showAll: false }}
-        allData={[mockTurbine]}
-        setSelectedTurbine={mockSetSelectedTurbine}
-      />
-    );
-
     expect(screen.queryByTestId('advanced-marker')).not.toBeInTheDocument();
   });
 
-  it('calls setSelectedTurbine on marker click', () => {
+  // O - One marker rendering
+  test('O - renders a marker for one turbine', () => {
     render(
-      <TurbineMarkers
-        filters={{ showAll: true }}
-        allData={[mockTurbine]}
-        setSelectedTurbine={mockSetSelectedTurbine}
-      />
+      <TurbineMarkers filters={{ showAll: true }} allData={[mockTurbines[0]]} setSelectedTurbine={mockSetSelectedTurbine} />
     );
+    expect(screen.getByTestId('advanced-marker')).toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByTestId('advanced-marker'));
-    expect(mockSetSelectedTurbine).toHaveBeenCalledWith(mockTurbine);
+  // M - Multiple markers rendered
+  test('M - renders multiple turbine markers when showAll is true', () => {
+    render(
+      <TurbineMarkers filters={{ showAll: true }} allData={mockTurbines} setSelectedTurbine={mockSetSelectedTurbine} />
+    );
+    const markers = screen.getAllByTestId('advanced-marker');
+    expect(markers).toHaveLength(2);
+  });
+
+  // B - Boundary position values
+  test('B - uses correct lat/lng from turbine data', () => {
+    render(
+      <TurbineMarkers filters={{ showAll: true }} allData={[mockTurbines[0]]} setSelectedTurbine={mockSetSelectedTurbine} />
+    );
+    const marker = screen.getByTestId('advanced-marker');
+    expect(marker).toHaveAttribute('title', 'TURB-001');
+  });
+
+  // I - Interaction with turbine marker
+  test('I - clicking a marker calls setSelectedTurbine', () => {
+    render(
+      <TurbineMarkers filters={{ showAll: true }} allData={[mockTurbines[0]]} setSelectedTurbine={mockSetSelectedTurbine} />
+    );
+    const marker = screen.getByTestId('advanced-marker');
+    fireEvent.click(marker);
+    expect(mockSetSelectedTurbine).toHaveBeenCalledWith(mockTurbines[0]);
+  });
+
+  // E - Edge case with empty allData
+  test('E - renders nothing when allData is empty', () => {
+    render(
+      <TurbineMarkers filters={{ showAll: true }} allData={[]} setSelectedTurbine={mockSetSelectedTurbine} />
+    );
+    expect(screen.queryByTestId('advanced-marker')).not.toBeInTheDocument();
+  });
+
+  // S - Styling/image inclusion
+  test('S - renders turbine icon image inside marker', () => {
+    render(
+      <TurbineMarkers filters={{ showAll: true }} allData={[mockTurbines[0]]} setSelectedTurbine={mockSetSelectedTurbine} />
+    );
+    const image = screen.getByAltText('Turbine');
+    expect(image).toHaveAttribute('src', '/icons/turbine.png');
   });
 });

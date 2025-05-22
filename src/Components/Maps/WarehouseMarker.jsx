@@ -3,6 +3,7 @@
 import { AdvancedMarker } from "@vis.gl/react-google-maps"
 import { Warehouse } from "lucide-react"
 import { useState } from "react"
+import React from "react"
 
 const isValidLatLng = (lat, lng) => !isNaN(lat) && !isNaN(lng) && typeof lat === "number" && typeof lng === "number"
 
