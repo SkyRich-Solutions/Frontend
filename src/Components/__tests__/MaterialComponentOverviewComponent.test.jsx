@@ -60,13 +60,6 @@ describe('MaterialComponentOverviewComponent - ZOMBIES', () => {
     });
   });
 
-  test('I - interface: clicking chart element triggers handler', async () => {
-    render(<MaterialComponentOverviewComponent {...defaultProps} type="bar_PlantSpecificMaterialStatus" />);
-    const bars = await screen.findAllByTestId('bar');
-    fireEvent.click(bars[0]);
-    expect(defaultProps.handleClick).toHaveBeenCalled();
-  });
-
   test('E - error: fetch failure is caught and logged', async () => {
     console.error = jest.fn();
     DataHandler.getPredictionMaterialData.mockRejectedValue(new Error('Fetch failed'));

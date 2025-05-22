@@ -1,115 +1,85 @@
-// src/Components/__tests__/TurbineComponentHealthScoresComponent.test.jsx
+// src/Components/__tests__/MaterialComponentPredictionsComponent.test.jsx
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import TurbineComponentHealthScoresComponent from '../TurbineComponentHealthScores';
-import * as DataHandler from '../../Utils/TurbineDashboardDataHandler';
+import MaterialComponentPredictionsComponent from '../MaterialComponentPredictionsComponent';
+import * as DataHandler from '../../Utils/MaterialDashboardDataHandler';
 
-// Recharts mock from __mocks__/recharts.js will be used
-jest.mock('recharts');
-jest.mock('../../Utils/TurbineDashboardDataHandler');
+jest.mock('../../Utils/MaterialDashboardDataHandler');
 
 const defaultProps = {
   selectedItem: null,
-  onItemClick: jest.fn(),
-  searchQuery: ''
+  searchQuery: '',
+  onItemClick: jest.fn()
 };
 
-describe('TurbineComponentHealthScoresComponent - ZOMBIES', () => {
+const mockReplacementData = [
+  { Material_Description: 'M1', BayesianProbability: 0.7 },
+  { Material_Description: 'M2', BayesianProbability: 0.3 }
+];
+
+describe('MaterialComponentPredictionsComponent - ZOMBIES (bar_ReplacementPrediction)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    DataHandler.getReplacementPredictions.mockResolvedValue(mockReplacementData);
+    DataHandler.getReplacementPredictionGlobal.mockResolvedValue([]);
+    DataHandler.getMaterialStatusTransitions.mockResolvedValue([]);
+    DataHandler.getMonteCarloDominance.mockResolvedValue([]);
+    DataHandler.getMaterialPredictions.mockResolvedValue([]);
+  });
+
+  test('Z - renders fallback with no data', async () => {
+    DataHandler.getReplacementPredictions.mockResolvedValue([]);
+    render(<MaterialComponentPredictionsComponent {...defaultProps} type="bar_ReplacementPrediction" />);
+    await waitFor(() => {
+      expect(screen.getByTestId('BarChart')).toBeInTheDocument();
+    });
   });
 
   test('O - renders bar chart with one data item', async () => {
-    DataHandler.getTurbineModelHealthScores.mockResolvedValue([
-      { Turbine_Model: 'Model A', Score: 85 }
-    ]);
-
-    render(
-      <TurbineComponentHealthScoresComponent
-        {...defaultProps}
-        type="bar_TurbineModelHealthScores"
-      />
-    );
-
+    DataHandler.getReplacementPredictions.mockResolvedValue([mockReplacementData[0]]);
+    render(<MaterialComponentPredictionsComponent {...defaultProps} type="bar_ReplacementPrediction" />);
     await waitFor(() => {
       expect(screen.getByTestId('BarChart')).toBeInTheDocument();
     });
   });
 
   test('M - renders bar chart with multiple items', async () => {
-    const mockItems = Array.from({ length: 5 }, (_, i) => ({
-      Turbine_Model: `Model ${i}`,
-      Score: Math.floor(Math.random() * 100)
-    }));
-    DataHandler.getTurbineModelHealthScores.mockResolvedValue(mockItems);
-
-    render(
-      <TurbineComponentHealthScoresComponent
-        {...defaultProps}
-        type="bar_TurbineModelHealthScores"
-      />
-    );
-
+    render(<MaterialComponentPredictionsComponent {...defaultProps} type="bar_ReplacementPrediction" />);
     await waitFor(() => {
       expect(screen.getByTestId('BarChart')).toBeInTheDocument();
     });
   });
 
-  test('B - boundary: renders only top 10 bars for bar_TurbineModelHealthScores', async () => {
-    const mockItems = Array.from({ length: 20 }, (_, i) => ({
-      Turbine_Model: `Model ${i}`,
-      Score: Math.floor(Math.random() * 100)
+  test('B - boundary: renders max 10 bars only', async () => {
+    const largeMock = Array.from({ length: 20 }, (_, i) => ({
+      Material_Description: `Material ${i}`,
+      BayesianProbability: Math.random()
     }));
-    DataHandler.getTurbineModelHealthScores.mockResolvedValue(mockItems);
+    DataHandler.getReplacementPredictions.mockResolvedValue(largeMock);
 
-    render(
-      <TurbineComponentHealthScoresComponent
-        {...defaultProps}
-        type="bar_TurbineModelHealthScores"
-      />
-    );
-
+    render(<MaterialComponentPredictionsComponent {...defaultProps} type="bar_ReplacementPrediction" />);
     await waitFor(() => {
       const bars = screen.getAllByTestId('bar');
       expect(bars.length).toBeLessThanOrEqual(10);
     });
   });
 
-  test('E - error: handles fetch failure gracefully', async () => {
+  test('E - error: handles fetch error gracefully', async () => {
     console.error = jest.fn();
-    DataHandler.getTurbineModelHealthScores.mockRejectedValue(new Error('Network Error'));
+    DataHandler.getReplacementPredictions.mockRejectedValue(new Error('Fetch failed'));
 
-    render(
-      <TurbineComponentHealthScoresComponent
-        {...defaultProps}
-        type="bar_TurbineModelHealthScores"
-      />
-    );
-
+    render(<MaterialComponentPredictionsComponent {...defaultProps} type="bar_ReplacementPrediction" />);
     await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith('Error fetching turbine data:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error fetching material data:', expect.any(Error));
     });
   });
 
-  test('S - style: shows tooltip with correct chart explanation', async () => {
-    DataHandler.getTurbineModelHealthScores.mockResolvedValue([
-      { Turbine_Model: 'Model A', Score: 85 }
-    ]);
-
-    render(
-      <TurbineComponentHealthScoresComponent
-        {...defaultProps}
-        type="bar_TurbineModelHealthScores"
-      />
-    );
-
+  test('S - style: shows info tooltip text', async () => {
+    render(<MaterialComponentPredictionsComponent {...defaultProps} type="bar_ReplacementPrediction" />);
     const infoIcon = await screen.findByText('ℹ️');
     fireEvent.mouseOver(infoIcon);
-
     await waitFor(() => {
-      expect(
-        screen.getByText(/health scores of different turbine models/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/top 10 materials most likely to be replaced/i)).toBeInTheDocument();
     });
   });
 });
