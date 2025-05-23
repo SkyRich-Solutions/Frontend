@@ -39,7 +39,7 @@ jobs:
       - name: Collect generated artifacts
         run: |
           mkdir -p artifacts
-          cp test-report.html artifacts/test-report.html
+          find . -name "test-report.html" -exec cp {} artifacts/test-report.html \;
           cp -r coverage/lcov-report artifacts/htmlcov
           cp Test/ReportDashboard/index.html artifacts/index.html
 
