@@ -21,12 +21,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run linting
-        run: |
-          npm install eslint
-          npx eslint . || true
-
-      - name: Run tests and generate HTML coverage report
+      - name: Run tests and generate coverage report
         run: |
           npm install --save-dev jest jest-html-reporter
           mkdir -p test_results coverage artifacts
@@ -37,11 +32,7 @@ jobs:
       - name: Inject last updated timestamp into dashboard
         run: |
           TIMESTAMP=$(TZ="Europe/Copenhagen" date +"%Y-%m-%d %H:%M CET")
-          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" public/Test/ReportDashboard/index.html || true
-
-      - name: Collect artifacts
-        run: |
-          cp public/Test/ReportDashboard/index.html artifacts/index.html || true
+          echo "<html><body><h1>Last updated: $TIMESTAMP</h1></body></html>" > artifacts/index.html
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
