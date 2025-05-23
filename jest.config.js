@@ -11,14 +11,20 @@ module.exports = {
   ],
   moduleFileExtensions: ['js', 'jsx', 'json', 'node'],
 
+
   collectCoverage: true,
+
   collectCoverageFrom: [
     'src/**/*.{js,jsx}',
-    '!src/**/*.test.{js,jsx}',     // exclude test files
-    '!**/node_modules/**',         // exclude node_modules
-    '!src/reportWebVitals.js',     // exclude CRA boilerplate
-    '!src/setupTests.js'           // exclude test setup
+    '!src/**/*.test.{js,jsx}',     
+    '!src/**/__tests__/**',         
+    '!**/node_modules/**',
+    '!src/reportWebVitals.js',
+    '!src/setupTests.js',
   ],
+
+  testMatch: ['**/?(*.)+(test).[jt]s?(x)'],
+
   coverageDirectory: 'coverage',
   coverageReporters: ['html', 'text', 'lcov']
 };
