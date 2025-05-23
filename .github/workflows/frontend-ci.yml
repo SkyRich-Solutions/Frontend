@@ -3,10 +3,7 @@ name: Frontend CI Pipeline
 on:
   push:
     branches:
-      # - Development
-      # - Feature
-      # - test-branch
-       - testingBranch
+      - testingBranch
 
 jobs:
   build:
@@ -60,3 +57,23 @@ jobs:
         with:
           name: frontend-artifacts
           path: artifacts/*
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download frontend artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-artifacts
+          path: public
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
