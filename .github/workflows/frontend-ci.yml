@@ -21,23 +21,28 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests and generate coverage report
+      - name: Run tests with HTML report and coverage
         run: |
           npm install --save-dev jest jest-html-reporter
-          mkdir -p test_results coverage artifacts
+          mkdir -p test_results htmlcov artifacts
           npx jest --coverage --outputFile=test_results/junit_report.json --json
-          cp test_results/junit_report.json artifacts/
-          cp coverage/lcov-report/index.html artifacts/test-report.html
-          cp -r coverage/lcov-report artifacts/htmlcov
+          cp coverage/lcov-report/index.html htmlcov/test-report.html
+          cp -r coverage/lcov-report htmlcov
 
-      - name: Copy custom dashboard index.html
+      - name: Inject last updated timestamp into dashboard
+        run: |
+          TIMESTAMP=$(TZ="Europe/Copenhagen" date +"%Y-%m-%d %H:%M CET")
+          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" Test/ReportDashboard/index.html
+
+      - name: Collect generated artifacts
         run: |
           mkdir -p artifacts
-          TIMESTAMP=$(TZ="Europe/Copenhagen" date +"%Y-%m-%d %H:%M CET")
+          cp test_results/junit_report.json artifacts/
+          cp htmlcov/test-report.html artifacts/test-report.html
+          cp -r htmlcov artifacts/htmlcov
           cp Test/ReportDashboard/index.html artifacts/index.html
-          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" artifacts/index.html
 
-      - name: Upload artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: frontend-artifacts
