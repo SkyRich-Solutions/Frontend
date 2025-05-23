@@ -41,11 +41,11 @@ jobs:
       - name: Inject last updated timestamp into dashboard
         run: |
           TIMESTAMP=$(TZ="Europe/Copenhagen" date +"%Y-%m-%d %H:%M CET")
-          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" Frontend/Test/ReportDashboard/index.html
+          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" Test/ReportDashboard/index.html
 
       - name: Copy dashboard to artifact folder
         run: |
-          cp Frontend/Test/ReportDashboard/index.html artifacts/index.html
+          cp Test/ReportDashboard/index.html artifacts/index.html
           # Flatten test-report to root so GitHub Pages shows it at /Frontend/test-report.html
           cp artifacts/test-report/test-report.html artifacts/test-report.html
 
