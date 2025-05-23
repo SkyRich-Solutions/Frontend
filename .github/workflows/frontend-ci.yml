@@ -16,47 +16,35 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests with HTML report
+      - name: Run linting
         run: |
-          npm install jest-html-reporter
-          mkdir -p test-report
-          npx jest --ci --reporters=default --reporters=jest-html-reporter
-        env:
-          JEST_HTML_REPORTER_OUTPUT_PATH: ./test-report/test-report.html
+          npm install eslint
+          npx eslint . || true
 
-      - name: Generate code coverage
+      - name: Run tests and generate HTML coverage report
         run: |
-          npx jest --coverage --coverageReporters=html
-          mkdir -p htmlcov
-          cp -r coverage/lcov-report/* htmlcov/ || echo "No htmlcov folder"
+          npm install --save-dev jest jest-html-reporter
+          mkdir -p test_results coverage artifacts
+          npx jest --coverage --outputFile=test_results/junit_report.json --json
+          cp coverage/lcov-report/index.html artifacts/test-report.html
+          cp -r coverage/lcov-report artifacts/htmlcov
 
       - name: Inject last updated timestamp into dashboard
         run: |
           TIMESTAMP=$(TZ="Europe/Copenhagen" date +"%Y-%m-%d %H:%M CET")
-          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" Test/ReportDashboard/index.html
+          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" public/Test/ReportDashboard/index.html || true
 
-      - name: Collect generated artifacts
+      - name: Collect artifacts
         run: |
-          mkdir -p artifacts
-          mv test-report artifacts/
-          mv htmlcov artifacts/
-          cp Test/ReportDashboard/index.html artifacts/index.html
+          cp public/Test/ReportDashboard/index.html artifacts/index.html || true
 
-      - name: Upload frontend test artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-artifacts
           path: artifacts/*
@@ -70,7 +58,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download frontend artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: frontend-artifacts
           path: public
