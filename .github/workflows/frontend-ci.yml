@@ -26,13 +26,16 @@ jobs:
           npm install --save-dev jest jest-html-reporter
           mkdir -p test_results coverage artifacts
           npx jest --coverage --outputFile=test_results/junit_report.json --json
+          cp test_results/junit_report.json artifacts/
           cp coverage/lcov-report/index.html artifacts/test-report.html
           cp -r coverage/lcov-report artifacts/htmlcov
 
-      - name: Inject last updated timestamp into dashboard
+      - name: Copy custom dashboard index.html
         run: |
+          mkdir -p artifacts
           TIMESTAMP=$(TZ="Europe/Copenhagen" date +"%Y-%m-%d %H:%M CET")
-          echo "<html><body><h1>Last updated: $TIMESTAMP</h1></body></html>" > artifacts/index.html
+          cp Frontend/Test/ReportDashboard/index.html artifacts/index.html
+          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" artifacts/index.html
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
