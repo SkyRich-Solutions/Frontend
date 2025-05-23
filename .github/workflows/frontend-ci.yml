@@ -39,7 +39,7 @@ jobs:
       - name: Collect generated artifacts
         run: |
           mkdir -p artifacts
-          cp jest-html-reporters-*.html artifacts/test-report.html
+          cp test-report.html artifacts/test-report.html
           cp -r coverage/lcov-report artifacts/htmlcov
           cp Test/ReportDashboard/index.html artifacts/index.html
 
