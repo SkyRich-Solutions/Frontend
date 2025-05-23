@@ -16,11 +16,11 @@ module.exports = {
 
   collectCoverageFrom: [
     'src/**/*.{js,jsx}',
-    '!src/**/*.test.{js,jsx}',     
-    '!src/**/__tests__/**',         
+    '!**/__tests__/**',
+    '!**/*.test.{js,jsx}',
     '!**/node_modules/**',
     '!src/reportWebVitals.js',
-    '!src/setupTests.js',
+    '!src/setupTests.js'
   ],
 
   testMatch: ['**/?(*.)+(test).[jt]s?(x)'],
