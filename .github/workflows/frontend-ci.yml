@@ -51,8 +51,8 @@ jobs:
       - name: Collect generated artifacts
         run: |
           mkdir -p artifacts
-          mv test-report artifacts/
-          mv htmlcov artifacts/
+          mv htmlcov/test-report.html artifacts/test-report.html
+          mv -f htmlcov artifacts/htmlcov || echo "No htmlcov folder"
           cp Test/ReportDashboard/index.html artifacts/index.html
 
       - name: Upload frontend test artifacts
