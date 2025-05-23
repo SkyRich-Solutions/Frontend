@@ -1,49 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>SkyRich Solutions – Frontend QA Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 2rem; }
-        h1 { color: #1a202c; }
-        .card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        a.button {
-            display: inline-block;
-            padding: 0.7rem 1.5rem;
-            background-color: #2563eb;
-            color: white;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        a.button:hover {
-            background-color: #1e40af;
-        }
-    </style>
-</head>
-<body>
-    <h1>SkyRich Solutions – Frontend QA Dashboard</h1>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
+        <meta
+            name="description"
+            content="Web site created using create-react-app"
+        />
+        <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+        <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
 
-    <div class="card">
-        <h2>✅ Jest Unit Tests</h2>
-        <p>Explore the outcome of all React unit tests including pass/fail summaries and runtime durations.</p>
-        <a href="./test-report.html" class="button" target="_blank">View Unit Test Report</a>
-    </div>
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+        <title>React App</title>
+    </head>
+    <body>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="root"></div>
+        <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
 
-    <div class="card">
-        <h2>📊 Code Coverage</h2>
-        <p>Visualize which parts of your frontend codebase are covered by tests.</p>
-        <a href="./htmlcov/index.html" class="button" target="_blank">View Coverage Dashboard</a>
-    </div>
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
 
-    <p style="text-align: center; color: #555; margin-top: 2rem;">
-        ⏱️ Last updated: <span id="timestamp">2025-05-23 11:21 CET</span>
-    </p>
-</body>
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    --></body>
 </html>
