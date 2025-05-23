@@ -26,7 +26,7 @@ jobs:
       - name: Install test reporters
         run: npm install --save-dev jest jest-html-reporters
 
-      - name: Run tests with HTML report and coverage
+      - name: Run tests with styled test report and coverage
         run: |
           mkdir -p test_results htmlcov artifacts
           npx jest --coverage --reporters=default --reporters=jest-html-reporters
@@ -39,7 +39,7 @@ jobs:
       - name: Collect generated artifacts
         run: |
           mkdir -p artifacts
-          find . -name "test-report.html" -exec cp {} artifacts/test-report.html \;
+          cp test-report.html artifacts/test-report.html
           cp -r coverage/lcov-report artifacts/htmlcov
           cp Test/ReportDashboard/index.html artifacts/index.html
 
