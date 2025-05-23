@@ -35,9 +35,13 @@ jobs:
 
       - name: Generate code coverage
         run: |
-          npx jest --coverage --coverageReporters=html
-          mkdir -p artifacts/htmlcov
-          cp -r coverage/lcov-report/* artifacts/htmlcov
+          npx jest
+          if [ -d "coverage/lcov-report" ]; then
+            mkdir -p artifacts/htmlcov
+            cp -r coverage/lcov-report/* artifacts/htmlcov
+          else
+            echo "⚠️ No coverage report generated."
+          fi
 
       - name: Inject last updated timestamp into dashboard
         run: |

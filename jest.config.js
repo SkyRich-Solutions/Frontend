@@ -11,5 +11,14 @@ module.exports = {
   ],
   moduleFileExtensions: ['js', 'jsx', 'json', 'node'],
 
-
+  collectCoverage: true,
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx}',
+    '!src/**/*.test.{js,jsx}',     // exclude test files
+    '!**/node_modules/**',         // exclude node_modules
+    '!src/reportWebVitals.js',     // exclude CRA boilerplate
+    '!src/setupTests.js'           // exclude test setup
+  ],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['html', 'text', 'lcov']
 };
