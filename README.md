@@ -12,6 +12,6 @@ This repository contains the frontend interface for SkyRich Solutions, providing
 
 We run continuous integration workflows to ensure UI quality and maintain test coverage. You can view the latest test and coverage reports below:
 
-📂 [**Test Dashboard**]((https://skyrich-solutions.github.io/Frontend/)
+📂 [**Test Dashboard**](https://skyrich-solutions.github.io/Frontend/)
 
 See which components passed, failed, or were skipped — along with full code coverage breakdown and update timestamp.
