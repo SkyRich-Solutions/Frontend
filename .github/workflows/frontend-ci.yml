@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -21,13 +23,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install test reporters
+        run: npm install --save-dev jest jest-html-reporters
+
       - name: Run tests with HTML report and coverage
         run: |
-          npm install --save-dev jest jest-html-reporter
           mkdir -p test_results htmlcov artifacts
-          npx jest --coverage --outputFile=test_results/junit_report.json --json
-          cp coverage/lcov-report/index.html htmlcov/test-report.html
-          cp -r coverage/lcov-report htmlcov
+          npx jest --coverage --reporters=default --reporters=jest-html-reporters
 
       - name: Inject last updated timestamp into dashboard
         run: |
@@ -37,9 +39,8 @@ jobs:
       - name: Collect generated artifacts
         run: |
           mkdir -p artifacts
-          cp test_results/junit_report.json artifacts/
-          cp htmlcov/test-report.html artifacts/test-report.html
-          cp -r htmlcov artifacts/htmlcov
+          cp jest-html-reporters-*.html artifacts/test-report.html
+          cp -r coverage/lcov-report artifacts/htmlcov
           cp Test/ReportDashboard/index.html artifacts/index.html
 
       - name: Upload build artifacts
