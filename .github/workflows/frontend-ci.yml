@@ -23,35 +23,31 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install test reporters
-        run: npm install --save-dev jest jest-html-reporters
+      - name: Install test reporter
+        run: npm install --save-dev jest jest-html-reporter
 
-      - name: Run tests with styled test report and coverage
+      - name: Run tests with HTML report
         run: |
-          mkdir -p test_results htmlcov artifacts
-          npx jest --coverage --reporters=default --reporters=jest-html-reporters
+          mkdir -p artifacts/test-report
+          npx jest --ci --reporters=default --reporters=jest-html-reporter
+        env:
+          JEST_HTML_REPORTER_OUTPUT_PATH: ./artifacts/test-report/test-report.html
+
+      - name: Generate code coverage
+        run: |
+          npx jest --coverage --coverageReporters=html
+          mv coverage/lcov-report artifacts/htmlcov || echo "No htmlcov folder"
 
       - name: Inject last updated timestamp into dashboard
         run: |
           TIMESTAMP=$(TZ="Europe/Copenhagen" date +"%Y-%m-%d %H:%M CET")
-          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" Test/ReportDashboard/index.html
+          sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" Frontend/Test/ReportDashboard/index.html
 
-      - name: Collect generated artifacts
+      - name: Copy dashboard to artifact folder
         run: |
-          mkdir -p artifacts
-          
-          # Safely locate test-report.html if not in root
-          REPORT_FILE=$(find . -name "test-report.html" | head -n 1)
-          if [ -z "$REPORT_FILE" ]; then
-            echo "❌ test-report.html not found"
-            exit 1
-          fi
-          cp "$REPORT_FILE" artifacts/test-report.html
-
-          # Coverage and dashboard
-          cp -r coverage/lcov-report artifacts/htmlcov
           cp Frontend/Test/ReportDashboard/index.html artifacts/index.html
-
+          # Flatten test-report to root so GitHub Pages shows it at /Frontend/test-report.html
+          cp artifacts/test-report/test-report.html artifacts/test-report.html
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
