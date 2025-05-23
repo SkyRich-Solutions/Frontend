@@ -6,7 +6,7 @@ on:
       - testingBranch
 
 jobs:
-  build:
+  frontend:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,24 +32,27 @@ jobs:
       - name: Run tests with HTML report
         run: |
           npm install jest-html-reporter
-          mkdir -p artifacts/test-report
+          mkdir -p test-report
           npx jest --ci --reporters=default --reporters=jest-html-reporter
         env:
-          JEST_HTML_REPORTER_OUTPUT_PATH: ./artifacts/test-report/test-report.html
+          JEST_HTML_REPORTER_OUTPUT_PATH: ./test-report/test-report.html
 
       - name: Generate code coverage
         run: |
           npx jest --coverage --coverageReporters=html
-          mv coverage/lcov-report artifacts/htmlcov || echo "No htmlcov folder"
+          mkdir -p htmlcov
+          mv coverage/lcov-report/* htmlcov/ || echo "No htmlcov folder"
 
       - name: Inject last updated timestamp into dashboard
         run: |
           TIMESTAMP=$(TZ="Europe/Copenhagen" date +"%Y-%m-%d %H:%M CET")
           sed -i "s|{{LAST_UPDATED}}|$TIMESTAMP|" Test/ReportDashboard/index.html
 
-      - name: Copy dashboard to artifact folder
+      - name: Collect generated artifacts
         run: |
           mkdir -p artifacts
+          mv test-report artifacts/
+          mv htmlcov artifacts/
           cp Test/ReportDashboard/index.html artifacts/index.html
 
       - name: Upload frontend test artifacts
@@ -59,7 +62,7 @@ jobs:
           path: artifacts/*
 
   deploy:
-    needs: build
+    needs: frontend
     runs-on: ubuntu-latest
 
     steps:
