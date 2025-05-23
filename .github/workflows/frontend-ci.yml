@@ -39,9 +39,19 @@ jobs:
       - name: Collect generated artifacts
         run: |
           mkdir -p artifacts
-          cp test-report.html artifacts/test-report.html
+          
+          # Safely locate test-report.html if not in root
+          REPORT_FILE=$(find . -name "test-report.html" | head -n 1)
+          if [ -z "$REPORT_FILE" ]; then
+            echo "❌ test-report.html not found"
+            exit 1
+          fi
+          cp "$REPORT_FILE" artifacts/test-report.html
+
+          # Coverage and dashboard
           cp -r coverage/lcov-report artifacts/htmlcov
-          cp Test/ReportDashboard/index.html artifacts/index.html
+          cp Frontend/Test/ReportDashboard/index.html artifacts/index.html
+
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
