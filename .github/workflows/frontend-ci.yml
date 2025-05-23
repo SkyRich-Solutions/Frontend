@@ -41,7 +41,7 @@ jobs:
         run: |
           npx jest --coverage --coverageReporters=html
           mkdir -p htmlcov
-          mv coverage/lcov-report/* htmlcov/ || echo "No htmlcov folder"
+          cp -r coverage/lcov-report/* htmlcov/ || echo "No htmlcov folder"
 
       - name: Inject last updated timestamp into dashboard
         run: |
@@ -51,8 +51,8 @@ jobs:
       - name: Collect generated artifacts
         run: |
           mkdir -p artifacts
-          mv htmlcov/test-report.html artifacts/test-report.html
-          mv -f htmlcov artifacts/htmlcov || echo "No htmlcov folder"
+          mv test-report artifacts/
+          mv htmlcov artifacts/
           cp Test/ReportDashboard/index.html artifacts/index.html
 
       - name: Upload frontend test artifacts
